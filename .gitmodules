@@ -1,0 +1,3 @@
+[submodule "university-goGame"]
+	path = university-goGame
+	url = git@github.com:nedap/university-goGame.git
