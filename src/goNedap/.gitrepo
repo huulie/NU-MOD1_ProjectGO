@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:nedap/university-goGame.git
+	branch = master
+	commit = 2a3642a47d7f47a58b0478ccf76a83039ae9dde4
+	parent = 03b37665dba5a6599c80569afb0704cbe3644cf4
+	method = merge
+	cmdver = 0.4.1
