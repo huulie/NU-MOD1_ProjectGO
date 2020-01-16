@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = git@github.com:nedap/nu5_module1_protocolmessages.git
+	branch = master
+	commit = 959bbbf26dd269e996f92dacc97baee2329172dc
+	parent = 6503a5bbeed5d9184842a39c475666acea05f45a
+	method = merge
+	cmdver = 0.4.1
