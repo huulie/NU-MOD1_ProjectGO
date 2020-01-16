@@ -1,6 +1,0 @@
-[submodule "university-goGame"]
-	path = university-goGame
-	url = git@github.com:nedap/university-goGame.git
-[submodule "nu5_module1_protocolmessages"]
-	path = nu5_module1_protocolmessages
-	url = git@github.com:nedap/nu5_module1_protocolmessages.git
