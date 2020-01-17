@@ -1,5 +1,7 @@
 package goGame;
 
+import goUI.GoTUI;
+
 //import goProtocol.ProtocolMessages;
 
 
@@ -14,6 +16,7 @@ public abstract class Player {
 
     private String name;
     private Stone color;
+    private GoTUI TUI;
     
 
     // -- Constructors -----------------------------------------------
@@ -65,6 +68,13 @@ public abstract class Player {
     public void makeMove(Board board) {
         int choice = determineMove(board);
         board.setField(choice, this.getColor());
+    }
+    
+    /**
+     * Displays message on user interface
+     */
+    public void displayMessage(String message) {
+            this.TUI.showMessage(message);
     }
 
 }
