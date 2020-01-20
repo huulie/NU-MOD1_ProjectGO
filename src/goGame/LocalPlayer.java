@@ -53,7 +53,7 @@ public class LocalPlayer extends Player {
         checkPrevious.setField(move, this.getColor());
         boolean validPrevious = board.checkSamePreviousState(checkPrevious.returnIntersectionArray());
         
-        boolean valid = validPlacement && validPrevious; 
+        boolean valid = validPlacement; // && validPrevious; //TODO: reanable previious 
       
         while (!valid) {
             TUI.showMessage("ERROR: field " + move + " is no valid move.");

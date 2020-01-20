@@ -442,7 +442,13 @@ public class Board {
 		return boardClone;
 	}
 
-	public class Coordinate2D {
+	/** All board indices are eventually converted into 2D coordinates
+	 * (note: these are not limited to the board)
+	 * 
+	 * @author huub.lievestro
+	 *
+	 */
+	public class Coordinate2D { 
 		private int row;
 		private int col;
 
@@ -478,6 +484,75 @@ public class Board {
 	 */
 	public Stone[][] returnIntersectionArray() {
 		return intersections;
+	}
+
+	
+	/**
+	 * Returns the index of the intersection above the given intersection, or -1 if outside board
+	 * @requires index to refer to a valid intersection
+	 * @returns index of the intersection above the given intersection
+	 * @param index intersection to start from
+	 */
+	public int above(int index) { // TODO: static, cannot because need to know dimensions
+		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
+		
+		int indexAbove = this.indexLinear(currentIntersection.getRow()-1, currentIntersection.getRow());
+		
+		if(!this.isField(indexAbove)) {
+			return -1; // to indicate outside board
+		}
+		return indexAbove ;
+	}
+	
+	/**
+	 * Returns the index of the intersection below the given intersection, or -1 if outside board
+	 * @requires index to refer to a valid intersection
+	 * @returns index of the intersection below the given intersection
+	 * @param index intersection to start from
+	 */
+	public int below(int index) { // TODO: static, cannot because need to know dimensions
+		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
+		
+		int indexBelow = this.indexLinear(currentIntersection.getRow()+1, currentIntersection.getRow());
+		
+		if(!this.isField(indexBelow)) {
+			return -1; // to indicate outside board
+		}
+		return indexBelow ;
+	}
+	
+	/**
+	 * Returns the index of the intersection left the given intersection, or -1 if outside board
+	 * @requires index to refer to a valid intersection
+	 * @returns index of the intersection left the given intersection
+	 * @param index intersection to start from
+	 */
+	public int left(int index) { // TODO: static, cannot because need to know dimensions
+		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
+		
+		int indexLeft = this.indexLinear(currentIntersection.getRow(), currentIntersection.getRow()-1);
+		
+		if(!this.isField(indexLeft)) {
+			return -1; // to indicate outside board
+		}
+		return indexLeft ;
+	}
+	
+	/**
+	 * Returns the index of the intersection right of the given intersection, or -1 if outside board
+	 * @requires index to refer to a valid intersection
+	 * @returns index of the intersection right of the given intersection
+	 * @param index intersection to start from
+	 */
+	public int right(int index) { // TODO: static, cannot because need to know dimensions
+		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
+		
+		int indexRight = this.indexLinear(currentIntersection.getRow(), currentIntersection.getRow()+1);
+		
+		if(!this.isField(indexRight)) {
+			return -1; // to indicate outside board
+		}
+		return indexRight ;
 	}
 	
 }

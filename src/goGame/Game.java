@@ -1,5 +1,11 @@
 package goGame;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 //import ss.utils.TextIO; // TODO: rewrite
 
 /**
@@ -64,7 +70,7 @@ public class Game {
 	 * Returns the current player
 	 * 
 	 */
-	Player getCurrentPlayer() { // TDO: now visibilty is package
+	Player getCurrentPlayer() { // TODO: now visibilty is package
 		return players[currentTotalTurn % NUMBER_PLAYERS];
 	}
 	
@@ -72,17 +78,28 @@ public class Game {
 	 * Resturns the next player
 	 * 
 	 */
-	Player moveToNextPlayer() { // TDO: now visibilty is package
+	void moveToNextPlayer() { // TODO: now visibilty is package, void instaed of Player
 		currentTotalTurn++;
-		return players[currentTotalTurn % NUMBER_PLAYERS];
+		//return players[currentTotalTurn % NUMBER_PLAYERS];
 	}
 
 	/**
 	 * Prints the game situation.
 	 */
-	void update() { // TODO visibility now package, check or get/setters
+	void print() { // TODO visibility now package, check or get/setters
 		System.out.println("\n Current game situation: \n\n" + board.toString()
 		+ "\n");
+	}
+	
+	/**
+	 * Applies the following GO rule(s) to the board:
+	 * - A stone or solidly connected group of stones of one color is captured and removed 
+	 *   from the board when all the intersections directly adjacent to it are occupied by the enemy. 
+	 *   (Capture of the enemy takes precedence over self-capture.)
+	 */
+	void update() { // TODO visibility now package, check or get/setters
+	CaptureChecker.doOpponentCaptures(board, this.getCurrentPlayer());
+	// logic moved to capture checker, because splitting to smaller methods and use its own isntance variables
 	}
 
 	/**

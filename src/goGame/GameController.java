@@ -32,7 +32,6 @@ public class GameController {
 	 */
 	private int current;
 	
-	
 	/**
 	 * @param boardDim
 	 * @param player1
@@ -96,16 +95,20 @@ public class GameController {
 //			this.update();
 			
 			this.game.getCurrentPlayer().makeMove(this.game.board);
-			this.game.moveToNextPlayer();
+			
 
-			playerCounter++;
-			this.game.update();
+			this.game.update(); // TODO: pattern render view something
+			this.game.print();
+			
+			this.game.moveToNextPlayer();
+			playerCounter++; // TDO: what does playerCounter do? 
+			
 		} 
 
 		//this.printResult();
 	}
 	
-	private static Player createNewPlayer(String inputName, Stone inputColor) {
+	private static Player createNewPlayer(String inputName, Stone inputColor, int boardDim) {
 		Player newPlayer;
 		
 		if (inputName.contains("-N")) {
@@ -113,7 +116,7 @@ public class GameController {
 		} else if (inputName.contains("-S")) {
 			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
 		} else {
-			newPlayer = new LocalPlayer(inputName, inputColor);
+			newPlayer = new LocalPlayer(inputName, inputColor, boardDim);
 		}
 		return newPlayer;
 	}
