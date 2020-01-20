@@ -468,4 +468,16 @@ public class Board {
 		}
 
 	}
+	
+	/**
+	 * Sets the content of the intersection represented by the 2D coordinate to the stone s.
+	 * @requires 2D coordinate be a valid intersection
+	 * @ensures 2D coordinate to be set to Stone s
+	 * @param coordinate the intersection's 2D coordinate
+	 * @param color of the stone to be placed
+	 */
+	public Stone[][] returnIntersectionArray() {
+		return intersections;
+	}
+	
 }

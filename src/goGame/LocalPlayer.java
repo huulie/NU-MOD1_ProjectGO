@@ -47,7 +47,13 @@ public class LocalPlayer extends Player {
  
     	int move = TUI.getInt(question);
         
-        boolean valid = board.isField(move) && board.isEmptyField(move);
+        boolean validPlacement = board.isField(move) && board.isEmptyField(move);
+        
+        Board checkPrevious = board.deepCopy();
+        checkPrevious.setField(move, this.getColor());
+        boolean validPrevious = board.checkSamePreviousState(checkPrevious.returnIntersectionArray());
+        
+        boolean valid = validPlacement && validPrevious; 
       
         while (!valid) {
             TUI.showMessage("ERROR: field " + move + " is no valid move.");
