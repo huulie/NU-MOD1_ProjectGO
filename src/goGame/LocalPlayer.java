@@ -54,9 +54,23 @@ public class LocalPlayer extends Player {
             move = TUI.getInt(question);
             valid = board.isField(move) && board.isEmptyField(move);
             
-        }
+        }        
         return move;
     }
+    
+    
+    /**
+     * Makes a move on the board. <br>
+     * @requires board is not null and not full
+     * @param board the current board
+     */
+    @Override
+    public void makeMove(Board board) {
+        int choice = determineMove(board);
+        board.setField(choice, this.getColor());
+		GUI.addStone(board.index(choice).getCol(), board.index(choice).getRow(), (this.getColor().equals(Stone.WHITE))); // TODO: think about location
+    }
+    
     
     /**
      * Displays message on local user interface

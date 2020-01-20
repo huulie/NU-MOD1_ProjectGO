@@ -44,7 +44,7 @@ public class LocalGame {
 		boolean continueGame = true;
 		while (continueGame) {
 		showMessage("\n -- Let the game begin! -- \n"); 
-		(new GameController(19, player1, player2)).start();
+		(new GameController(boardDim, player1, player2)).start();
 		// localGame = new GameController(19, player1, player2);
 		// localGame.start();
 		continueGame = getBoolean("\n> Play another time? (y/n)?");
