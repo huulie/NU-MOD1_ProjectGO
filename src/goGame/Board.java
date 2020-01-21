@@ -554,5 +554,9 @@ public class Board {
 		}
 		return indexRight ;
 	}
+
+	public int getDim() {
+		return this.DIM;
+	}
 	
 }

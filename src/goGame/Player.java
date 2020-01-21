@@ -77,4 +77,6 @@ public abstract class Player {
             this.TUI.showMessage(message);
     }
 
+	public abstract void updateGUI(Board board); // TODO: keep or adjust this?
+
 }

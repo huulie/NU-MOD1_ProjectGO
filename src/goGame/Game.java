@@ -37,6 +37,11 @@ public class Game {
 	 * @invariant the index is always between 0 and NUMBER_PLAYERS
 	 */
 	private int currentTotalTurn;
+	
+	/**
+	 * Capture checker TODO extend
+	 */
+	private CaptureChecker captureChecker;
 
 	// -- Constructors -----------------------------------------------
 
@@ -98,7 +103,7 @@ public class Game {
 	 *   (Capture of the enemy takes precedence over self-capture.)
 	 */
 	void update() { // TODO visibility now package, check or get/setters
-	CaptureChecker.doOpponentCaptures(board, this.getCurrentPlayer());
+	captureChecker.doOpponentCaptures(this.board, this.getCurrentPlayer().getColor());
 	// logic moved to capture checker, because splitting to smaller methods and use its own isntance variables
 	}
 
@@ -116,4 +121,9 @@ public class Game {
 //			System.out.println("Draw. There is no winner!");
 //		}
 	}
+
+	public Board getBoard() {
+		return board;
+	}
+
 }

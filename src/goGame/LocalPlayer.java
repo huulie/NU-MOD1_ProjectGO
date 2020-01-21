@@ -2,6 +2,8 @@ package goGame;
 
 import com.nedap.go.gui.GoGuiIntegrator;
 
+import goUI.GoGuiUpdater;
+
 // import ss.utils.TextIO;
 
 /**
@@ -13,6 +15,7 @@ public class LocalPlayer extends Player {
 
 	private GoLocalTUI TUI;
 	private GoGuiIntegrator GUI;
+	private GoGuiUpdater GUIupdater;
 	
     // -- Constructors -----------------------------------------------
 
@@ -26,9 +29,12 @@ public class LocalPlayer extends Player {
     public LocalPlayer(String name, Stone color, int boardDim) {
         super(name, color);
         this.TUI = new GoLocalTUI(this);
+        
         this.GUI = new GoGuiIntegrator(true, true, boardDim);
         this.GUI.startGUI();
         this.GUI.setBoardSize(boardDim);
+        this.GUIupdater = new GoGuiUpdater(this.GUI);
+//        this.GUIupdater.updateWholeBoard(board);
     }
 
     // -- Commands ---------------------------------------------------
@@ -74,7 +80,17 @@ public class LocalPlayer extends Player {
     public void makeMove(Board board) {
         int choice = determineMove(board);
         board.setField(choice, this.getColor());
-		GUI.addStone(board.index(choice).getCol(), board.index(choice).getRow(), (this.getColor().equals(Stone.WHITE))); // TODO: think about location
+        //this.GUIupdater.updateWholeBoard(board);
+		//GUI.addStone(board.index(choice).getCol(), board.index(choice).getRow(), (this.getColor().equals(Stone.WHITE))); // TODO: think about location
+    }
+    
+    /**
+     * Displays updated board in GUI
+     */
+    // TODO: decide how and where to do this
+    @Override
+    public void updateGUI(Board board) {
+    	this.GUIupdater.updateWholeBoard(board);
     }
     
     

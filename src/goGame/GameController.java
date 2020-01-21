@@ -95,9 +95,8 @@ public class GameController {
 //			this.update();
 			
 			this.game.getCurrentPlayer().makeMove(this.game.board);
-			
-
 			this.game.update(); // TODO: pattern render view something
+			this.game.getCurrentPlayer().updateGUI(this.game.board);
 			this.game.print();
 			
 			this.game.moveToNextPlayer();
