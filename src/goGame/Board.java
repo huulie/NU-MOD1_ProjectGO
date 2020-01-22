@@ -350,6 +350,30 @@ public class Board {
 		}
 		return s;
 	}
+	
+	/**
+	 * Returns a formatted String representation of this board. I
+	 * in addition to the current situation, the String also shows the numbering of the intersections. TODO implement?
+	 *
+	 * @return the game situation as String
+	 */
+	public String toStringFormatted() {
+		String s = "";
+		for (int i = 0; i < DIM; i++) {
+			String row = "";
+			for (int j = 0; j < DIM; j++) {
+				row = row + " " + getField(i, j).toString() ;
+//				if (j < DIM - 1) {
+//					row = row + " |";
+//				}
+			}
+			s = s + row + "\n";
+//			if (i < DIM - 1) {
+//				s = s + "\n" + LINE + DELIM + NUMBERING[i * 2 + 1] + "\n";
+//			}
+		}
+		return s;
+	}
 
 	/**
 	 * Empties all intersections of this board (i.e., let them refer to the value
@@ -496,7 +520,7 @@ public class Board {
 	public int above(int index) { // TODO: static, cannot because need to know dimensions
 		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
 		
-		int indexAbove = this.indexLinear(currentIntersection.getRow()-1, currentIntersection.getRow());
+		int indexAbove = this.indexLinear(currentIntersection.getRow()-1, currentIntersection.getCol());
 		
 		if(!this.isField(indexAbove)) {
 			return -1; // to indicate outside board
@@ -513,7 +537,7 @@ public class Board {
 	public int below(int index) { // TODO: static, cannot because need to know dimensions
 		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
 		
-		int indexBelow = this.indexLinear(currentIntersection.getRow()+1, currentIntersection.getRow());
+		int indexBelow = this.indexLinear(currentIntersection.getRow()+1, currentIntersection.getCol());
 		
 		if(!this.isField(indexBelow)) {
 			return -1; // to indicate outside board
@@ -530,7 +554,7 @@ public class Board {
 	public int left(int index) { // TODO: static, cannot because need to know dimensions
 		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
 		
-		int indexLeft = this.indexLinear(currentIntersection.getRow(), currentIntersection.getRow()-1);
+		int indexLeft = this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol()-1);
 		
 		if(!this.isField(indexLeft)) {
 			return -1; // to indicate outside board
@@ -547,7 +571,7 @@ public class Board {
 	public int right(int index) { // TODO: static, cannot because need to know dimensions
 		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
 		
-		int indexRight = this.indexLinear(currentIntersection.getRow(), currentIntersection.getRow()+1);
+		int indexRight = this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol()+1);
 		
 		if(!this.isField(indexRight)) {
 			return -1; // to indicate outside board
