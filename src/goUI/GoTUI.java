@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import goUI.GoTUICommands;
 
 import exceptions.ExitProgram;
+import goGame.GoGameConstants;
 
 /** General TUI (view) for the GO game.
  *
@@ -206,6 +207,39 @@ public class GoTUI  { // implements Runnable  ?
 			}
 		}
         return answerBool;
+	}
+	
+	/**
+	 * Prints the question and asks the user to input an Move (int, with -1 for PASS).
+	 * 
+	 * @param question the question shown to the user, asking for input
+	 * @return The written Integer, or -1 if PASS.
+	 */
+	public int getMove(String question) {
+		String answer = null;
+		int answerInt = 0;
+		Boolean answerValid = false;
+
+		while (!answerValid) {
+			this.showMessage(question); 
+			try {
+				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+				answer = in.readLine();
+
+				answerInt = Integer.parseInt(answer);
+				answerValid = true;
+			} catch (NumberFormatException eFormat) {
+				if (answer.contentEquals(String.valueOf(GoTUICommands.PASS))) {
+					return GoGameConstants.PASSint;
+				} else {
+					this.showMessage("ERROR> " + answer +  " is not an integer nor a PASS (" 
+							+ eFormat.getLocalizedMessage() + ") try again!");
+				}
+			} catch (IOException e) {
+				this.showMessage("IO Exception occurred");
+			}
+		}
+        return answerInt;
 	}
 
 	/**

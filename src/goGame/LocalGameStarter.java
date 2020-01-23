@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
 //import java.io.IOException;
 //import java.io.InputStreamReader;
 
-public class LocalGame {
+public class LocalGameStarter {
 	
 	GameController localGame;
 
@@ -41,9 +41,9 @@ public class LocalGame {
 		
 		int boardDim = 5;
 		
-		Player player1 = new LocalPlayer(name1, Stone.BLACK, boardDim); // TODO change to gamecontroller
-		Player player2 = new LocalPlayer(name2, Stone.WHITE, boardDim); // TODO change to gamecontroller
-		
+		LocalPlayer player1 = new LocalPlayer(name1, Stone.BLACK, boardDim, true); // TODO change to gamecontroller
+		LocalPlayer player2 = new LocalPlayer(name2, Stone.WHITE, boardDim, false); // TODO change to gamecontroller
+
 		boolean continueGame = true;
 		while (continueGame) {
 		showMessage("\n -- Let the game begin! -- \n"); 

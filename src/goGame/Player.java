@@ -1,5 +1,6 @@
 package goGame;
 
+import exceptions.InvalidFieldException;
 import goUI.GoTUI;
 
 //import goProtocol.ProtocolMessages;
@@ -52,7 +53,7 @@ public abstract class Player {
     /**
      * Determines the field for the next move.
      * @requires board is not null and not full
-     * @ensures the returned in is a valid field index and that field is empty
+     * @ensures the returned in is a valid field index and that field is empty, or -1 to pass
      * @param board the current game board
      * @return the player's choice
      */
@@ -65,9 +66,19 @@ public abstract class Player {
      * @requires board is not null and not full
      * @param board the current board
      */
-    public void makeMove(Board board) {
+    public char makeMove(Board board) {
         int choice = determineMove(board);
-        board.setField(choice, this.getColor());
+        
+        if (choice == GoGameConstants.PASSint) {
+        	return GoGameConstants.PASS;
+        } else {
+        	try {
+        		board.setField(choice, this.getColor());
+        		return GoGameConstants.VALID;
+        	} catch (InvalidFieldException e) {
+        		return GoGameConstants.INVALID;
+        	}
+        }
     }
     
     /**
@@ -77,6 +88,15 @@ public abstract class Player {
             this.TUI.showMessage(message);
     }
 
-	public abstract void updateGUI(Board board); // TODO: keep or adjust this?
+    /**
+     * TODO per default no GUI
+     */
+    public boolean hasGUI() {
+		return false;
+	}
+    
+    public abstract void updateGUI(Board board); // TODO: keep or adjust this?
+
+	
 
 }

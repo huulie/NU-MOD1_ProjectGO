@@ -3,13 +3,15 @@ package goGame;
 import java.util.ArrayList;
 import java.util.List;
 
+import exceptions.InvalidFieldException;
+
 /**
  * Board for the GO game. 
  *
  * @author Huub Lievestro
  */
 public class Board {
-	public int DIM = 0;
+	private int DIM = 0;
 //	private static final String[] NUMBERING = {" 0 | 1 | 2 ", "---+---+---",
 //			" 3 | 4 | 5 ", "---+---+---", " 6 | 7 | 8 "};
 //	private static final String LINE = "--------+--------+--------"; //NUMBERING[1]; for layout
@@ -29,14 +31,16 @@ public class Board {
 	 * List index is in chronological order, with highest being latest state
 	 */
 	private List<Stone[][]> previousStates = new ArrayList<Stone[][]>(); 
+	// TODO: save whole boards or only hashes?!
 
 	// -- Constructors -----------------------------------------------
 
 	/**
 	 * Creates an empty board.
+	 * @throws InvalidFieldException 
 	 * @ensures all intersections are UNOCCUPIED
 	 */
-	public Board(int dimension) {
+	public Board(int dimension) throws InvalidFieldException {
 		DIM = dimension;
 		intersections = new Stone[DIM][DIM];
 		this.reset(); // to set all intersection to empty (instead of default null), also (re)sets previous states
@@ -55,12 +59,19 @@ public class Board {
 	 * Calculates the index in the linear array of intersections from a (row, col) pair.
 	 * @requires row to be between 0 and DIM
 	 * @requires col to be between 0 and DIM
-	 * @return the index belonging to the (row,col)-intersection
+	 * @return the index belonging to the (row,col)-intersection, or -1 if 2D is outside board
 	 */
 	public int indexLinear(int row, int col) {
 //		assert (row >= 0 && row < DIM) : "Row should be between zero and DIM";
 //		assert (col >= 0 && col < DIM) : "Col should be between zero and DIM";
 		// SHOULD RETURN FALSE AT .ISFIELD(), INSTEAD OF BREAKING PROGRAM
+		// TODO However: 2D coordinates are not limited to the board! (negative also possible)
+		// what TODO with assertions? 
+
+ 
+		if( !(row >= 0 && row < DIM) || !(col >= 0 && col < DIM) ) {
+			return -1;
+		}
 
 		return (row) * DIM + col;
 	}
@@ -68,11 +79,16 @@ public class Board {
 	/**
 	 * Calculates the 2D coordinate in the 2D matrix of intersections from a linear index pair.
 	 * @requires linear index to be between 0 and DIM*DIM
-	 * @return the corresponding (row,col) index
+	 * @return the corresponding (row,col) index, or null if outside board
 	 */
 	public Coordinate2D index(int i) {
 //		assert (i >= 0 && i < DIM * DIM) : "Index should be between zero and DIM*DIM";
 		// SHOULD RETURN FALSE AT .ISFIELD(), INSTEAD OF BREAKING PROGRAM
+		// TODO However: 2D coordinates are not limited to the board! (negative also possible)
+
+		if( !(i >= 0) && !(i < DIM * DIM)) {
+			return null;
+		}
 
 		Coordinate2D index = new Coordinate2D(i / DIM, i % DIM);
 		return index;
@@ -85,10 +101,11 @@ public class Board {
 	 * @return the corresponding (row,col) index
 	 */
 	public Coordinate2D index(int row, int col) {
-//		assert (row >= 0 && row < DIM) : "Row should be between zero and DIM";
-//		assert (col >= 0 && col < DIM) : "Col should be between zero and DIM";,		
+		assert (row >= 0 && row < DIM) : "Row should be between zero and DIM";
+		assert (col >= 0 && col < DIM) : "Col should be between zero and DIM";		
 		// SHOULD RETURN FALSE AT .ISFIELD(), INSTEAD OF BREAKING PROGRAM
-
+		// TODO However: 2D coordinates are not limited to the board! (negative also possible)
+		// what TODO with assertions? 
 
 		Coordinate2D index = new Coordinate2D(row, col);
 		return index;
@@ -378,9 +395,10 @@ public class Board {
 	/**
 	 * Empties all intersections of this board (i.e., let them refer to the value
 	 * Stone.UNOCCUPIED).
+	 * @throws InvalidFieldException 
 	 * @ensures all intersections are EMPTY
 	 */
-	public void reset() {
+	public void reset() throws InvalidFieldException {
 		//implement, see exercise P-4.6
 		for (int emptyRow = 0; emptyRow < DIM; emptyRow++) {
 			for (int emptyColumn = 0; emptyColumn < DIM; emptyColumn++) {
@@ -399,8 +417,9 @@ public class Board {
 	 * @ensures intersection i to be set to Stone s
 	 * @param i the intersection number (see NUMBERING)
 	 * @param color of the stone to be placed
+	 * @throws InvalidFieldException 
 	 */
-	public void setField(int i, Stone color) {
+	public void setField(int i, Stone color) throws InvalidFieldException {
 		this.setField(this.index(i),color);
 		return;
 	}
@@ -412,8 +431,9 @@ public class Board {
 	 * @param row the intersection's row
 	 * @param col the intersection's column
 	 * @param color of the stone to be placed
+	 * @throws InvalidFieldException 
 	 */
-	public void setField(int row, int col, Stone color) {
+	public void setField(int row, int col, Stone color) throws InvalidFieldException {
 		this.setField(this.index(row,col),color);
 		return;
 	}
@@ -424,13 +444,20 @@ public class Board {
 	 * @ensures 2D coordinate to be set to Stone s
 	 * @param coordinate the intersection's 2D coordinate
 	 * @param color of the stone to be placed
+	 * @throws InvalidFieldException  when trying to set invalid field (outside board)
 	 */
-	public void setField(Coordinate2D coordinate, Stone color) {
-		assert (this.isField(coordinate)) : "non-valid coordinate!";
+	public char setField(Coordinate2D coordinate, Stone color) throws InvalidFieldException {
+//		assert (this.isField(coordinate)) : "non-valid coordinate!"; TODO assert now exceptionS
+		
+		if (this.isField(coordinate)) {
 		
 		this.intersections[coordinate.getRow()][coordinate.getCol()] = color ; // TODO: check this stone object
 		this.previousStates.add(intersections);
-		return;
+		return GoGameConstants.VALID ;
+		}
+		else {
+			throw new InvalidFieldException(coordinate.toString() + " is not a valid field on this board!");
+		}
 		
 	}
 	
@@ -457,7 +484,13 @@ public class Board {
 
 	@Override
 	public Board clone() {
-		Board boardClone = new Board(this.DIM);
+		Board boardClone = null;
+		try {
+			boardClone = new Board(this.DIM);
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		for (int indexRow = 0; indexRow < DIM; indexRow++) {
 			for (int indexColumn = 0; indexColumn < DIM; indexColumn++) {
 				boardClone.intersections[indexRow][indexColumn] = this.intersections[indexRow][indexColumn];
@@ -467,7 +500,7 @@ public class Board {
 	}
 
 	/** All board indices are eventually converted into 2D coordinates
-	 * (note: these are not limited to the board)
+	 * (note: these are not limited to the board! (negative also possible))
 	 * 
 	 * @author huub.lievestro
 	 *
@@ -522,6 +555,7 @@ public class Board {
 		
 		int indexAbove = this.indexLinear(currentIntersection.getRow()-1, currentIntersection.getCol());
 		
+	//	if( (currentIntersection.getRow()-1)<0 || !this.isField(indexAbove)) { TODO: already here check if row in bounds? 
 		if(!this.isField(indexAbove)) {
 			return -1; // to indicate outside board
 		}
@@ -555,7 +589,7 @@ public class Board {
 		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
 		
 		int indexLeft = this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol()-1);
-		
+		int col = currentIntersection.getCol()-1;
 		if(!this.isField(indexLeft)) {
 			return -1; // to indicate outside board
 		}

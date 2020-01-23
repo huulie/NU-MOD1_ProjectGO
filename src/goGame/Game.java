@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import exceptions.InvalidFieldException;
+
 //import ss.utils.TextIO; // TODO: rewrite
 
 /**
@@ -42,6 +44,8 @@ public class Game {
 	 * Capture checker TODO extend
 	 */
 	private CaptureChecker captureChecker;
+	
+	// TODO add GUI TO GAME, FOR SERVER TO VISUALIZE OR LOCAL TO SEE TWO PLAYERS
 
 	// -- Constructors -----------------------------------------------
 
@@ -53,7 +57,14 @@ public class Game {
 	 * @param s1 the second player
 	 */
 	public Game(int boardDim, Player s0, Player s1) {
-		board = new Board(boardDim);
+		try {
+			board = new Board(boardDim);
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR something went wrong when making a new board");
+			e.printStackTrace();
+		}
+		captureChecker  = new CaptureChecker(false);
 		players = new Player[NUMBER_PLAYERS];
 		players[0] = s0;
 		players[1] = s1;
@@ -68,7 +79,13 @@ public class Game {
 	 */
 	void reset() { // TDO: now visibilty is package
 		currentTotalTurn = 0;
-		board.reset();
+		try {
+			board.reset();
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			System.out.println("ERROR something went wrong when resetting the board");
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -92,7 +109,7 @@ public class Game {
 	 * Prints the game situation.
 	 */
 	void print() { // TODO visibility now package, check or get/setters
-		System.out.println("\n Current game situation: \n\n" + board.toString()
+		System.out.println("\n [GAME] Current game situation: \n\n" + board.toStringFormatted()
 		+ "\n");
 	}
 	
@@ -104,9 +121,33 @@ public class Game {
 	 */
 	void update() { // TODO visibility now package, check or get/setters
 	captureChecker.doOpponentCaptures(this.board, this.getCurrentPlayer().getColor());
+	captureChecker.doOwnCaptures(this.board, this.getCurrentPlayer().getColor());
 	// logic moved to capture checker, because splitting to smaller methods and use its own isntance variables
 	}
 
+	/**
+	 * @TODO add JavaDoc
+	 * @param color
+	 * @return
+	 */
+	public int getScore(Stone color) {
+		
+		int numberOfStones = 0;
+		int enclosedEmtpyIntersections = 0; // TODO: how?
+		
+		int boardDim = this.board.getDim();
+		
+		for (int iRow = 0; iRow < boardDim; iRow++) {
+			for (int iCol = 0; iCol < boardDim; iCol++) {
+				if (this.board.getField(iRow, iCol) == color) {
+					numberOfStones++;
+				}
+			}
+		}
+		
+		return numberOfStones + enclosedEmtpyIntersections;
+	}
+	
 	/**
 	 * Prints the result of the last game. <br>
 	 * @requires the game to be over

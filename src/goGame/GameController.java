@@ -70,7 +70,7 @@ public class GameController {
 	private void play() {
 		
 		boolean gameOver = false; // TODO implement
-		
+		boolean firstPassed = false;
 
 		//Game currentGame = new Game(19, player1, player2); // TODO fixed harcoded game settings
 
@@ -94,30 +94,51 @@ public class GameController {
 //			playerCounter++;
 //			this.update();
 			
-			this.game.getCurrentPlayer().makeMove(this.game.board);
-			this.game.update(); // TODO: pattern render view something
-			this.game.getCurrentPlayer().updateGUI(this.game.board);
-			this.game.print();
+			char currentMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard());
 			
-			this.game.moveToNextPlayer();
-			playerCounter++; // TDO: what does playerCounter do? 
+			if (currentMove == GoGameConstants.PASS) {
+				if(firstPassed) {
+					gameOver = true; // TODO properly end game
+				} else {
+				firstPassed = true;
+				}
+			} else if (currentMove == GoGameConstants.INVALID) {
+				System.out.println(" INVALID"); // TODO end game as loser
+				gameOver = true;
+			} else {
+				this.game.update(); // TODO: pattern render view something
+				
+				if (this.game.getCurrentPlayer().hasGUI()) {
+				this.game.getCurrentPlayer().updateGUI(this.game.getBoard());
+				}
+				
+				this.game.print(); // TODO is printing for game, not for players!
+//				if (outputBoardToTUI) {
+//		        	TUI.showMessage(board.toString());
+//		        }
+				firstPassed = false;
+				this.game.moveToNextPlayer();
+				playerCounter++; // TDO: what does playerCounter do? 
+			}
 			
+
 		} 
 
 		//this.printResult();
 	}
 	
-	private static Player createNewPlayer(String inputName, Stone inputColor, int boardDim) {
-		Player newPlayer;
-		
-		if (inputName.contains("-N")) {
-			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
-		} else if (inputName.contains("-S")) {
-			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
-		} else {
-			newPlayer = new LocalPlayer(inputName, inputColor, boardDim);
-		}
-		return newPlayer;
-	}
+	// TODO: do something with this?
+//	private static Player createNewPlayer(String inputName, Stone inputColor, int boardDim) {
+//		Player newPlayer;
+//		
+//		if (inputName.contains("-N")) {
+//			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
+//		} else if (inputName.contains("-S")) {
+//			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
+//		} else {
+//			newPlayer = new LocalPlayer(inputName, inputColor, boardDim, false);
+//		}
+//		return newPlayer;
+//	}
 
 }
