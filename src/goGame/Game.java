@@ -43,7 +43,7 @@ public class Game {
 	/**
 	 * Capture checker TODO extend
 	 */
-	private CaptureChecker captureChecker;
+	private BoardTools boardTools;
 	
 	// TODO add GUI TO GAME, FOR SERVER TO VISUALIZE OR LOCAL TO SEE TWO PLAYERS
 
@@ -72,7 +72,7 @@ public class Game {
 			System.out.println("ERROR something went wrong when making a new board");
 			e.printStackTrace();
 		}
-		captureChecker  = new CaptureChecker(false);
+		boardTools  = new BoardTools(false);
 		players = new Player[NUMBER_PLAYERS];
 		players[0] = s0;
 		players[1] = s1;

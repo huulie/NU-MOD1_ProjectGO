@@ -16,8 +16,7 @@ import exceptions.InvalidFieldException;
  *
  */
 
-public class CaptureChecker { // TODO: board helper? board utilities? board service?
-
+public class BoardTools { 
 // TODO: all static >> CANNOT BE STATIC CLASS AND HAVE INSTANCE VARIABLES
 	
 	private static final char ABOVE = 'a';
@@ -55,7 +54,7 @@ public class CaptureChecker { // TODO: board helper? board utilities? board serv
 	/**
 	 * @param printDebug
 	 */
-	public CaptureChecker(boolean printDebug) {
+	public BoardTools(boolean printDebug) {
 		this.printDebug = printDebug;
 	}
 

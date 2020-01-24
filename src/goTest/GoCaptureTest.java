@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import exceptions.InvalidFieldException;
 import goGame.Board;
-import goGame.CaptureChecker;
+import goGame.BoardTools;
 import goGame.Game;
 import goGame.GameController;
 import goGame.LocalPlayer;
@@ -37,7 +37,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureSingleWhiteSurroundedWithBlack() {
 			try {
-			CaptureChecker captureChecker = new CaptureChecker(true);
+			BoardTools boardTools = new BoardTools(true);
 			int boardDim = 3;
 			int centerIndex = 4;
 			// U B U	0 1 2
@@ -71,7 +71,7 @@ public class GoCaptureTest {
 					 )); // note minus one to convert to index, crossed out in first index
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning BLACK
+			boardTools.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning BLACK
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(testBoard.above(centerIndex))
 					+ BLACK
@@ -90,7 +90,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureThreeWhiteSurroundedWithBlack() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 			// U B B U	 0  1  2  3
 			// B W W B 	 4  5  6  7
@@ -128,7 +128,7 @@ public class GoCaptureTest {
 			
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(
 					UNOCCUPIED + BLACK + BLACK + UNOCCUPIED
@@ -149,7 +149,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureThreeWhiteEdgeSurroundedWithBlack() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 			// W W B U	 0  1  2  3
 			// W B U U 	 4  5  6  7
@@ -183,7 +183,7 @@ public class GoCaptureTest {
 			
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(
 					UNOCCUPIED + UNOCCUPIED + BLACK + UNOCCUPIED
@@ -204,7 +204,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureTwelveBlackFilledOvalSurroundedWithWhite() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B B B B W 	 6  7  8  9 10 11
@@ -257,7 +257,7 @@ public class GoCaptureTest {
 			
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(
 					UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED 
@@ -282,7 +282,7 @@ public class GoCaptureTest {
 		@Test
 		void testNoCaptureEightBlackOpenOvalSurroundedWithWhite() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B B B B W 	 6  7  8  9 10 11
@@ -333,7 +333,7 @@ public class GoCaptureTest {
 			
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(
 					UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED 
@@ -352,7 +352,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureThirteenBlackRandomComplexFigureSurroundedWithWhite() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B W B B W 	 6  7  8  9 10 11
@@ -410,7 +410,7 @@ public class GoCaptureTest {
 			
 			System.out.println(testBoard.toStringFormatted());
 			System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
-			captureChecker.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
 			System.out.println(testBoard.toStringFormatted());
 			assertThat(testBoard.toString(), containsString(
 					UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED 
@@ -435,7 +435,7 @@ public class GoCaptureTest {
 		@Test
 		void testCaptureMultipleBlackSurroundedWithWhite() {
 			try {
-			CaptureChecker captureChecker = new CaptureChecker(true);
+			BoardTools boardTools = new BoardTools(true);
 			int boardDim = 6;
 				// B W W W B W 	 0  1  2  3  4  5
 				// W W B B B W 	 6  7  8  9 10 11
@@ -492,7 +492,7 @@ public class GoCaptureTest {
 				
 				System.out.println(testBoard.toStringFormatted());
 				System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
-				captureChecker.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+				boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
 				System.out.println(testBoard.toStringFormatted());
 				assertThat(testBoard.toString(), containsString(
 						UNOCCUPIED + WHITE + WHITE + WHITE + UNOCCUPIED + WHITE
@@ -511,7 +511,7 @@ public class GoCaptureTest {
 		@Test
 		void testOwnCaptureMultipleBlackSurroundedWithWhite() {
 			try {
-			CaptureChecker captureChecker = new CaptureChecker(true);
+			BoardTools boardTools = new BoardTools(true);
 			int boardDim = 6;
 				// B W W W B W 	 0  1  2  3  4  5
 				// W W B B B W 	 6  7  8  9 10 11
@@ -568,8 +568,8 @@ public class GoCaptureTest {
 				
 				System.out.println(testBoard.toStringFormatted());
 				System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
-				//captureChecker.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
-				captureChecker.doOwnCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
+				//boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+				boardTools.doOwnCaptures(testBoard, Stone.BLACK);// do capture, owning WHITE
 				System.out.println(testBoard.toStringFormatted());
 				assertThat(testBoard.toString(), containsString(
 						UNOCCUPIED + WHITE + WHITE + WHITE + UNOCCUPIED + WHITE
@@ -588,7 +588,7 @@ public class GoCaptureTest {
 		@Test
 		void testTwiceCaptureThreeWhiteSurroundedWithBlack() {
 			try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 			// U B B U	 0  1  2  3
 			// B W W B 	 4  5  6  7
@@ -628,7 +628,7 @@ public class GoCaptureTest {
 			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
 			
 			Board testBoardFirst = testBoard.clone();
-			captureChecker.doOpponentCaptures(testBoardFirst, Stone.BLACK);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoardFirst, Stone.BLACK);// do capture, owning WHITE
 			System.out.println(testBoardFirst.toStringFormatted());
 			assertThat(testBoardFirst.toString(), containsString(
 					UNOCCUPIED + BLACK + BLACK + UNOCCUPIED
@@ -637,7 +637,7 @@ public class GoCaptureTest {
 					+ UNOCCUPIED + BLACK + UNOCCUPIED +  UNOCCUPIED));
 			
 			Board testBoardSecond = testBoard.clone();
-			captureChecker.doOpponentCaptures(testBoardSecond, Stone.BLACK);// do capture, owning WHITE
+			boardTools.doOpponentCaptures(testBoardSecond, Stone.BLACK);// do capture, owning WHITE
 			System.out.println(testBoardSecond.toStringFormatted());
 			assertThat(testBoardSecond.toString(), containsString(
 					UNOCCUPIED + BLACK + BLACK + UNOCCUPIED

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import exceptions.InvalidFieldException;
 import goGame.Board;
-import goGame.CaptureChecker;
+import goGame.BoardTools;
 import goGame.Game;
 import goGame.GoGameConstants;
 import goGame.Stone;
@@ -23,7 +23,7 @@ public class GoScoringTest {
 	@Test
 	void testScore4TwoSidesAllOccupied() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 		// B B W W	 0  1  2  3
 		// B B W W 	 4  5  6  7
@@ -62,7 +62,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = captureChecker.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame); 
 		double scoreBlack = 8; // TODO calculate yourself
 		double scoreWhite = 8+testGame.getKomi(); // TODO calculate yourself, think of Komi!
 
@@ -77,7 +77,7 @@ public class GoScoringTest {
 	@Test
 	void testScore4TwoSidesWithUnoccupied() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 		// U B W U	 0  1  2  3
 		// U B W U 	 4  5  6  7
@@ -108,7 +108,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = captureChecker.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame); 
 		double scoreBlack = 8; // TODO calculate yourself
 		double scoreWhite = 8+testGame.getKomi(); // TODO calculate yourself, think of Komi!
 
@@ -123,7 +123,7 @@ public class GoScoringTest {
 	@Test
 	void testScore4LargeBlackSmallWhiteWithUnoccupied() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 		// U U U B	 0  1  2  3
 		// U B B B 	 4  5  6  7
@@ -155,7 +155,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = captureChecker.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame); 
 		double scoreBlack = 12; // TODO calculate yourself
 		double scoreWhite = 4+testGame.getKomi(); // TODO calculate yourself, think of Komi!
 
@@ -169,7 +169,7 @@ public class GoScoringTest {
 	@Test
 	void testScore4UnoccupiedIsNeutral() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 4;
 		// B U U W	 0  1  2  3
 		// B U U W 	 4  5  6  7
@@ -200,7 +200,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = captureChecker.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame); 
 		double scoreBlack = 4; // TODO calculate yourself
 		double scoreWhite = 4+testGame.getKomi(); // TODO calculate yourself, think of Komi!
 
@@ -214,7 +214,7 @@ public class GoScoringTest {
 	@Test
 	void testScore8MultipleBlackWhiteWithUnoccupied() {
 		try {
-		CaptureChecker captureChecker = new CaptureChecker(true);
+		BoardTools boardTools = new BoardTools(true);
 		int boardDim = 8;
 		// U U B B U W U B	 0  1  2  3  4  5  6  7
 		// U B B B U W U B 	 8  9 10 11 12 13 14 15
@@ -286,7 +286,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = captureChecker.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame); 
 		double scoreBlack = 38; // TODO calculate yourself
 		double scoreWhite = 15+testGame.getKomi(); // TODO calculate yourself, think of Komi!
 
