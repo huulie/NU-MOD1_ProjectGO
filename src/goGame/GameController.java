@@ -101,6 +101,7 @@ public class GameController {
 					gameOver = true; // TODO properly end game
 				} else {
 				firstPassed = true;
+				this.game.moveToNextPlayer();
 				}
 			} else if (currentMove == GoGameConstants.INVALID) {
 				System.out.println(" INVALID"); // TODO end game as loser
@@ -124,7 +125,25 @@ public class GameController {
 
 		} 
 
-		//this.printResult();
+		System.out.println(" -- GAME ENDED -- "); // TODO is printing for game, not for players!
+		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
+
+		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
+		double scoreBlack = Double.parseDouble(scores[0]);
+		double scoreWhite = Double.parseDouble(scores[1]);
+		
+		String winner = null; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
+		if(scoreBlack>scoreWhite) {
+			winner = " BLACK ";
+		} else {
+			winner = " WHITE ";
+		}
+		
+		System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
+		System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
+		System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
+		
+	
 	}
 	
 	// TODO: do something with this?

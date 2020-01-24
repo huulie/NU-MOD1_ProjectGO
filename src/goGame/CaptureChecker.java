@@ -16,7 +16,7 @@ import exceptions.InvalidFieldException;
  *
  */
 
-public class CaptureChecker {
+public class CaptureChecker { // TODO: board helper? board utilities? board service?
 
 // TODO: all static >> CANNOT BE STATIC CLASS AND HAVE INSTANCE VARIABLES
 	
@@ -42,6 +42,16 @@ public class CaptureChecker {
 	List<Integer> recursiveFound = new ArrayList<Integer>(); // TODO; separate, to know which stones to transer after recursive search
 
 	
+	private List<Integer> blackStoneIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+	private List<Integer> whiteStoneIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+	// TODO same as all area indices: private List<Integer> unoccupiedStoneIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+
+	private List<Integer> blackAreaIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+	private List<Integer> whiteAreaIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+	private List<Integer> unoccupiedAreaIndices = new ArrayList<Integer>(); // no removing from this list (checking using checkedIndices)
+	Stone areaColor = null;
+	
+	// TODO CAPTURE CHECKING
 	/**
 	 * @param printDebug
 	 */
@@ -49,7 +59,7 @@ public class CaptureChecker {
 		this.printDebug = printDebug;
 	}
 
-	public void doOpponentCaptures(Board board, Stone ownStone) {		
+	public void doOpponentCaptures(Board board, Stone ownStone) { // TODO: return number of stones caputerd?		
 		// Check capture of OPPONENT stones (take priority of capture vs self-capture in mind)
 		// first simple implementation, TODO: check for groups
 		
@@ -64,7 +74,9 @@ public class CaptureChecker {
 		this.board = board;
 		this.ownStone = ownStone;
 		
-		allIndices.addAll(IntStream.rangeClosed(0, board.DIM*board.DIM-1) // TDO: mind -1!
+		int boardDim = board.getDim();
+		
+		allIndices.addAll(IntStream.rangeClosed(0, boardDim*boardDim-1) // TODO: mind -1!
 				.boxed().collect(Collectors.toList())); // do NOT use ^ for squaring
 
 		//Iterator<Integer> boardIterator = indicesToCheck.iterator();
@@ -323,5 +335,275 @@ public class CaptureChecker {
 	public void doOwnCaptures(Board board, Stone ownStone) {
 		doOpponentCaptures(board,ownStone.other());
 	}
+	
+	
+	// TODO SCORE COUNTING
 
+	/**
+	 * TODO ADD JAVADOC
+	 * @param board
+	 * @return
+	 */
+	public String getScores(Game game) {
+		// TODO: HERE CLEAR FOR OTHER SEARCHES?! OR MAKE NEW CHECKER? 
+		allIndices.clear();
+		checkedIndices.clear();
+		
+		blackStoneIndices.clear();
+		whiteStoneIndices.clear();
+
+		blackAreaIndices.clear(); 
+		whiteAreaIndices.clear(); 
+		unoccupiedAreaIndices.clear();
+		
+		this.board = game.getBoard();
+		int boardDim = board.getDim();
+
+		allIndices.addAll(IntStream.rangeClosed(0, boardDim*boardDim-1) 
+				.boxed().collect(Collectors.toList())); // do NOT use ^ for squaring
+
+		boardIterator = allIndices.iterator();
+
+		while (boardIterator.hasNext()) {
+
+			int checkingIndex = boardIterator.next();
+
+			if(checkedIndices.contains(checkingIndex)) {
+				if (printDebug) System.out.println("DEBUG: Already checked this stone at index " + checkingIndex + ": now skipping");
+				continue;
+			} else { 
+				checkedIndices.add(checkingIndex);
+			}
+			if (printDebug) System.out.println("DEBUG: checking stone at index " + checkingIndex);
+
+			if (board.getField(checkingIndex).equals(Stone.BLACK) ) {
+				blackStoneIndices.add(checkingIndex); // and do nothing
+				if (printDebug) System.out.println("DEBUG: stone is BLACK");
+			} else if (board.getField(checkingIndex).equals(Stone.WHITE) ) {
+				whiteStoneIndices.add(checkingIndex); // and do nothing
+				if (printDebug) System.out.println("DEBUG: stone is WHITE"); 
+			} else if (board.getField(checkingIndex).equals(Stone.UNOCCUPIED) ) { // UNOCCUPIED stone
+				if (printDebug) System.out.println("DEBUG: stone is UNOCCUPIED >> needs further checking");
+
+				//				Stone areaColor = null;
+				areaColor = null;
+				boolean hasUnoccupiedNeigbours = false;
+
+				if (printDebug) System.out.println("DEBUG: > looking above...");
+				if ( (board.above(checkingIndex)!= -1 && board.getField(board.above(checkingIndex))!=(Stone.UNOCCUPIED))) {
+					//TODO also add them to corresponding list black/white?
+					areaColor = board.getField(board.above(checkingIndex));
+					if (printDebug) System.out.println("DEBUG: >> areaColor set to " + areaColor.toString());
+				} else if ((board.above(checkingIndex)!= -1 && board.getField(board.above(checkingIndex))==(Stone.UNOCCUPIED))){
+					hasUnoccupiedNeigbours = true; // TODO: start here with recursive search to abovve?
+					if (printDebug) System.out.println("DEBUG: >> stone has UNOCCUPIED neighbours > starting recursive search");
+				}
+
+				if (printDebug) System.out.println("DEBUG: > looking right...");
+				if ( (board.right(checkingIndex)!= -1 && board.getField(board.right(checkingIndex))!=(Stone.UNOCCUPIED))) {
+					if(areaColor == null) {
+						areaColor = board.getField(board.right(checkingIndex));
+						if (printDebug) System.out.println("DEBUG: >> areaColor set to " + areaColor.toString());
+					} else if(areaColor != board.getField(board.right(checkingIndex))) {
+						// field becomes neutral / U area
+						unoccupiedAreaIndices.add(checkingIndex);
+						if (printDebug) System.out.println("DEBUG: >> non-matching colors, areaColor set to neutral / U");
+						continue;
+					} 
+					// else groupcolor stays the same, and continue checking
+				} else if ((board.right(checkingIndex)!= -1 && board.getField(board.right(checkingIndex))==(Stone.UNOCCUPIED))){
+					hasUnoccupiedNeigbours = true; // TODO: start here with recursive search to right?
+					if (printDebug) System.out.println("DEBUG: >> stone has UNOCCUPIED neighbours > starting recursive search");
+				}
+
+				if (printDebug) System.out.println("DEBUG: > looking below...");
+				if ( (board.below(checkingIndex)!= -1 && board.getField(board.below(checkingIndex))!=(Stone.UNOCCUPIED))) {
+					if(areaColor == null) {
+						areaColor = board.getField(board.below(checkingIndex));
+						if (printDebug) System.out.println("DEBUG: >> areaColor set to " + areaColor.toString());
+					} else if(areaColor != board.getField(board.below(checkingIndex))) {
+						// field becomes neutral / U area
+						unoccupiedAreaIndices.add(checkingIndex);
+						if (printDebug) System.out.println("DEBUG: >> non-matching colors, areaColor set to neutral / U");
+						continue;
+					} 
+					// else groupcolor stays the same, and continue checking
+				} else if ((board.below(checkingIndex)!= -1 && board.getField(board.below(checkingIndex))==(Stone.UNOCCUPIED))){
+					hasUnoccupiedNeigbours = true; // TODO: start here with recursive search to below?
+					if (printDebug) System.out.println("DEBUG: >> stone has UNOCCUPIED neighbours > starting recursive search");
+
+				}
+
+				if (printDebug) System.out.println("DEBUG: > looking left...");
+				if ( (board.left(checkingIndex)!= -1 && board.getField(board.left(checkingIndex))!=(Stone.UNOCCUPIED))) {
+					if(areaColor == null) {
+						areaColor = board.getField(board.left(checkingIndex));
+						if (printDebug) System.out.println("DEBUG: >> areaColor set to " + areaColor.toString());
+					} else if(areaColor != board.getField(board.left(checkingIndex))) {
+						// field becomes neutral / U area
+						unoccupiedAreaIndices.add(checkingIndex);
+						if (printDebug) System.out.println("DEBUG: >> non-matching colors, areaColor set to neutral / U");
+						continue;
+					} 
+					// else groupcolor stays the same, and continue checking
+				} else if ((board.left(checkingIndex)!= -1 && board.getField(board.left(checkingIndex))==(Stone.UNOCCUPIED))){
+					hasUnoccupiedNeigbours = true; // TODO: start here with recursive search to left?
+					if (printDebug) System.out.println("DEBUG: >> stone has UNOCCUPIED neighbours > starting recursive search");
+
+				}
+
+				recursiveFound.clear();
+				recursiveFound.add(checkingIndex);
+
+				boolean oneColorAbove = true; // if no stone found, it also cannot block capture
+				boolean oneColorRight = true;
+				boolean oneColorBelow = true;
+				boolean oneColorLeft = true;
+
+				if (hasUnoccupiedNeigbours) { // recursive search needed
+					if (printDebug) System.out.println("DEBUG: # starting recursive search");
+
+					if(board.above(checkingIndex)!= -1 && board.getField(board.above(checkingIndex))==Stone.UNOCCUPIED){	
+						if (printDebug) System.out.println("DEBUG: ## first search above started");
+						oneColorAbove = recursiveScoring(board.above(checkingIndex),0); // ,areaColor
+					} // TODO: no else!
+					if(board.right(checkingIndex)!= -1 && board.getField(board.right(checkingIndex))==Stone.UNOCCUPIED){
+						if (printDebug) System.out.println("DEBUG: ## first search right started");
+						oneColorRight = recursiveScoring(board.right(checkingIndex),0); // ,areaColor
+					} 
+					if(board.below(checkingIndex)!= -1 && board.getField(board.below(checkingIndex))==Stone.UNOCCUPIED){
+						if (printDebug) System.out.println("DEBUG: ## first search below started");
+						oneColorBelow = recursiveScoring(board.below(checkingIndex),0); // ,areaColor
+					} 
+					if(board.left(checkingIndex)!= -1 && board.getField(board.left(checkingIndex))==Stone.UNOCCUPIED){
+						if (printDebug) System.out.println("DEBUG: ## first search left started");
+						oneColorLeft = recursiveScoring(board.left(checkingIndex),0); // ,areaColor
+					}
+				}
+
+				if (!(oneColorAbove == true && oneColorRight == true && oneColorBelow == true && oneColorLeft == true)) {
+					unoccupiedAreaIndices.addAll(recursiveFound);
+					if (printDebug) System.out.println("DEBUG: # end recursive search => Area assigned to neutral: " + recursiveFound);
+				} else if (areaColor == Stone.BLACK) {
+					blackAreaIndices.addAll(recursiveFound);
+					if (printDebug) System.out.println("DEBUG: # end recursive search => Area assigned to black: " + recursiveFound);
+				} else if (areaColor == Stone.WHITE) {
+					whiteAreaIndices.addAll(recursiveFound);
+					if (printDebug) System.out.println("DEBUG: # end recursive search => Area assigned to white: " + recursiveFound);
+				} else {
+					if (printDebug) System.out.println("DEBUG: # end recursive search => something weird happend with: " + recursiveFound);
+				}
+
+			}
+		}
+
+		return calculateScore(game);
+	}
+			
+	private boolean recursiveScoring(int index, int searchStartingDepth) { // , Stone areaColor 
+		int searchDepth = searchStartingDepth + 1;
+
+		if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " \\/ subchecking stone at index " + index);
+
+		if(checkedIndices.contains(index)) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ Already found UNOCCUPIED stone at index " + index + ": now skipping");
+			return true; // TODO: should already checked be false or true?!
+		} else {
+			checkedIndices.add(index);
+		}
+
+		recursiveFound.add(index);
+		if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " || index " + index + " added to found group");
+		if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " || >> found group is now " + recursiveFound);
+
+
+		boolean oneColorAbove = true; // if no stone found, it also cannot block capture
+		boolean oneColorRight = true;
+		boolean oneColorBelow = true;
+		boolean oneColorLeft = true;
+
+		if(board.above(index)!= -1 && board.getField(board.above(index))==Stone.UNOCCUPIED){	
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search above started");					
+			oneColorAbove = recursiveScoring(board.above(index),searchDepth); // ,areaColor
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search above done");
+		} else if(board.above(index)!= -1 && areaColor == null) {
+			this.areaColor = board.getField(board.above(index));
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone above of " + index + ": areaColor set to " + areaColor);
+			return true;
+		} else if(board.above(index)!= -1 && areaColor != board.getField(board.above(index))) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + " has different neighbouring colors, so assigned to neutral");
+			return false;
+		}
+		
+		if(board.right(index)!= -1 && board.getField(board.right(index))==Stone.UNOCCUPIED){
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search right started");						
+			oneColorRight = recursiveScoring(board.right(index),searchDepth); // ,areaColor
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search right done");
+		} else if(board.right(index)!= -1 && areaColor == null) {
+			this.areaColor = board.getField(board.right(index));
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone right of " + index + ": areaColor set to " + areaColor);
+			return true;
+		} else if(board.right(index)!= -1 && areaColor != board.getField(board.right(index))) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + " has different neighbouring colors, so assigned to neutral");
+			return false;
+		}
+		
+		if(board.below(index)!= -1 && board.getField(board.below(index))==Stone.UNOCCUPIED){
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search below started");
+			oneColorBelow = recursiveScoring(board.below(index),searchDepth); // ,areaColor
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search below done");
+		} else if(board.below(index)!= -1 && areaColor == null) {
+			this.areaColor = board.getField(board.below(index));
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone below of " + index + ": areaColor set to " + areaColor);
+			return true;
+		} else if(board.below(index)!= -1 && areaColor != board.getField(board.below(index))) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + " has different neighbouring colors, so assigned to neutral");
+			return false;
+		}
+		
+		if(board.left(index)!= -1 && board.getField(board.left(index))==Stone.UNOCCUPIED){
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search left started");					
+			oneColorLeft = recursiveScoring(board.left(index),searchDepth); // ,areaColor
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " ||-> search left done");
+		} else if(board.left(index)!= -1 && areaColor == null) {
+			this.areaColor = board.getField(board.left(index));
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone left of" + index + ": areaColor set to " + areaColor);
+			return true;
+		} else if(board.left(index)!= -1 && areaColor != board.getField(board.left(index))) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + " has different neighbouring colors, so assigned to neutral");
+			return false;
+		}
+
+		if (!(oneColorAbove == true && oneColorRight == true && oneColorBelow == true && oneColorLeft == true)) {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + ": a connected stone has different neighbouring colors, so assigned to neutral");
+			return false;
+		} else {
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ stone " + index + ": a connected stone has same neighbouring colors, so may be assigned to black/white area");
+			return true;	
+		}
+
+
+
+	}
+
+			
+			private String calculateScore(Game game) {
+				
+				
+				double scoreBlack = blackStoneIndices.size() + blackAreaIndices.size();
+				double scoreWhite = whiteStoneIndices.size() + whiteAreaIndices.size()+ game.getKomi();
+				
+				String score = scoreBlack + GoGameConstants.DELIMITER + scoreWhite;
+				
+				if (printDebug) {
+					int boardDim = game.getBoard().getDim();
+					
+					if (scoreBlack + scoreWhite + unoccupiedAreaIndices.size() - game.getKomi() == boardDim*boardDim) {
+						 System.out.println("DEBUG: number of intersections checksum: OK");
+					} else {
+						System.out.println("DEBUG: number of intersections checksum: FAILURE");
+					}
+				}
+				return score;
+			}
 }

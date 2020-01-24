@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.jupiter.api.Test;
 
+import exceptions.InvalidFieldException;
 import goGame.Board;
 import goGame.CaptureChecker;
 import goGame.Game;
@@ -35,7 +36,8 @@ public class GoCaptureTest {
 //		
 		@Test
 		void testCaptureSingleWhiteSurroundedWithBlack() {
-			CaptureChecker captureChecker = new CaptureChecker();
+			try {
+			CaptureChecker captureChecker = new CaptureChecker(true);
 			int boardDim = 3;
 			int centerIndex = 4;
 			// U B U	0 1 2
@@ -43,8 +45,11 @@ public class GoCaptureTest {
 			// U B U 	6 7 8
 			
 			// Get a board, check if it is indeed empty
-			Board testBoard = new Board(boardDim); //game.getBoard();
-			testBoard.reset();
+			Board testBoard;
+			
+				testBoard = new Board(boardDim);
+				testBoard.reset();
+			 //game.getBoard();
 			assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
 			// Check when four black stones surround a white stone, the white stone is removed
@@ -76,11 +81,16 @@ public class GoCaptureTest {
 					+ BLACK
 					+ UNOCCUPIED.repeat(boardDim*boardDim-testBoard.below(centerIndex)-1) 
 					 )); // note minus one to convert to index, crossed out in first index
+			} catch (InvalidFieldException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		@Test
 		void testCaptureThreeWhiteSurroundedWithBlack() {
-		CaptureChecker captureChecker = new CaptureChecker();
+		try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 4;
 			// U B B U	 0  1  2  3
 			// B W W B 	 4  5  6  7
@@ -130,11 +140,16 @@ public class GoCaptureTest {
 			// B * B U 	 8  9 10 11
 			// U B U U	12 13 14 15
 			// * = should be captured, so now U
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testCaptureThreeWhiteEdgeSurroundedWithBlack() {
-		CaptureChecker captureChecker = new CaptureChecker();
+		try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 4;
 			// W W B U	 0  1  2  3
 			// W B U U 	 4  5  6  7
@@ -180,11 +195,16 @@ public class GoCaptureTest {
 			// B U U U 	 8  9 10 11
 			// U U U U	12 13 14 15
 			// * = should be captured, so now U
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testCaptureTwelveBlackFilledOvalSurroundedWithWhite() {
-		CaptureChecker captureChecker = new CaptureChecker();
+		try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B B B B W 	 6  7  8  9 10 11
@@ -253,11 +273,16 @@ public class GoCaptureTest {
 			// U W W W W U 	24 25 26 27 28 29
 			// U W U U U W 	30 31 32 33 34 35
 			// * = should be captured, so now U
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testNoCaptureEightBlackOpenOvalSurroundedWithWhite() {
-		CaptureChecker captureChecker = new CaptureChecker();
+		try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B B B B W 	 6  7  8  9 10 11
@@ -318,11 +343,16 @@ public class GoCaptureTest {
 					+ UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED 
 					+ UNOCCUPIED + WHITE + UNOCCUPIED + UNOCCUPIED + UNOCCUPIED + WHITE)); 
 			// Should be no captures, so see map on top
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testCaptureThirteenBlackRandomComplexFigureSurroundedWithWhite() {
-		CaptureChecker captureChecker = new CaptureChecker();
+		try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 6;
 			// U W W W W U 	 0  1  2  3  4  5
 			// W B W B B W 	 6  7  8  9 10 11
@@ -396,11 +426,16 @@ public class GoCaptureTest {
 			// U W * W W * 	24 25 26 27 28 29
 			// U W W W U W 	30 31 32 33 34 35
 			// * = should be captured, so now U
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testCaptureMultipleBlackSurroundedWithWhite() {
-			CaptureChecker captureChecker = new CaptureChecker();
+			try {
+			CaptureChecker captureChecker = new CaptureChecker(true);
 			int boardDim = 6;
 				// B W W W B W 	 0  1  2  3  4  5
 				// W W B B B W 	 6  7  8  9 10 11
@@ -467,11 +502,16 @@ public class GoCaptureTest {
 						+ UNOCCUPIED + WHITE + UNOCCUPIED + UNOCCUPIED + WHITE + WHITE
 						+ UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED ));  
 				// Should be no captures, so see map on top
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			}
 		
 		@Test
 		void testOwnCaptureMultipleBlackSurroundedWithWhite() {
-			CaptureChecker captureChecker = new CaptureChecker();
+			try {
+			CaptureChecker captureChecker = new CaptureChecker(true);
 			int boardDim = 6;
 				// B W W W B W 	 0  1  2  3  4  5
 				// W W B B B W 	 6  7  8  9 10 11
@@ -539,11 +579,16 @@ public class GoCaptureTest {
 						+ UNOCCUPIED + WHITE + UNOCCUPIED + UNOCCUPIED + WHITE + WHITE
 						+ UNOCCUPIED + WHITE + WHITE + WHITE + WHITE + UNOCCUPIED ));  
 				// Should be no captures, so see map on top
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 		
 		@Test
 		void testTwiceCaptureThreeWhiteSurroundedWithBlack() {
-		CaptureChecker captureChecker = new CaptureChecker();
+			try {
+		CaptureChecker captureChecker = new CaptureChecker(true);
 		int boardDim = 4;
 			// U B B U	 0  1  2  3
 			// B W W B 	 4  5  6  7
@@ -604,5 +649,9 @@ public class GoCaptureTest {
 			// B * B U 	 8  9 10 11
 			// U B U U	12 13 14 15
 			// * = should be captured, so now U
+		} catch (InvalidFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		}
 }

@@ -47,7 +47,15 @@ public class Game {
 	
 	// TODO add GUI TO GAME, FOR SERVER TO VISUALIZE OR LOCAL TO SEE TWO PLAYERS
 
+	
+	/** TODO: add javadoc
+	 * 
+	 */
+	private double komi = 0.5;
+	
 	// -- Constructors -----------------------------------------------
+
+	
 
 	/**
 	 * Creates a new Game object.
@@ -130,22 +138,31 @@ public class Game {
 	 * @param color
 	 * @return
 	 */
-	public int getScore(Stone color) {
-		
-		int numberOfStones = 0;
-		int enclosedEmtpyIntersections = 0; // TODO: how?
-		
-		int boardDim = this.board.getDim();
-		
-		for (int iRow = 0; iRow < boardDim; iRow++) {
-			for (int iCol = 0; iCol < boardDim; iCol++) {
-				if (this.board.getField(iRow, iCol) == color) {
-					numberOfStones++;
-				}
-			}
-		}
-		
-		return numberOfStones + enclosedEmtpyIntersections;
+	public String getScores() {
+	//public int getScore(Stone color) {
+		return captureChecker.getScores(this);
+//		int numberOfStones = 0;
+//		int enclosedEmtpyIntersections = 0; // TODO: how?
+//		
+//		int boardDim = this.board.getDim();
+//		
+//		for (int iRow = 0; iRow < boardDim; iRow++) {
+//			for (int iCol = 0; iCol < boardDim; iCol++) {
+//				if (this.board.getField(iRow, iCol) == color) {
+//					numberOfStones++;
+//				}
+//			}
+//		}
+//		
+//		return numberOfStones + enclosedEmtpyIntersections;
+	}
+	
+	public double getKomi() {
+		return komi;
+	}
+
+	public void setKomi(double komi) {
+		this.komi = komi;
 	}
 	
 	/**

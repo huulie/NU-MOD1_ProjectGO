@@ -228,8 +228,8 @@ public class GoTUI  { // implements Runnable  ?
 
 				answerInt = Integer.parseInt(answer);
 				answerValid = true;
-			} catch (NumberFormatException eFormat) {
-				if (answer.contentEquals(String.valueOf(GoTUICommands.PASS))) {
+			} catch (NumberFormatException eFormat) {				
+				if (answer.equalsIgnoreCase(String.valueOf(GoTUICommands.PASS))) {
 					return GoGameConstants.PASSint;
 				} else {
 					this.showMessage("ERROR> " + answer +  " is not an integer nor a PASS (" 

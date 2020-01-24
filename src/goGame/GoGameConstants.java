@@ -14,6 +14,7 @@ import goProtocol.ProtocolMessages;
 		public static final char INVALID = ProtocolMessages.INVALID;
 		public static final char PASS = ProtocolMessages.PASS; //used to indicate a pass move, when using char
 		public static final int PASSint = -1; //used to indicate a pass move, when using int
+		public static final String DELIMITER = ProtocolMessages.DELIMITER;
 
 		
 	}
