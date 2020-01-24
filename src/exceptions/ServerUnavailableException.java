@@ -1,5 +1,10 @@
 package exceptions;
 
+/**
+ * Exception to indicate that server is unavailable.
+ * @author huub.lievestro
+ *
+ */
 public class ServerUnavailableException extends Exception {
 
 	private static final long serialVersionUID = 3194494346431589825L;
