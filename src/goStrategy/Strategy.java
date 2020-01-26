@@ -1,8 +1,16 @@
 package goStrategy;
 
+import goGame.Board;
+import goGame.Stone;
+
+/**
+ * A GO strategy, to let a computer determine moves
+ * @author huub.lievestro
+ *
+ */
 public interface Strategy {
 	
-	public String getName(); // interface method, has no body
+	public String getName();
 	
-	public int determineMove(Board board, Mark mark);
+	public int determineMove(Board board, Stone color);
 }

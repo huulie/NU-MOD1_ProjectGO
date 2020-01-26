@@ -17,8 +17,8 @@ import ss.week7.hotel.exceptions.ExitProgram;
 import ss.week7.hotel.protocol.ProtocolMessages;
 import ss.week7.hotel.protocol.ServerProtocol;
 
-KIJK OOK EVEN BIJ TICTACTOE.JAVA
-GAME ALS THREAD? OF NOG APARTE GAMECCONTROLLER? 
+//KIJK OOK EVEN BIJ TICTACTOE.JAVA
+//GAME ALS THREAD? OF NOG APARTE GAMECCONTROLLER? 
 
 
 /**

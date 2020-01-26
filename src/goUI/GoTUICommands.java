@@ -1,5 +1,6 @@
 package goUI;
 
+import goGame.GoGameConstants;
 import goProtocol.ProtocolMessages;
 
 /**
@@ -14,10 +15,11 @@ public class GoTUICommands {
 	public static final char HELP = 'h';
 		
 	//Constants representing ..
-	public static final char WHITE = ProtocolMessages.WHITE;
-	public static final char BLACK = ProtocolMessages.BLACK;
-	public static final char UNOCCUPIED =ProtocolMessages.UNOCCUPIED;
-	public static final char PASS = ProtocolMessages.PASS; //used to indicate a pass move
+	public static final char WHITE = GoGameConstants.WHITE;
+	public static final char BLACK = GoGameConstants.BLACK;
+	public static final char UNOCCUPIED = GoGameConstants.UNOCCUPIED;
+	public static final char PASS = ProtocolMessages.PASS; //used to indicate a pass move 
+	// TODO use single source?
 	
 
 }

@@ -11,17 +11,15 @@ import goUI.GoTUICommands;
 import exceptions.ExitProgram;
 import goGame.GoGameConstants;
 
-/** General TUI (view) for the GO game.
- *
+/** 
+ * General TUI (view) for the GO game.
  * This class handles all reading and writing, and leaves implementation of command handling to a more specific TUI
+ * Input could be sent to a Local Player or, via Client <-> ClientHandler, to a Remote Player
+ * 
  * @author huub.lievestro
  *
  */
-
-public class GoTUI  { // implements Runnable  ?
-	
-	// private Object controller; // To implement: corresponding controller,
-		// could be Local Player or Client (<-> ClientHandler <-> RemotePlayer)
+public class GoTUI  { // TODO implements Runnable ?
 	
 	/**
 	 * Starts TUI (thread): asks for user input continuously and handles communication accordingly using
@@ -30,13 +28,13 @@ public class GoTUI  { // implements Runnable  ?
 	 * If an ExitProgram exception is thrown, stop asking for input, send an exit message to the controller
 	 * 
 	 */
-	public void start() { // throws ServerUnavailableException {
+	public void start() {
 		String input;
 		try {
 			input = this.getString("Input your command or " + GoTUICommands.HELP + " for help:");
 			while (input != null) {
 				handleUserInput(input);
-				input = this.getString(" "); // Input your command or " + HELP + " for help:
+				input = this.getString(" ");
 			}
 		} catch (ExitProgram eExit) {
 			// To implement: controller."exit"
@@ -50,9 +48,9 @@ public class GoTUI  { // implements Runnable  ?
 	 * - If the input is invalid, show a message to the user and print the help menu.
 	 * 
 	 * @param input The user input.
-	 * @throws ExitProgram               	When the user has indicated to exit the program.
+	 * @throws ExitProgram When the user has indicated to exit the program.
 	 */
-	public void handleUserInput(String input) throws ExitProgram { //, ServerUnavailableException {
+	public void handleUserInput(String input) throws ExitProgram {
 		// To be implemented by a specific TUI, here only HELP and EXIT implemented as an example
 		
 		String [] split = input.split("\\s+");
@@ -68,7 +66,6 @@ public class GoTUI  { // implements Runnable  ?
 
 		case GoTUICommands.HELP:
 			this.showMessage(" - Help for the GO game - ");
-			// Could be implemented: controller."help"
 			printHelpMenu();
 			break;
 			
@@ -251,8 +248,5 @@ public class GoTUI  { // implements Runnable  ?
 		this.showMessage(GoTUICommands.HELP + " ................ help (this menu)");
 		System.out.println(GoTUICommands.EXIT + " ................ exit program");
 	}
-	
-	
-	
 	
 }

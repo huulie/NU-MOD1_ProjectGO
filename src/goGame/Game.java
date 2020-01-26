@@ -1,14 +1,7 @@
 package goGame;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import exceptions.InvalidFieldException;
 
-//import ss.utils.TextIO; // TODO: rewrite
 
 /**
  * Class containing the model for the GO game.
@@ -17,171 +10,152 @@ import exceptions.InvalidFieldException;
 public class Game {
 	/**
 	 * The number of player of one game
-	 * @invariant number_players is always 2
+	 * @invariant NUMBER_PLAYERS is always 2
 	 */
-	public static final int NUMBER_PLAYERS = 2; 
+	private static final int NUMBER_PLAYERS = 2; 
 
 	/**
-	 * The board.
+	 * The board, associated to this game..
 	 * @invariant board is never null
 	 */
-	Board board; // TDO: board is now visible for package, check and create getters/setters?
+	private Board board;
 
 	/**
-	 * The 2 players of the game.
+	 * The NUMBER_PLAYERS players of the game.
 	 * @invariant the length of the array equals NUMBER_PLAYERS
 	 * @invariant all array items are never null
 	 */
 	private Player[] players;
 
 	/**
-	 * Index of the current turn.
-	 * @invariant the index is always between 0 and NUMBER_PLAYERS
+	 * Index of the current turn, counting total number of turns that have past.
+	 * @invariant the index is always zero or positive
 	 */
 	private int currentTotalTurn;
 	
 	/**
-	 * Capture checker TODO extend
+	 * Board tools, used to execute game rules on the board
 	 */
 	private BoardTools boardTools;
 	
-	// TODO add GUI TO GAME, FOR SERVER TO VISUALIZE OR LOCAL TO SEE TWO PLAYERS
-
-	
-	/** TODO: add javadoc
-	 * 
+	/**
+	 * The Komi is a compensation for BLACK starting the game.
+	 * From the rules of Go:
+	 * Black's initial advantage of moving first can be offset by komi (compensation points):
+	 * a fixed number of points, agreed before the game, added to White's score at the end of the game
 	 */
 	private double komi = 0.5;
 	
-	// -- Constructors -----------------------------------------------
-
 	
-
 	/**
-	 * Creates a new Game object.
-	 * @requires s0 and s1 to be non-null
+	 * Creates a new Game instance, including the board, and associates Players to it.
+	 * @requires blackPlayer and whitePlayer to be non-null
 	 * @param boardDim is dimension of the board
-	 * @param s0 the first player
-	 * @param s1 the second player
+	 * @param blackPlayer the first player, and will be playing with BLACK
+	 * @param whitePlayer the second player, and will be playing with WHITE
 	 */
-	public Game(int boardDim, Player s0, Player s1) {
+	public Game(int boardDim, Player blackPlayer, Player whitePlayer) {
 		try {
 			board = new Board(boardDim);
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
-			System.out.println("ERROR something went wrong when making a new board");
+			System.out.println("ERROR something went wrong when making a new board: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		boardTools  = new BoardTools(false);
 		players = new Player[NUMBER_PLAYERS];
-		players[0] = s0;
-		players[1] = s1;
+		players[0] = blackPlayer;
+		players[1] = whitePlayer;
 		currentTotalTurn = 0;
 	}
-
-	// -- Commands ---------------------------------------------------
 
 	/**
 	 * Resets the game. <br>
 	 * The board is emptied and player[0] becomes the current player.
 	 */
-	void reset() { // TDO: now visibilty is package
+	public void reset() { // TODO: set visibility to protected? https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html
 		currentTotalTurn = 0;
 		try {
 			board.reset();
 		} catch (InvalidFieldException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ERROR something went wrong when resetting the board");
+			System.out.println("ERROR something went wrong when resetting the board: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
 
 	/**
 	 * Returns the current player
-	 * 
+	 * @return Player current player
 	 */
-	Player getCurrentPlayer() { // TODO: now visibilty is package
+	public Player getCurrentPlayer() { // TODO: set visibility to protected?
 		return players[currentTotalTurn % NUMBER_PLAYERS];
 	}
 	
 	/**
-	 * Resturns the next player
+	 * Moves game to the next player
 	 * 
 	 */
-	void moveToNextPlayer() { // TODO: now visibilty is package, void instaed of Player
+	public void moveToNextPlayer() { // TODO: set visibility to protected?
 		currentTotalTurn++;
-		//return players[currentTotalTurn % NUMBER_PLAYERS];
 	}
 
 	/**
-	 * Prints the game situation.
+	 * Prints the game situation, to the standard system output (of the VM running the game).
 	 */
-	void print() { // TODO visibility now package, check or get/setters
+	public void print() { // TODO: set visibility to protected?
 		System.out.println("\n [GAME] Current game situation: \n\n" + board.toStringFormatted()
 		+ "\n");
 	}
 	
 	/**
-	 * Applies the following GO rule(s) to the board:
+	 * Updates the game, by applying the following GO rule(s) to the board:
 	 * - A stone or solidly connected group of stones of one color is captured and removed 
 	 *   from the board when all the intersections directly adjacent to it are occupied by the enemy. 
 	 *   (Capture of the enemy takes precedence over self-capture.)
 	 */
-	void update() { // TODO visibility now package, check or get/setters
-	captureChecker.doOpponentCaptures(this.board, this.getCurrentPlayer().getColor());
-	captureChecker.doOwnCaptures(this.board, this.getCurrentPlayer().getColor());
-	// logic moved to capture checker, because splitting to smaller methods and use its own isntance variables
+	public void update() { // TODO: set visibility to protected?
+	boardTools.doOpponentCaptures(this.board, this.getCurrentPlayer().getColour());
+	boardTools.doOwnCaptures(this.board, this.getCurrentPlayer().getColour());
 	}
 
 	/**
-	 * @TODO add JavaDoc
-	 * @param color
-	 * @return
+	 * Get the current scores of both players.
+	 * @return scores String, with scoreBlack + DELIMITER + scoreWhite.
 	 */
 	public String getScores() {
-	//public int getScore(Stone color) {
-		return captureChecker.getScores(this);
-//		int numberOfStones = 0;
-//		int enclosedEmtpyIntersections = 0; // TODO: how?
-//		
-//		int boardDim = this.board.getDim();
-//		
-//		for (int iRow = 0; iRow < boardDim; iRow++) {
-//			for (int iCol = 0; iCol < boardDim; iCol++) {
-//				if (this.board.getField(iRow, iCol) == color) {
-//					numberOfStones++;
-//				}
-//			}
-//		}
-//		
-//		return numberOfStones + enclosedEmtpyIntersections;
+		return boardTools.getScores(this);
 	}
 	
+	/**
+	 * Get the Komi as currently set for this game
+	 * @return Komi for this game
+	 */
 	public double getKomi() {
 		return komi;
 	}
 
+	/**
+	 * Set the Komi for this game
+	 * @ensures this game has Komi set to requested komi
+	 */
 	public void setKomi(double komi) {
 		this.komi = komi;
 	}
-	
-	/**
-	 * Prints the result of the last game. <br>
-	 * @requires the game to be over
-	 */
-	private void printResult() {
-//		if (board.hasWinner()) {
-//			Player winner = board.isWinner(players[0].getMark()) ? players[0]
-//					: players[1];
-//			System.out.println("Player " + winner.getName() + " ("
-//					+ winner.getMark().toString() + ") has won!");
-//		} else {
-//			System.out.println("Draw. There is no winner!");
-//		}
-	}
 
+	/**
+	 * Get the board of this game.
+	 * @return board, the current state of the board associated with this game.
+	 */
 	public Board getBoard() {
 		return board;
+	}
+
+	/**
+	 * Get the number of players of this game.
+	 * @return NUMBER_PLAYERS, the current number of players associated with this game.
+	 */
+	public static int getNumberPlayers() {
+		return NUMBER_PLAYERS;
 	}
 
 }

@@ -1,7 +1,9 @@
 package goGame;
 
-// import ss.utils.TextIO;
-//import goProtocol.ProtocolMessages;
+import com.nedap.go.gui.GoGuiIntegrator;
+
+import goUI.GoGuiUpdater;
+
 
 /** Game controller, to control a game of Go
  * @author huub.lievestro
@@ -9,155 +11,142 @@ package goGame;
  */
 public class GameController {
 
+	/**
+	 * Associated game, controlled by this GameController.
+	 */
 	private Game game;
-	
-	int boardDim;
-	
+
 	/**
-	 * The number of player of one game
-	 * @invariant number_players is always 2
+	 * GUI, to monitor current state of the game 
+	 * (use when two local players cannot open two GUIs or on server as monitor)
 	 */
-	public static final int NUMBER_PLAYERS = 2; 
-	
+	private GoGuiIntegrator gameGUI;
+
 	/**
-	 * The 2 players of the game.
-	 * @invariant the length of the array equals NUMBER_PLAYERS
-	 * @invariant all array items are never null
+	 * Updater of (optional) associated GUI
 	 */
-	private Player[] players;
-	
+	private GoGuiUpdater gameGUIupdater;
+
+
 	/**
-	 * Index of the current player.
-	 * @invariant the index is always between 0 and NUMBER_PLAYERS
+	 * Creates a new GameController, including the game.
+	 * @param boardDim is dimension of the board
+	 * @param blackPlayer the first player, and will be playing with BLACK
+	 * @param whitePlayer the second player, and will be playing with WHITE
+	 * @param GUI start a GUI to view the associated game (note: only one GUI can be started per VM)
 	 */
-	private int current;
-	
-	/**
-	 * @param boardDim
-	 * @param player1
-	 * @param player2
-	 */
-	public GameController(int boardDim, Player player1, Player player2) {
-		this.boardDim = boardDim;
-		
-		this.players = new Player[NUMBER_PLAYERS];
-		this.players[0] = player1;
-		this.players[1] = player2;
-		
-		this.game = new Game(this.boardDim, this.players[0], this.players[1]);
+	public GameController(int boardDim, Player blackPlayer, Player whitePlayer, boolean GUI) {
+		this.game = new Game(boardDim, blackPlayer, whitePlayer);
+
+		if (GUI) {
+			this.gameGUI = new GoGuiIntegrator(true, true, boardDim);
+			this.gameGUI.startGUI();
+			this.gameGUI.setBoardSize(boardDim);
+			this.gameGUIupdater = new GoGuiUpdater(this.gameGUI);
+		}
+		// TODO: let GameController create Player objects? >> how to determine which type? Local starter or server knows!
 	}
 
 	/**
 	 * Starts the Go game. <br>
 	 * Asks after each ended game if the user want to continue. Continues until
-	 * the user does not want to play anymore.
+	 * the user does not want to play anymore. TODO implementation?
 	 */
-	public void start() {
-		System.out.println("DEBUG: Game controller is starting..."); // TODO: eventually remove
-	
-			this.game.reset();
-			current = 0;
-			play();
-			
+	public void startGame() {
+		System.out.println("DEBUG: Game controller is starting..."); // TODO: eventually remove/disable
+
+		this.game.reset(); // TODO: current player in game controller? 
+		play();
 	}
-	
+
 	/**
-	 * Plays the Go game. <br>
-	 * First the (still empty) board is shown. Then the game is played
-	 * until it is over. Players can make a move one after the other. 
-	 * After each move, the changed game situation is printed.
+	 * Plays the Go game. <br> TODO: take a second look 
+	 * First the (still empty) board is shown. Then the game is played until it is over. 
+	 * Players can make a move one after the other. After each move, the game state is updated
 	 */
 	private void play() {
-		
 		boolean gameOver = false; // TODO implement
 		boolean firstPassed = false;
 
-		//Game currentGame = new Game(19, player1, player2); // TODO fixed harcoded game settings
+		while (gameOver != true) { // TODO implement a this.board.gameOver() ?
 
-//		this.game.players[0].displayMessage("PLAYER1: " + this.game.board.toString());
-//		this.players[1].displayMessage("PLAYER2: " + this.game.board.toString());
-
-		int playerCounter = 0;
-		while (gameOver != true) { // this.board.gameOver()
-//			current = playerCounter % NUMBER_PLAYERS;
-//
-//			System.out.println("\n");
-//			
-////			if (players[current]instanceof HumanPlayer)  {
-////				this.board.setField(players[current].determineMove(this.board),players[current].getMark());
-////			} else {
-////				players[current].makeMove(this.board);
-////			}
-//			
-//			players[current].makeMove(this.board);
-//
-//			playerCounter++;
-//			this.update();
-			
+			// TODO implement checks on validity / previous state etc
 			char currentMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard());
-			
+
 			if (currentMove == GoGameConstants.PASS) {
 				if(firstPassed) {
 					gameOver = true; // TODO properly end game
 				} else {
-				firstPassed = true;
-				this.game.moveToNextPlayer();
+					firstPassed = true;
+					this.game.moveToNextPlayer();
 				}
 			} else if (currentMove == GoGameConstants.INVALID) {
-				System.out.println(" INVALID"); // TODO end game as loser
+				System.out.println("INVALID"); // TODO end game as loser
 				gameOver = true;
 			} else {
 				this.game.update(); // TODO: pattern render view something
-				
+
+				// send new game state to players 
+				// TODO implement!
+
+
+				// if present, update GUI's for local player or gameController
 				if (this.game.getCurrentPlayer().hasGUI()) {
-				this.game.getCurrentPlayer().updateGUI(this.game.getBoard());
+					this.game.getCurrentPlayer().updateGUI(this.game.getBoard());
 				}
-				
-				this.game.print(); // TODO is printing for game, not for players!
-//				if (outputBoardToTUI) {
-//		        	TUI.showMessage(board.toString());
-//		        }
+				if (this.hasGameGUI()) {
+					this.updateGameGUI(this.game.getBoard());
+				} else {
+					this.game.print(); // TODO printing for gamecontroller, not for players: keep?
+				}
+
 				firstPassed = false;
 				this.game.moveToNextPlayer();
-				playerCounter++; // TDO: what does playerCounter do? 
 			}
-			
+
 
 		} 
 
+		// TODO to seperate methods?! and make it server-client proof!
 		System.out.println(" -- GAME ENDED -- "); // TODO is printing for game, not for players!
 		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
 
 		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
 		double scoreBlack = Double.parseDouble(scores[0]);
 		double scoreWhite = Double.parseDouble(scores[1]);
-		
+
 		String winner = null; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
 		if(scoreBlack>scoreWhite) {
 			winner = " BLACK ";
 		} else {
 			winner = " WHITE ";
 		}
-		
+
 		System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
 		System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
 		System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
-		
-	
 	}
-	
-	// TODO: do something with this?
-//	private static Player createNewPlayer(String inputName, Stone inputColor, int boardDim) {
-//		Player newPlayer;
-//		
-//		if (inputName.contains("-N")) {
-//			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
-//		} else if (inputName.contains("-S")) {
-//			newPlayer = new ComputerPlayer(inputColor, new RandomStrategy());
-//		} else {
-//			newPlayer = new LocalPlayer(inputName, inputColor, boardDim, false);
-//		}
-//		return newPlayer;
-//	}
+
+
+
+	/**
+	 * Returns if this GameController has an associated gameGUI
+	 * @return true if it has a GUI, false if not
+	 */
+	public boolean hasGameGUI() {
+		return (this.gameGUI != null);
+	}
+
+	/**
+	 * Displays updated board in gameGUI
+	 */
+	public void updateGameGUI(Board board) {
+		if (this.hasGameGUI()) {
+			this.gameGUIupdater.updateWholeBoard(board);
+		} else {
+			System.out.println("There is no GUI to update!");
+		}
+
+	}
 
 }

@@ -2,17 +2,17 @@ package goGame;
 
 /**
  * Represents a stone in the GO game. There three possible values:
- * Mark.BLACK, Mark.WHITE and Mark.UNOCCUPIED.
+ * GoGameConstants.BLACK, GoGameConstants.WHITE and GoGameConstants.UNOCCUPIED.
  * 
  * @author Huub Lievestro
  */
 public enum Stone {
-	BLACK("B"), WHITE("W"), UNOCCUPIED("U"); // TODO: vervangen door protocol messages?!
+	BLACK(GoGameConstants.BLACK), WHITE(GoGameConstants.WHITE), UNOCCUPIED(GoGameConstants.UNOCCUPIED); // TODO: vervangen door protocol messages?!
 	
 	private final String print;
 	
-	private Stone(String print) {
-		this.print = print;
+	private Stone(char print) {
+		this.print = String.valueOf(print);
 	}
     
     @Override
@@ -21,10 +21,10 @@ public enum Stone {
     }
 
     /**
-     * Returns the other stone.
-     * @ensures that OO is returned if this mark is XX, that XX is returned 
-     * 			when if mark is OO and EMPTY otherwise 
-     * @return the other mark is this mark is not EMPTY or EMPTY
+     * Returns the other stone colour.
+     * @ensures that WHITE is returned if this stone is BLACK, and vice versa.
+     * Returns UNOCCUPIED otherwise 
+     * @return the other stone colour if this mark is not UNOCCUPIED, or UNOCCUPIED
      */
     public Stone other() {
         if (this == BLACK) {

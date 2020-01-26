@@ -12,10 +12,12 @@ import goGame.Game;
 import goGame.GoGameConstants;
 import goGame.Stone;
 
+/**
+ * Tests for doing captures on the GO board
+ * @author huub.lievestro
+ *
+ */
 public class GoScoringTest {
-
-
-	
 	private static final String WHITE = " " + Stone.WHITE.toString() + " ";
 	private static final String BLACK = " " + Stone.BLACK.toString() + " ";
 	private static final String UNOCCUPIED = " " + Stone.UNOCCUPIED.toString() + " ";
@@ -32,11 +34,10 @@ public class GoScoringTest {
 		
 		// Get a board, check if it is indeed empty
 		Game testGame = new Game(boardDim, null, null); // Game has no players (for this test)
-		Board testBoard = testGame.getBoard(); //game.getBoard();
+		Board testBoard = testGame.getBoard();
 		testBoard.reset();
 		assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
-		// TODO comments
 		testBoard.setField(0, Stone.BLACK); 
 		testBoard.setField(4, Stone.BLACK); 
 		testBoard.setField(8, Stone.BLACK); 
@@ -63,12 +64,12 @@ public class GoScoringTest {
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
 		String testScore = boardTools.getScores(testGame); 
-		double scoreBlack = 8; // TODO calculate yourself
-		double scoreWhite = 8+testGame.getKomi(); // TODO calculate yourself, think of Komi!
+		double scoreBlack = 8; // calculate yourself
+		double scoreWhite = 8+testGame.getKomi(); // calculate yourself, think of Komi!
 
 		assertThat(testScore.toString(), containsString(scoreBlack + GoGameConstants.DELIMITER + scoreWhite)); 
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -90,7 +91,6 @@ public class GoScoringTest {
 		testBoard.reset();
 		assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
-		// TODO comments
 		testBoard.setField(1, Stone.BLACK); 
 		testBoard.setField(5, Stone.BLACK); 
 		testBoard.setField(9, Stone.BLACK); 
@@ -109,12 +109,12 @@ public class GoScoringTest {
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
 		String testScore = boardTools.getScores(testGame); 
-		double scoreBlack = 8; // TODO calculate yourself
-		double scoreWhite = 8+testGame.getKomi(); // TODO calculate yourself, think of Komi!
+		double scoreBlack = 8; // calculate yourself
+		double scoreWhite = 8+testGame.getKomi(); // calculate yourself, think of Komi!
 
 		assertThat(testScore.toString(), containsString(scoreBlack + GoGameConstants.DELIMITER + scoreWhite)); 
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -132,11 +132,10 @@ public class GoScoringTest {
 		
 		// Get a board, check if it is indeed empty
 		Game testGame = new Game(boardDim, null, null); // Game has no players (for this test)
-		Board testBoard = testGame.getBoard(); //game.getBoard();
+		Board testBoard = testGame.getBoard(); 
 		testBoard.reset();
 		assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
-		// TODO comments
 		testBoard.setField(3, Stone.BLACK); 
 		testBoard.setField(5, Stone.BLACK); 
 		testBoard.setField(6, Stone.BLACK); 
@@ -156,12 +155,12 @@ public class GoScoringTest {
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
 		String testScore = boardTools.getScores(testGame); 
-		double scoreBlack = 12; // TODO calculate yourself
-		double scoreWhite = 4+testGame.getKomi(); // TODO calculate yourself, think of Komi!
+		double scoreBlack = 12; // calculate yourself
+		double scoreWhite = 4+testGame.getKomi(); // calculate yourself, think of Komi!
 
 		assertThat(testScore.toString(), containsString(scoreBlack + GoGameConstants.DELIMITER + scoreWhite)); 
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -178,11 +177,10 @@ public class GoScoringTest {
 		
 		// Get a board, check if it is indeed empty
 		Game testGame = new Game(boardDim, null, null); // Game has no players (for this test)
-		Board testBoard = testGame.getBoard(); //game.getBoard();
+		Board testBoard = testGame.getBoard(); 
 		testBoard.reset();
 		assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
-		// TODO comments
 		testBoard.setField(0, Stone.BLACK); 
 		testBoard.setField(4, Stone.BLACK); 
 		testBoard.setField(8, Stone.BLACK); 
@@ -201,12 +199,12 @@ public class GoScoringTest {
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
 		String testScore = boardTools.getScores(testGame); 
-		double scoreBlack = 4; // TODO calculate yourself
-		double scoreWhite = 4+testGame.getKomi(); // TODO calculate yourself, think of Komi!
+		double scoreBlack = 4; // calculate yourself
+		double scoreWhite = 4+testGame.getKomi(); // calculate yourself, think of Komi!
 
 		assertThat(testScore.toString(), containsString(scoreBlack + GoGameConstants.DELIMITER + scoreWhite)); 
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -227,11 +225,10 @@ public class GoScoringTest {
 		
 		// Get a board, check if it is indeed empty
 		Game testGame = new Game(boardDim, null, null); // Game has no players (for this test)
-		Board testBoard = testGame.getBoard(); //game.getBoard();
+		Board testBoard = testGame.getBoard(); 
 		testBoard.reset();
 		assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
 
-		// TODO comments
 		testBoard.setField(2, Stone.BLACK); 
 		testBoard.setField(3, Stone.BLACK); 
 		testBoard.setField(7, Stone.BLACK); 
@@ -287,12 +284,12 @@ public class GoScoringTest {
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
 		String testScore = boardTools.getScores(testGame); 
-		double scoreBlack = 38; // TODO calculate yourself
-		double scoreWhite = 15+testGame.getKomi(); // TODO calculate yourself, think of Komi!
+		double scoreBlack = 38; // calculate yourself
+		double scoreWhite = 15+testGame.getKomi(); // calculate yourself, think of Komi!
 
 		assertThat(testScore.toString(), containsString(scoreBlack + GoGameConstants.DELIMITER + scoreWhite)); 
 		} catch (InvalidFieldException e) {
-			// TODO Auto-generated catch block
+			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}

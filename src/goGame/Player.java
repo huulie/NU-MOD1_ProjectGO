@@ -1,9 +1,9 @@
 package goGame;
 
+import java.util.Arrays;
+
 import exceptions.InvalidFieldException;
 import goUI.GoTUI;
-
-//import goProtocol.ProtocolMessages;
 
 
 /**
@@ -13,90 +13,100 @@ import goUI.GoTUI;
  */
 public abstract class Player {
 
-    // -- Instance variables -----------------------------------------
+	/**
+	 * Name of this Player
+	 */
+	private String name;
 
-    private String name;
-    private Stone color;
-    private GoTUI TUI;
-    
+	/**
+	 * Stone colour of this Player
+	 */
+	private Stone colour;
 
-    // -- Constructors -----------------------------------------------
+	/**
+	 * TUI associated to this Player
+	 */
+	private GoTUI TUI;
 
-    /**
-     * Creates a new Player object.
-     * @requires name is not null
-     * @requires color is either ProtocolMessages.BLACK or ProtocolMessages.WHITE
-     * @ensures the Name of this player will be name
-     * @ensures the Mark of this player will be color
-     */
-    public Player(String name, Stone color) {
-        this.name = name;
-        this.color = color;
-    }
 
-    // -- Queries ----------------------------------------------------
+	// -- Constructor(s) ---------------------------------------------
 
-    /**
-     * Returns the name of the player.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Returns the color of the player.
-     */
-    public Stone getColor() {
-        return color;
-    }
-
-    /**
-     * Determines the field for the next move.
-     * @requires board is not null and not full
-     * @ensures the returned in is a valid field index and that field is empty, or -1 to pass
-     * @param board the current game board
-     * @return the player's choice
-     */
-    public abstract int determineMove(Board board);
-
-    // -- Commands ---------------------------------------------------
-
-    /**
-     * Makes a move on the board. <br>
-     * @requires board is not null and not full
-     * @param board the current board
-     */
-    public char makeMove(Board board) {
-        int choice = determineMove(board);
-        
-        if (choice == GoGameConstants.PASSint) {
-        	return GoGameConstants.PASS;
-        } else {
-        	try {
-        		board.setField(choice, this.getColor());
-        		return GoGameConstants.VALID;
-        	} catch (InvalidFieldException e) {
-        		return GoGameConstants.INVALID;
-        	}
-        }
-    }
-    
-    /**
-     * Displays message on user interface
-     */
-    public void displayMessage(String message) {
-            this.TUI.showMessage(message);
-    }
-
-    /**
-     * TODO per default no GUI
-     */
-    public boolean hasGUI() {
-		return false;
+	/**
+	 * Creates a new Player object.
+	 * @requires name is not null
+	 * @requires colour is either GoGameConstants.BLACK or GoGameConstants.WHITE
+	 * @ensures the Name of this player will be name
+	 * @ensures the Stone of this player will be colour
+	 */
+	public Player(String name, Stone colour) {
+		this.name = name;
+		this.colour = colour;
 	}
-    
-    public abstract void updateGUI(Board board); // TODO: keep or adjust this?
 
+
+	// -- Queries ----------------------------------------------------
+
+	/**
+	 * Returns the name of the player.
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * Returns the colour of the player.
+	 */
+	public Stone getColour() {
+		return colour;
+	}
+
+	/**
+	 * Determines the field for the next move.
+	 * @requires board is not null and not full
+	 * @ensures the returned in is a valid field index and that field is empty, or -1 to pass
+	 * @param board the current game board
+	 * @return the player's choice
+	 */
+	public abstract int determineMove(Board board);
 	
+	/**
+	 * Check if this Player has a (a field named) GUI
+	 */
+	public boolean hasGUI() {
+		return Arrays.stream(this.getClass().getFields())
+				.anyMatch(f -> f.getName().equals("GUI"));
+	}
+
+	// -- Commands ---------------------------------------------------
+
+	/**
+	 * Makes a move on the board. <br>
+	 * @requires board is not null and not full
+	 * @param board the current board
+	 */
+	public char makeMove(Board board) {
+		int choice = determineMove(board);
+
+		if (choice == GoGameConstants.PASSint) {
+			return GoGameConstants.PASS;
+		} else {
+			try {
+				board.setField(choice, this.getColour());
+				return GoGameConstants.VALID;
+			} catch (InvalidFieldException e) {
+				return GoGameConstants.INVALID;
+			}
+		}
+	}
+
+	/**
+	 * Displays message on user interface
+	 */
+	public void displayMessage(String message) {
+		this.TUI.showMessage(message);
+	}
+
+	public void updateGUI(Board board) {
+	}
 
 }

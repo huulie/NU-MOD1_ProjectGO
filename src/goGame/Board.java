@@ -315,7 +315,7 @@ public class Board {
 	public boolean checkSamePreviousState(Stone[][] newState) {
 		boolean sameFound;
 
-		if (this.previousStates.contains(newState) ) { // TODO: CHECK not wanting to compare object, but compare their contents
+		if (this.previousStates.contains(newState) ) { // TODO: CHECK not wanting to compare object, but compare their contents> == ?!
 			sameFound = true;
 		} else {
 			sameFound = false;

@@ -7,31 +7,29 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import exceptions.ExitProgram;
-import goClient.GoClient;
+import goClient.GoClient; // TODO check for unused imports
 import goUI.GoTUI;
 import goUI.GoTUICommands;
 
-/** Hotel Client TUI.
+/** Go Game Local TUI.
+ * Can be used by a local player or locally on server //TODO thinks about this> maybe seperate?
  * @author huub.lievestro
  *
  */
 public class GoLocalTUI extends GoTUI {
 
-private LocalPlayer player; // corresponding controller
-	
-	
-	/** Constructor.
-	 * @param client corresponding client
-	 */
-	public GoLocalTUI(LocalPlayer player) {
-		super();
-		this.player = player;
-	}
-	
-	/** Constructor, not bound to a player.
+	//	/** Constructor. TODO: need a TUI to know which player it's connected to? 
+	//	 * @param client corresponding client
+	//	 */
+	//	public GoLocalTUI(LocalPlayer player) {
+	//		super();
+	//		this.player = player; 
+	//	}
+
+	/** Creates a new local TUI, not bound to a player.
 	 */
 	public GoLocalTUI() {
-		GoLocalTUI(null);
+		super();
 	}
 
 	/**
@@ -61,49 +59,44 @@ private LocalPlayer player; // corresponding controller
 
 		case GoTUICommands.HELP:
 			this.showMessage(" - Help for the GO game - ");
-			// Could be implemented: controller."help"
+			// Could be implemented: controller."help" TODO: add something about player?
 			printHelpMenu();
 			break;
-			
-			case GoTUICommands.EXIT:
-    			String confirmation = null;
 
-    			while (confirmation == null) {
-    				confirmation = this.getString("Are you sure? [Y]es / [N]o ");
+		case GoTUICommands.EXIT:
+			String confirmation = null;
 
-    				if (confirmation.equalsIgnoreCase("Y")) {
-    					this.showMessage("Bye bye! ");
-    					throw new ExitProgram("User requested EXIT");
-    				} else if (confirmation.equalsIgnoreCase("N")) {
-    					this.showMessage("Okay, continue to run client ");
-    				} else {
-    					confirmation = null; // all other inputs are ignored
-    				}
-    			}
-    			break;
-		
-    		default:
-    			System.out.println("I don't understand this command, try again");
-    			System.out.println("Maybe this helps:");
-    			printHelpMenu();
+			while (confirmation == null) {
+				confirmation = this.getString("Are you sure? [Y]es / [N]o ");
+
+				if (confirmation.equalsIgnoreCase("Y")) {
+					this.showMessage("Bye bye! ");
+					throw new ExitProgram("User requested EXIT");
+				} else if (confirmation.equalsIgnoreCase("N")) {
+					this.showMessage("Okay, continue to run client ");
+				} else {
+					confirmation = null; // all other inputs are ignored
+				}
+			}
+			break;
+
+		default:
+			this.showMessage("I don't understand this command, try again");
+			this.showMessage("Maybe this helps:");
+			printHelpMenu();
 		}
 	}
-
 
 	/**
 	 * Prints the help menu with available input options.
 	 */
 	@Override
 	public void printHelpMenu() {
-		System.out.println("Commands:");
-		System.out.println(IN + " name ........... check in guest with name");
-		System.out.println(OUT + " name ........... check out guest with name");
-		System.out.println(ROOM + " name ........... request room of guest");
-		System.out.println(ACTIVATESAFE + " name password... activate safe (password required for PricedSafe)");
-		System.out.println(BILL + " name nights..... print bill for guest (name) and number of nights");
-		System.out.println(HELP + " ................ help (this menu)");
-		System.out.println(PRINT + " ................ print state of hotel");
-		System.out.println(EXIT + " ................ exit program");
+		this.showMessage("Commands:");
+		this.showMessage(GoTUICommands.HELP + " ................ help (this menu)");
+		this.showMessage(GoTUICommands.EXIT + " ................ exit program");
+		this.showMessage("TO BE IMPLEMTED FURHTER"); // TODO NEED TO ADD SOME THINGS? 
+		
 	}
 
 }

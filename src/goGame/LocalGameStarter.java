@@ -3,60 +3,64 @@ package goGame;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
 
-//import java.io.BufferedReader;
-//import java.io.IOException;
-//import java.io.InputStreamReader;
 
+/**
+ * Starter for a local game of Go, between two local players
+ * @author huub.lievestro
+ *
+ */
 public class LocalGameStarter {
-	
-	GameController localGame;
 
+	/**
+	 * GameController of the started local game.
+	 */
+	static GameController localGame;
+
+	/**
+	 * Main method, to start the local game
+	 * @param args may input one or two players name 
+	 */
 	public static void main(String[] args) {
 		assert (args.length <= 2) : "Sorry, two players maximum!";
-		
+
 		String name1;
 		String name2;
-		
+
 		if (args.length == 0) {
 			name1 = getString("Please enter name of the first player and press return: ");
 		} else {
 			showMessage("The first player is: " + args[0]);
 			name1 = args[0];
 		}
-		
+
 		if (args.length <= 1) {
 			name2  = getString("Please enter name of the second player and press return: ");
-			
+
 		} else {
 			showMessage("The second player is: " + args[1]);
 			name2 = args[1];
 		}
 
-//		Player player1 = createNewPlayer(name1, Stone.BLACK); // TODO change to colors, changeable?
-//		Player player2 = createNewPlayer(name2, Stone.WHITE); // TODO change to colors, changeable?
-		
-		int boardDim = 5;
-		
-		LocalPlayer player1 = new LocalPlayer(name1, Stone.BLACK, boardDim, true); // TODO change to gamecontroller
-		LocalPlayer player2 = new LocalPlayer(name2, Stone.WHITE, boardDim, false); // TODO change to gamecontroller
+		int boardDim = 5; // TODO fixed board dimensions
+
+		LocalPlayer player1 = new LocalPlayer(name1, Stone.BLACK, boardDim, false); 
+		LocalPlayer player2 = new LocalPlayer(name2, Stone.WHITE, boardDim, false); 
 
 		boolean continueGame = true;
 		while (continueGame) {
-		showMessage("\n -- Let the game begin! -- \n"); 
-		(new GameController(boardDim, player1, player2)).start();
-		// localGame = new GameController(19, player1, player2);
-		// localGame.start();
-		continueGame = getBoolean("\n> Play another time? (true/false)?"); // TODO convert this to yes/no?
+			showMessage("\n -- Let the game begin! -- \n"); 
+
+			localGame = new GameController(boardDim, player1, player2, true);
+			localGame.startGame();
+
+			continueGame = getBoolean("\n> Play another time? (true/false)?"); // TODO convert this to yes/no?
 		}
 		showMessage("Bye bye!");
-		
+
 	}
-	
-	
+
+// TODO: use a local TUI instance? Or make a subclass of local TUI?
 	/**
 	 * Writes the given message to system output.
 	 * 
@@ -74,16 +78,16 @@ public class LocalGameStarter {
 	 */
 	public static String getString(String question) { // TODO implement in separate TUI?
 		showMessage(question); // manual new line, for better layout (no extra white lines)
-        String antw = null;
-        try {
-        	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-            antw = in.readLine();
-        } catch (IOException e) {
-        	showMessage("IO exception: " + e.getLocalizedMessage());
-        }
-        return (antw == null) ? "" : antw;
+		String antw = null;
+		try {
+			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+			antw = in.readLine();
+		} catch (IOException e) {
+			showMessage("IO exception: " + e.getLocalizedMessage());
+		}
+		return (antw == null) ? "" : antw;
 	}
-	
+
 	/**
 	 * Prints the question and asks the user for a yes/no answer.
 	 * 
@@ -110,7 +114,7 @@ public class LocalGameStarter {
 				showMessage("IO Exception occurred");
 			}
 		}
-        return answerBool;
+		return answerBool;
 	}
 
 }
