@@ -564,4 +564,22 @@ public class BoardTools {
 		return score;
 	}
 
+//	TODO: implement? also see GUI updater
+//	/**
+//	 * Returns a formatted String representation of this board.
+//	 *
+//	 * @return the formatted String representation of board
+//	 */
+//	public String StringtoStringFormatted(String board) {
+//		String s = "";
+//		for (int i = 0; i < DIM; i++) {
+//			String row = "";
+//			for (int j = 0; j < DIM; j++) {
+//				row = row + " " + getField(i, j).toString() ;
+//			}
+//			s = s + row + "\n";
+//		}
+//		return s;
+//	}
+	
 }

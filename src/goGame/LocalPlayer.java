@@ -14,6 +14,7 @@ import goUI.GoTUICommands;
 - */
 public class LocalPlayer extends Player {
 
+	
 	/** 
 	 * Associated TUI of this local Player.
 	 */

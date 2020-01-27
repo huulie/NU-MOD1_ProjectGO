@@ -53,23 +53,28 @@ public class GoGuiUpdater {
 
 	public void updateWholeBoard(String boardString) {
 		// TODO: add conversion from string to board here or in board?!
+		// HERE, because cannot create a new board (will not be connected to the game)
 
-//		for ( int i = 0; i < boardDim*boardDim; i++) {
-//			Stone stoneAtField = board.getField(i);
-//
-//			try {
-//				if (stoneAtField==(Stone.WHITE) || stoneAtField==(Stone.BLACK) ) { 
-//					connectedGUI.removeStone(board.index(i).getCol(), board.index(i).getRow());
-//					connectedGUI.addStone(board.index(i).getCol(), board.index(i).getRow(), stoneAtField.equals(Stone.WHITE));
-//				} else if (stoneAtField == Stone.UNOCCUPIED ) {
-//					connectedGUI.removeStone(board.index(i).getCol(), board.index(i).getRow());
-//				} else {
-//					throw new Exception("ERROR GUI-UPDATER: I don't understand this Stone on this board");
-//				}
-//			} catch (Exception e) {
-//				System.out.println(e.getLocalizedMessage());
-//			}
-//		}
+		for ( int i = 0; i < boardDim*boardDim; i++) {
+			Stone stoneAtField = Stone.charToStone(boardString.charAt(i));
+			
+			int row = i / boardDim; // TODO: check if safe enough
+			int col = i % boardDim; // TODO: check if safe enough
+			
+			
+			try {
+				if (stoneAtField==(Stone.WHITE) || stoneAtField==(Stone.BLACK) ) { 
+					connectedGUI.removeStone(col, row);
+					connectedGUI.addStone(col, row, stoneAtField.equals(Stone.WHITE));
+				} else if (stoneAtField == Stone.UNOCCUPIED ) {
+					connectedGUI.removeStone(col, row);
+				} else {
+					throw new Exception("ERROR GUI-UPDATER: I don't understand this Stone on this board");
+				}
+			} catch (Exception e) {
+				System.out.println(e.getLocalizedMessage());
+			}
+		}
 	}
 
 //		public updateOne(int index) { // TODO IMPLEMENT?

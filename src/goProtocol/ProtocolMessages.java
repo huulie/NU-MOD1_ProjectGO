@@ -1,3 +1,6 @@
+package goProtocol;
+
+
 /**
  * Protocol for NU5 GO game (final assignment 1).
  * This is version: ‘0.1’

@@ -8,12 +8,15 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import ss.week3.bill.StringPrinter;
-import ss.week7.hotel.exceptions.ExitProgram;
-import ss.week7.hotel.exceptions.ProtocolException;
-import ss.week7.hotel.exceptions.ServerUnavailableException;
-import ss.week7.hotel.protocol.ClientProtocol;
-import ss.week7.hotel.protocol.ProtocolMessages;
+import com.nedap.go.gui.GoGuiIntegrator;
+
+import exceptions.ExitProgram;
+import exceptions.ProtocolException;
+import exceptions.ServerUnavailableException;
+import goGame.GoLocalTUI;
+import goProtocol.ProtocolMessages;
+import goUI.GoGuiUpdater;
+import goUI.GoTUICommands;
 
 /**
  * Client for Networked Go Game
@@ -26,23 +29,81 @@ public class GoClient { //implements ClientProtocol {
 	private BufferedReader in;
 	private BufferedWriter out;
 	
-	private String hotelName;
+	/**
+	 * Setting to keep connecting if game ended //TODO refine
+	 */
+	private boolean keepConnecting;
 	
-	private HotelClientTUI TUI;
+	
+	/**
+	 * Name of this client
+	 */
+	private String clientName;
+	
+	/**
+	 * Version of communication protocol this client is currently using.
+	 */
+	String protocolVersion = null;
+	
+	private GoLocalTUI TUI;
 	
 	private String serverResponseMarker = "> ";
 	private String localErrorMarker = "!ERROR: ";
-
+	
 	/**
-	 * Constructs a new HotelClient. Initialises the view.
+	 * Boolean to indicate if this client is waiting or participating in a started game
+	 */
+	boolean gameStarted;
+	
+	/**
+	 * Color of the client in the current game
+	 */
+	private String playColour; // TODO change to Stone (and add conversion)
+	
+	/**
+	 * Local model of the board // TODO: convert from STring to Board
+	 */
+	private String localBoard;
+
+	/** 
+	 * TODO: keep? then doc!
+	 */
+	private boolean printDebug = true;
+	
+	
+	/** 
+	 * Associated GUI of this client.
+	 */
+	private GoGuiIntegrator GUI;
+
+	/** 
+	 * To update the associated GUI of this client.
+	 */
+	private GoGuiUpdater GUIupdater;
+
+	/** 
+	 * Indicates if the board has to be sent to the TUI
+	 * TODO what to do with this? 
+	 */
+	private boolean outputBoardToTUI;
+	
+	/**
+	 * Constructs a new GoClient. Initialises the TUI.
 	 */
 	public GoClient() {
-		this.TUI = new HotelClientTUI(this);
+		this.TUI = new GoLocalTUI();
+		this.clientName = TUI.getString("What is your name?");
+		this.gameStarted = false;
+		this.keepConnecting = true;
+	}
+
+	public String getClientName() {
+		return clientName;
 	}
 
 	/**
-	 * Starts a new HotelClient by creating a connection, followed by the 
-	 * HELLO handshake as defined in the protocol. After a successful 
+	 * Starts a new GoClient by creating a connection, followed by the 
+	 * handshake as defined in the protocol. TODO After a successful 
 	 * connection and handshake, the view is started. The view asks for 
 	 * used input and handles all further calls to methods of this class. 
 	 * 
@@ -50,22 +111,35 @@ public class GoClient { //implements ClientProtocol {
 	 * user is asked whether a new connection should be made.
 	 */
 	public void start() {
+		
+		while(keepConnecting){
 		try {
 			this.createConnection();
-			this.handleHello();
+			this.sendHandshake();
 			
-			TUI.start();
+			// TUI.start(); TODO no start TUI because locking thread?!!
+			
+			this.waitForStartGame();
+			this.playingGame();
+			
+			// TODO: connect again? refine?
+			
 		} catch (ServerUnavailableException e) {
-			System.out.println("Server unavailable!");
+			TUI.showMessage("Server unavailable!");
+			TUI.showMessage("Error while communicating with server: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		} catch (ExitProgram e) { // from create connection
-			System.out.println("CLIENT EXIT");
+			TUI.showMessage("CLIENT EXIT");
+			this.keepConnecting = false;
 			e.printStackTrace();
 		} catch (ProtocolException e) { // from handle hello
-			System.out.println("Protocol exception:" + e.getLocalizedMessage());
+			TUI.showMessage("Protocol exception:" + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		}
 	}
+
+	
 
 	/**
 	 * Creates a connection to the server. Requests the IP and port to 
@@ -168,34 +242,34 @@ public class GoClient { //implements ClientProtocol {
 		}
 	}
 
-	/**
-	 * Reads and returns multiple lines from the server until the end of 
-	 * the text is indicated using a line containing ProtocolMessages.EOT.
-	 * 
-	 * @return the concatenated lines sent by the server.
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	public String readMultipleLinesFromServer() 
-			throws ServerUnavailableException {
-		if (in != null) {
-			try {
-				// Read and return answer from Server
-				StringBuilder sb = new StringBuilder();
-				for (String line = in.readLine(); line != null
-						&& !line.equals(ProtocolMessages.EOT); 
-						line = in.readLine()) {
-					sb.append(line + System.lineSeparator());
-				}
-				return sb.toString();
-			} catch (IOException e) {
-				throw new ServerUnavailableException("Could not read "
-						+ "from server.");
-			}
-		} else {
-			throw new ServerUnavailableException("Could not read "
-					+ "from server.");
-		}
-	}
+//	/**
+//	 * Reads and returns multiple lines from the server until the end of 
+//	 * the text is indicated using a line containing ProtocolMessages.EOT.
+//	 * 
+//	 * @return the concatenated lines sent by the server.
+//	 * @throws ServerUnavailableException if IO errors occur.
+//	 */
+//	public String readMultipleLinesFromServer() 
+//			throws ServerUnavailableException {
+//		if (in != null) {
+//			try {
+//				// Read and return answer from Server
+//				StringBuilder sb = new StringBuilder();
+//				for (String line = in.readLine(); line != null
+//						&& !line.equals(ProtocolMessages.EOT); 
+//						line = in.readLine()) {
+//					sb.append(line + System.lineSeparator());
+//				}
+//				return sb.toString();
+//			} catch (IOException e) {
+//				throw new ServerUnavailableException("Could not read "
+//						+ "from server.");
+//			}
+//		} else {
+//			throw new ServerUnavailableException("Could not read "
+//					+ "from server.");
+//		}
+//	}
 
 	/**
 	 * Closes the connection by closing the In- and OutputStreams, as 
@@ -225,200 +299,162 @@ public class GoClient { //implements ClientProtocol {
 	 * @throws ServerUnavailableException if IO errors occur.
 	 * @throws ProtocolException          if the server response is invalid.
 	 */
-	@Override
-	public void handleHello() 
+	public void sendHandshake() 
 			throws ServerUnavailableException, ProtocolException {
-		this.sendMessage(String.valueOf(ProtocolMessages.HELLO));
 		
-		String helloResponse = this.readLineFromServer();
+		String requestedVersion = "1.0";
+		String requestedColour = TUI.getString("Do you want " + ProtocolMessages.BLACK + " or " + ProtocolMessages.WHITE +"?"); // TODO make a "get colour" 
 		
-		if (helloResponse != null && !helloResponse.equalsIgnoreCase("")) {
-			String[] splitHelloResponse = helloResponse.split(ProtocolMessages.DELIMITER);
-			if (splitHelloResponse.length == 2) {
-				if (splitHelloResponse[0].equals(String.valueOf(ProtocolMessages.HELLO))) {
-					 hotelName = splitHelloResponse[1];
+		String handshake = ProtocolMessages.HANDSHAKE + ProtocolMessages.DELIMITER 
+				+ requestedVersion + ProtocolMessages.DELIMITER + this.getClientName()
+				+ ProtocolMessages.DELIMITER + requestedColour;
+		
+		String handshakeServerMessage;
+		
+		this.sendMessage(handshake);
+		
+		String handshakeResponse = this.readLineFromServer();
+		
+		if (handshakeResponse != null && !handshakeResponse.equalsIgnoreCase("")) {
+			String[] splitHandshakeResponse = handshakeResponse.split(ProtocolMessages.DELIMITER);
+			if (splitHandshakeResponse.length == 3) {
+				if (splitHandshakeResponse[0].equals(String.valueOf(ProtocolMessages.HANDSHAKE))) {
+					 this.protocolVersion = splitHandshakeResponse[1];
+					 handshakeServerMessage = splitHandshakeResponse[2];
 				} else {
-					throw new ProtocolException("Handshake failed: server did not say Hello");
+					throw new ProtocolException("Handshake failed: server did not reply correctly (was " + handshakeResponse + " )");
 				}
 			} else {
 				throw new ProtocolException("Handshake failed: Wrong number of arguments (" 
-			+ splitHelloResponse.length + " instead of 2) in response from server");
+			+ splitHandshakeResponse.length + " instead of 2) in response from server");
 			}
 		} else {
 			throw new ProtocolException("Handshake failed: Empty response from server");
 		}
 		// System.out.println("DEBUG" + Welcome to the Hotel booking system of hotel: " + hotelName);
-		TUI.showMessage("Connected to the hotel booking system of: " + hotelName);
+		TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
 	}
 	
 	/**
-	 * Sends a checkIn request to the server.
 	 * 
-	 * Given the name of a guest, the doIn() method sends the following message to
-	 * the server: ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName
-	 * 
-	 * The result (one line) is then retrieved and forwarded to the view.
-	 * 
-	 * @requires guestName != null
-	 * @param guestName Name of the guest
-	 * @throws ServerUnavailableException if IO errors occur.
 	 */
-	@Override
-	public void doIn(String guestName) throws ServerUnavailableException {
-        assert guestName != null : "guestName may not be null";
-		
-        this.sendMessage(ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName);
-        
-		String doInResponse = this.readLineFromServer();
-		
-		// System.out.println("DEBUG" + serverResponseMarker + doInResponse);
-		TUI.showMessage(serverResponseMarker + doInResponse);
+	public void waitForStartGame() {
+		TUI.showMessage("Waiting for a game to begin...");
 
-	}
-
-	/**
-	 * Sends a checkOut request to the server.
-	 * 
-	 * Given the name of a guest, the doOut() method sends the following message to
-	 * the server: ProtocolMessages.OUT + ProtocolMessages.DELIMITER + guestName
-	 * 
-	 * The result (one line) is then retrieved and forwarded to the view.
-	 * 
-	 * @requires guestName != null
-	 * @param guestName Name of the guest
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	@Override
-	public void doOut(String guestName) throws ServerUnavailableException {
-		assert guestName != null : "guestName may not be null";
-		
-        this.sendMessage(ProtocolMessages.OUT + ProtocolMessages.DELIMITER + guestName);
-        
-		String doOutResponse = this.readLineFromServer();
-		
-		// System.out.println("DEBUG" + serverResponseMarker + doOutResponse);
-		TUI.showMessage(serverResponseMarker + doOutResponse);
-	}
-
-	/**
-	 * Sends a room request to the server.
-	 * 
-	 * Given the name of a guest, the doRoom() method sends the following message to
-	 * the server: ProtocolMessages.ROOM + ProtocolMessages.DELIMITER + guestName
-	 * 
-	 * The result (one line) is then retrieved and forwarded to the view.
-	 * 
-	 * @requires guestName != null
-	 * @param guestName Name of the guest
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	@Override
-	public void doRoom(String guestName) throws ServerUnavailableException {
-		assert guestName != null : "guestName may not be null";
-		
-        this.sendMessage(ProtocolMessages.ROOM + ProtocolMessages.DELIMITER + guestName);
-        
-		String doRoomResponse = this.readLineFromServer();
-		
-		// System.out.println("DEBUG" + serverResponseMarker + doRoomResponse);
-		TUI.showMessage(serverResponseMarker + doRoomResponse);
-	}
-
-	/**
-	 * Sends a safe activation request to the server.
-	 * 
-	 * Given the name of a guest, the doAct() method sends the following message to
-	 * the server: ProtocolMessages.ACT + ProtocolMessages.DELIMITER + guestName +
-	 * ProtocolMessages.DELIMITER + password
-	 * 
-	 * The result (one line) is then retrieved and forwarded to the view.
-	 * 
-	 * @requires guestName != null
-	 * @param guestName Name of the guest
-	 * @param password  (Optional) Password in case of a protected safe
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	@Override
-	public void doAct(String guestName, String password) 
-			throws ServerUnavailableException {
-		assert guestName != null : "guestName may not be null";
-		assert password != null : "password may not be null";
-
-        this.sendMessage(ProtocolMessages.ACT + ProtocolMessages.DELIMITER + guestName +
-        		  ProtocolMessages.DELIMITER + password);
-        
-		String doActResponse = this.readLineFromServer();
-		
-		// System.out.println("DEBUG" + serverResponseMarker + doActResponse);
-		TUI.showMessage(serverResponseMarker + doActResponse);
-	}
-
-	/**
-	 * Requests the bill for a guest at the server.
-	 * 
-	 * Given the name of a guest and the number of nights of the stay, the doBill()
-	 * method sends the following message to the server: ProtocolMessages.ACT +
-	 * ProtocolMessages.DELIMITER + guestName + ProtocolMessages.DELIMITER +
-	 * nights
-	 * 
-	 * If nights is not an integer or not a positive number, a message is shown in
-	 * the view and no request is sent to the server.
-	 * 
-	 * When a request is sent to the server, the result (multiple lines, ending with
-	 * ProtocolMessages.EOT) is retrieved and forwarded to the view.
-	 * 
-	 * @requires guestName != null
-	 * @requires nights to be integer and > 0
-	 * @param guestName Name of the guest
-	 * @param nights    Number of nights of the stay
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	@Override
-	public void doBill(String guestName, String nights) 
-			throws ServerUnavailableException {
-		assert guestName != null : "guestName may not be null";
-//		assert (nights != null && Integer.parseInt(nights) > 0) : "nights may not be null or less then one";
-
-		try {
-			if (Integer.parseInt(nights) <= 0) {
-				TUI.showMessage(localErrorMarker 
-						+ "number of nights has to be greater than zero");
-			} else {
-				this.sendMessage(ProtocolMessages.BILL + ProtocolMessages.DELIMITER + guestName 
-						+ ProtocolMessages.DELIMITER + nights);
-				
-				String doBillResponse = this.readMultipleLinesFromServer();
-				
-				// System.out.println("DEBUG" + serverResponseMarker + doBillResponse);
-				TUI.showMessage(serverResponseMarker + doBillResponse);
+		while (this.gameStarted == false) {
+			String serverStarts = null;
+			try {
+				serverStarts = this.readLineFromServer();
+			} catch (ServerUnavailableException e) {
+				TUI.showMessage("Error while reading from server: " + e.getLocalizedMessage());
+				e.printStackTrace();
 			}
-		} catch (NumberFormatException nfe) {
-			// System.out.println("DEBUG" + localErrorMarker + "number of nights could not be converted to integer");
-			TUI.showMessage(localErrorMarker + "number of nights could not be converted to integer");
+			String[] splitServerStarts = serverStarts.split(ProtocolMessages.DELIMITER);
+			if(splitServerStarts[0].equals(String.valueOf(ProtocolMessages.GAME))) {
+				this.localBoard = splitServerStarts[1]; // TODO convert from String to board
+				this.playColour = splitServerStarts[2];
+				this.gameStarted = true;
+				TUI.showMessage("... game started!");
+			}
 		}
 	}
-
-	/**
-	 * Requests the state of the hotel at the server. The state contains an overview
-	 * of the rooms, its guests and the state of the safes.
-	 * 
-	 * The doPrint() method sends the following message to the server:
-	 * ProtocolMessages.PRINT
-	 * 
-	 * The result (multiple lines, ending with ProtocolMessages.EOT) is retrieved
-	 * and forwarded to the view
-	 * 
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	@Override
-	public void doPrint() throws ServerUnavailableException {
-		this.sendMessage(String.valueOf(ProtocolMessages.PRINT));
-      
-		String doPrintResponse = this.readMultipleLinesFromServer();
+	
+	private void playingGame() {
+		int boardDim = 19; // TODO derive from sent board?!
 		
-		// System.out.println("DEBUG" + serverResponseMarker + doPrintResponse);
-		TUI.showMessage(serverResponseMarker + doPrintResponse);
+		boolean startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
+		if (startGUI) {
+			this.TUI.showMessage("Player " + clientName + " will use a GUI");
+			this.GUI = new GoGuiIntegrator(true, true, boardDim);
+			this.GUI.startGUI();
+			this.GUI.setBoardSize(boardDim);
+			this.GUIupdater = new GoGuiUpdater(this.GUI);
+			this.outputBoardToTUI = false;
+		} else {
+			this.TUI.showMessage("Player " + clientName + " will use a TUI");
+			this.outputBoardToTUI = true;
+		}
+		
+		while (gameStarted == true) {
+			TUI.showMessage("Waiting for response from server..");
+			String serverResponse = null;
+
+			try {
+				serverResponse = this.readLineFromServer();
+				if (printDebug) TUI.showMessage("DEBUG server sends: " + serverResponse);
+
+				String[] splitServerResponse = serverResponse.split(ProtocolMessages.DELIMITER);
+				
+				switch(splitServerResponse[0].charAt(0)) {
+				
+				case ProtocolMessages.TURN:
+					this.localBoard = splitServerResponse[1]; // TODO convert from String to board
+					if (this.GUI != null) {
+						this.GUIupdater.updateWholeBoard(this.localBoard);
+						}
+					
+					String opponentLastMove = splitServerResponse[2];			
+
+					String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
+							+ TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
+					this.sendMessage(makeMove);
+					break;
+					
+				case ProtocolMessages.RESULT:
+					String valid = splitServerResponse[1];
+					this.localBoard = splitServerResponse[2];
+					if (this.GUI != null) {
+					this.GUIupdater.updateWholeBoard(this.localBoard);
+					}
+					break;
+				
+				case ProtocolMessages.END:
+					String reasonEnd = splitServerResponse[1];
+					String winner = splitServerResponse[2];
+					String scoreBlack = splitServerResponse[3];
+					String scoreWhite = splitServerResponse[4];
+					TUI.showMessage("This game has ended [DEBUG]");
+					this.gameStarted = false;
+					
+				case ProtocolMessages.ERROR:	
+					throw new ProtocolException("Invalid message received by server");
+			}	
+
+			} catch (ServerUnavailableException e) {
+				TUI.showMessage("Error while communicating with server: " + e.getLocalizedMessage());
+				e.printStackTrace();
+			} catch (ProtocolException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
+	
+//	/**
+//	 * Sends a checkIn request to the server.
+//	 * 
+//	 * Given the name of a guest, the doIn() method sends the following message to
+//	 * the server: ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName
+//	 * 
+//	 * The result (one line) is then retrieved and forwarded to the view.
+//	 * 
+//	 * @requires guestName != null
+//	 * @param guestName Name of the guest
+//	 * @throws ServerUnavailableException if IO errors occur.
+//	 */
+//	public void doIn(String guestName) throws ServerUnavailableException {
+//        assert guestName != null : "guestName may not be null";
+//		
+//        this.sendMessage(ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName);
+//        
+//		String doInResponse = this.readLineFromServer();
+//		
+//		// System.out.println("DEBUG" + serverResponseMarker + doInResponse);
+//		TUI.showMessage(serverResponseMarker + doInResponse);
+//
+//	}
+
+
 
 	/**
 	 * Sends a message to the server indicating that this client will exit:
@@ -429,40 +465,39 @@ public class GoClient { //implements ClientProtocol {
 	 * 
 	 * @throws ServerUnavailableException if IO errors occur.
 	 */
-	@Override
 	public void sendExit() throws ServerUnavailableException {
 		this.sendMessage(String.valueOf(ProtocolMessages.EXIT));
 		
 		this.closeConnection();
 	}
 	
-	/**
-	 * Requests name of hotel and network information, to show in help
-	 * 
-	 * The doHelp() method sends the following message to the server:
-	 * ProtocolMessages.HELP
-	 * 
-	 * The result (one line) is retrieved and forwarded to the view
-	 * 
-	 * @throws ServerUnavailableException if IO errors occur.
-	 */
-	// @Override
-	public void doHelp() throws ServerUnavailableException {
-		this.sendMessage(String.valueOf(ProtocolMessages.HELP));
-      
-		String doPrintResponse = this.readLineFromServer();
-		
-		// System.out.println("DEBUG" + serverResponseMarker + doPrintResponse);
-		TUI.showMessage(serverResponseMarker + doPrintResponse);
-	}
+//	/**
+//	 * Requests name of hotel and network information, to show in help
+//	 * 
+//	 * The doHelp() method sends the following message to the server:
+//	 * ProtocolMessages.HELP
+//	 * 
+//	 * The result (one line) is retrieved and forwarded to the view
+//	 * 
+//	 * @throws ServerUnavailableException if IO errors occur.
+//	 */
+//	// @Override
+//	public void doHelp() throws ServerUnavailableException {
+//		this.sendMessage(String.valueOf(ProtocolMessages.));
+//      
+//		String doPrintResponse = this.readLineFromServer();
+//		
+//		// System.out.println("DEBUG" + serverResponseMarker + doPrintResponse);
+//		TUI.showMessage(serverResponseMarker + doPrintResponse);
+//	}
 
 	/**
-	 * This method starts a new HotelClient.
+	 * This method starts a new GoClient.
 	 * 
 	 * @param args 
 	 */
 	public static void main(String[] args) {
-		(new HotelClient()).start();
+		(new GoClient()).start();
 	}
 
 }

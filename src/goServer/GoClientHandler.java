@@ -7,11 +7,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 
-import ss.utils.TextIO;
-import ss.week3.bill.StringPrinter;
-import ss.week3.hotel.PricedSafe;
-import ss.week3.hotel.Room;
-import ss.week7.hotel.protocol.ProtocolMessages;
+import exceptions.ClientUnavailableException;
+import goGame.Player;
+import goGame.RemotePlayer;
+import goGame.Stone;
+import goProtocol.ProtocolMessages;
+
 
 /**
  * GoClientHandler for the GO Server application.
@@ -30,7 +31,12 @@ public class GoClientHandler implements Runnable {
 	private GoServer srv;
 
 	/** Name of this ClientHandler. */
-	private String name;
+	private String clientName;
+	
+	/**
+	 * Associated Remote Player, taking part in the game
+	 */
+	Player remotePlayer;
 
 	/**
 	 * Constructs a new GoClientHandler. Opens the In- and OutputStreams.
@@ -39,7 +45,7 @@ public class GoClientHandler implements Runnable {
 	 * @param srv  The connected server
 	 * @param name The name of this ClientHandler
 	 */
-	public GoClientHandler(Socket sock, GoServer srv, String name) {
+	public GoClientHandler(Socket sock, GoServer srv, String name) { 
 		try {
 			in = new BufferedReader(
 					new InputStreamReader(sock.getInputStream()));
@@ -47,7 +53,10 @@ public class GoClientHandler implements Runnable {
 					new OutputStreamWriter(sock.getOutputStream()));
 			this.sock = sock;
 			this.srv = srv;
-			this.name = name;
+			this.clientName = name;
+			
+			// this.remotePlayer = createRemotePlayer(this.name); TODO create after handshake
+			
 		} catch (IOException e) {
 			shutdown();
 		}
@@ -55,15 +64,15 @@ public class GoClientHandler implements Runnable {
 
 	/**
 	 * Continuously listens to client input and forwards the input to the
-	 * {@link #handleCommand(String)} method.
+	 * {@link #handleIncoming(String)} method.
 	 */
 	public void run() {
 		String msg;
 		try {
 			msg = in.readLine();
 			while (msg != null) {
-				System.out.println("> [" + name + "] Incoming: " + msg);
-				handleCommand(msg);
+				System.out.println("> [" + clientName + "] Incoming: " + msg);
+				handleIncoming(msg);
 				out.newLine();
 				out.flush();
 				msg = in.readLine();
@@ -86,38 +95,81 @@ public class GoClientHandler implements Runnable {
 	 * @param msg command from client
 	 * @throws IOException if an IO errors occur.
 	 */
-	private void handleCommand(String msg) throws IOException {
+	private void handleIncoming(String msg) throws IOException {
 		String [] split = msg.split(ProtocolMessages.DELIMITER);
 
 		char command = split[0].charAt(0); // convert to char
-		String param = null;
+		String param1 = null;
 		String param2 = null;
+		String param3 = null;
 
 		if (split.length > 1) {
-			param = split[1]; // [0] is command
+			param1 = split[1]; // [0] is command
 		}
 		if (split.length > 2) {
 			param2 = split[2];
 		}
+		if (split.length > 3) {
+			param3 = split[3];
+		}
 
+		try {
 		switch (command) {
 		
-		    case ProtocolMessages.HELLO:
-		    	// xxx
+		    case ProtocolMessages.HANDSHAKE:
+			String requestedVersion = param1;
+	    	String playerName = param2;
+			String requestColor = param3;
+		    	
+			this.remotePlayer = createRemotePlayer(playerName);	
+			this.sendMessage(srv.respondHandshake(this));
+			
+			srv.checkWaitingList();
 		    	break;
+		    	
+//		    case ProtocolMessages.MOVE: // TODO: this handled in requestmove?
+//		    	 // do something with move
+//		    	
+//		    	
+//		    	
+//		    	// TODO validation
+//		    	String board = this.remotePlayer.getGame().getGameBoard().toString();
+//		    	
+//		    	String result = ProtocolMessages.RESULT + ProtocolMessages.DELIMITER 
+//		    	+ ProtocolMessages.VALID + ProtocolMessages.DELIMITER + board;
+//		    	this.sendMessage(result);
+//		    	break;
     
     		default:
-    			System.out.println("I don't understand this command, try again");
+    			System.out.println("DEBUG I don't understand this command, try again"); //TODO sent to system out
     			// and send invalid
+    			this.sendMessage(ProtocolMessages.ERROR + ProtocolMessages.DELIMITER + "unkown command" );
+		}
+		} catch (ClientUnavailableException e) {
+			System.out.println("Error while communicating with client: " + e.getLocalizedMessage()); // TODO where to send this to? 
+			e.printStackTrace();
 		}
 	}
 
+	
+	/** 
+	 * 
+	 */
+	public Player createRemotePlayer(String name) {
+		// TODO LET IT ASK FOR COLOUR
+		
+		Stone colour = Stone.BLACK;
+		
+		this.remotePlayer = new RemotePlayer(name, colour, this);
+		return this.remotePlayer;
+	}
+	
 	/**
 	 * Shut down the connection to this client by closing the socket and 
 	 * the In- and OutputStreams.
 	 */
 	private void shutdown() {
-		System.out.println("> [" + name + "] Shutting down.");
+		System.out.println("> [" + clientName + "] Shutting down.");
 		try {
 			in.close();
 			out.close();
@@ -126,5 +178,102 @@ public class GoClientHandler implements Runnable {
 			e.printStackTrace();
 		}
 		srv.removeClient(this);
+	}
+
+	public int requestMove() {
+		String board = this.remotePlayer.getGame().getGameBoard().toString();
+		String opponentsLastMove = " "; // TODO also implement
+
+		String moveAnswer = null;
+		int move = -2; // TODO think of default
+		Boolean answerValid = false;
+		while (!answerValid) {
+
+			try {
+				this.sendMessage(ProtocolMessages.TURN + ProtocolMessages.DELIMITER 
+						+ board + ProtocolMessages.DELIMITER + opponentsLastMove);
+			} catch (ClientUnavailableException e) {
+				System.out.println("Error while communicating with client: " + e.getLocalizedMessage()); // TODO where to send this to? 
+				e.printStackTrace();
+			}
+
+			try {
+				moveAnswer = in.readLine();
+
+
+				move = Integer.parseInt(moveAnswer);
+				answerValid = true;
+			} catch (NumberFormatException eFormat) {
+				System.out.println("DEBUG: answer not a int"); //TODO handle this elegantly
+				//		this.showMessage("ERROR> " + answer +  " is not an integer (" 
+				//				+ eFormat.getLocalizedMessage() + ") try again!");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		// TODO validation
+
+		String result = ProtocolMessages.RESULT + ProtocolMessages.DELIMITER 
+				+ ProtocolMessages.VALID + ProtocolMessages.DELIMITER + board;
+		try {
+			this.sendMessage(result);
+		} catch (ClientUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return move;
+
+
+	}
+	
+	/**
+	 * TODO doc
+	 */
+	public void clientStartGame( ) {
+		
+		String startGame = ProtocolMessages.GAME + ProtocolMessages.DELIMITER 
+				+ this.getRemotePlayer().getGame().getGameBoard() + ProtocolMessages.DELIMITER
+				+ this.getRemotePlayer().getColour();
+		try {
+			this.sendMessage(startGame);
+		} catch (ClientUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Sends a message to the connected client, followed by a new line. 
+	 * The stream is then flushed.
+	 * 
+	 * @param msg the message to write to the OutputStream.
+	 * @throws ClientUnavailableException if IO errors occur.
+	 */
+	public synchronized void sendMessage(String msg) 
+			throws ClientUnavailableException {
+		if (out != null) {
+			try {
+				out.write(msg);
+				out.newLine();
+				out.flush();
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+				throw new ClientUnavailableException("Could not write "
+						+ "to client: IO esception > " + e.getLocalizedMessage());
+			}
+		} else {
+			throw new ClientUnavailableException("Could not write "
+					+ "to client: no out writer");
+		}
+	}
+
+	public Player getRemotePlayer() {
+		return remotePlayer;
+	}
+
+	public String getClientName() {
+		return this.clientName;
 	}
 }

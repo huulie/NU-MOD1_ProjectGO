@@ -9,7 +9,7 @@ import goUI.GoGuiUpdater;
  * @author huub.lievestro
  *
  */
-public class GameController {
+public class GameController implements Runnable{
 
 	/**
 	 * Associated game, controlled by this GameController.
@@ -69,7 +69,7 @@ public class GameController {
 		boolean firstPassed = false;
 
 		while (gameOver != true) { // TODO implement a this.board.gameOver() ?
-
+			System.out.println("DEBUG: make a new move..."); // TODO: eventually remove/disable
 			// TODO implement checks on validity / previous state etc
 			char currentMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard());
 
@@ -84,6 +84,8 @@ public class GameController {
 				System.out.println("INVALID"); // TODO end game as loser
 				gameOver = true;
 			} else {
+				
+				System.out.println("DEBUG: update game.."); // TODO: eventually remove/disable
 				this.game.update(); // TODO: pattern render view something
 
 				// send new game state to players 
@@ -147,6 +149,20 @@ public class GameController {
 			System.out.println("There is no GUI to update!");
 		}
 
+	}
+	
+	/** 
+	 * Get board from the game associated to this GameController
+	 * @return board from the game associated to this GameController
+	 */
+	public Board getGameBoard() {
+		return this.game.getBoard();
+	}
+
+	@Override
+	public void run() {
+		this.startGame();
+		
 	}
 
 }

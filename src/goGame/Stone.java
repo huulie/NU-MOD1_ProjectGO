@@ -14,12 +14,32 @@ public enum Stone {
 	private Stone(char print) {
 		this.print = String.valueOf(print);
 	}
+	
+	private char print() {
+		return this.print
+	}
     
     @Override
     public String toString() {
     	return this.print;
     }
 
+    /**
+     * Convert char to Stone TODO: DOC
+     * @param name
+     * @return
+     */
+    public static Stone charToStone(char name){
+    	for (Stone stone : Stone.values())
+            if (stone.print() == name)
+                return stone;
+
+        return null;
+    	
+        // TODO: JAVA 8, but no Arrays in enum?
+    	//return Arrays.stream(FileType.values()).filter(f -> f.name == name).findAny().orElseThrow(IllegalArgumentException::new);
+    }
+    
     /**
      * Returns the other stone colour.
      * @ensures that WHITE is returned if this stone is BLACK, and vice versa.

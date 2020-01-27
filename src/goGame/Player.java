@@ -24,6 +24,11 @@ public abstract class Player {
 	private Stone colour;
 
 	/**
+	 * GameController associated to this Player
+	 */
+	private GameController game;
+
+	/**
 	 * TUI associated to this Player
 	 */
 	private GoTUI TUI;
@@ -76,9 +81,17 @@ public abstract class Player {
 		return Arrays.stream(this.getClass().getFields())
 				.anyMatch(f -> f.getName().equals("GUI"));
 	}
+	
+	public GameController getGame() {
+		return game;
+	}
 
 	// -- Commands ---------------------------------------------------
 
+	public void setGame(GameController game) {
+		this.game = game;
+	}
+	
 	/**
 	 * Makes a move on the board. <br>
 	 * @requires board is not null and not full
@@ -106,6 +119,10 @@ public abstract class Player {
 		this.TUI.showMessage(message);
 	}
 
+	/**
+	 * Updates the GUI of the Player with this board
+	 * @param board data to update GUI with
+	 */
 	public void updateGUI(Board board) {
 	}
 
