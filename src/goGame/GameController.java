@@ -2,6 +2,7 @@ package goGame;
 
 import com.nedap.go.gui.GoGuiIntegrator;
 
+import exceptions.TimeOutException;
 import goUI.GoGuiUpdater;
 
 
@@ -71,16 +72,26 @@ public class GameController implements Runnable{
 		while (gameOver != true) { // TODO implement a this.board.gameOver() ?
 			System.out.println("DEBUG: make a new move..."); // TODO: eventually remove/disable
 			// TODO implement checks on validity / previous state etc
-			char currentMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard());
+			
+			int chosenMove = -2; //TODO think of default
+			try {
+				chosenMove = this.game.getCurrentPlayer().determineMove(this.game.getBoard());
+			} catch (TimeOutException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+				System.out.println("Be faster, now passing!");
+				chosenMove = -1;
+			}
+			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
 
-			if (currentMove == GoGameConstants.PASS) {
+			if (resultMove == GoGameConstants.PASS) {
 				if(firstPassed) {
 					gameOver = true; // TODO properly end game
 				} else {
 					firstPassed = true;
 					this.game.moveToNextPlayer();
 				}
-			} else if (currentMove == GoGameConstants.INVALID) {
+			} else if (resultMove == GoGameConstants.INVALID) {
 				System.out.println("INVALID"); // TODO end game as loser
 				gameOver = true;
 			} else {
@@ -91,7 +102,7 @@ public class GameController implements Runnable{
 				// send new game state to players 
 				// TODO implement!
 
-
+				this.game.getCurrentPlayer().moveResult(resultMove, this.game.getBoard());
 				// if present, update GUI's for local player or gameController
 				if (this.game.getCurrentPlayer().hasGUI()) {
 					this.game.getCurrentPlayer().updateGUI(this.game.getBoard());

@@ -18,9 +18,9 @@ import goGame.Stone;
  *
  */
 public class GoScoringTest {
-	private static final String WHITE = " " + Stone.WHITE.toString() + " ";
-	private static final String BLACK = " " + Stone.BLACK.toString() + " ";
-	private static final String UNOCCUPIED = " " + Stone.UNOCCUPIED.toString() + " ";
+	private static final String WHITE = (" " + Stone.WHITE.toString() + " ").replaceAll("\\s+","");
+	private static final String BLACK = (" " + Stone.BLACK.toString() + " ").replaceAll("\\s+","");
+	private static final String UNOCCUPIED = (" " + Stone.UNOCCUPIED.toString() + " ").replaceAll("\\s+","");
 
 	@Test
 	void testScore4TwoSidesAllOccupied() {
@@ -271,6 +271,8 @@ public class GoScoringTest {
 		testBoard.setField(58, Stone.WHITE);
 		testBoard.setField(60, Stone.WHITE);
 		
+		System.out.println(testBoard.returnIntersectionArray());
+		
 		assertThat(testBoard.toString(), containsString(
 				UNOCCUPIED + UNOCCUPIED + BLACK + BLACK + UNOCCUPIED + WHITE + UNOCCUPIED + BLACK
 				+ UNOCCUPIED + BLACK + BLACK + BLACK + UNOCCUPIED + WHITE + UNOCCUPIED + BLACK
@@ -292,5 +294,6 @@ public class GoScoringTest {
 			System.out.println("ERROR: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+
 	}
 }

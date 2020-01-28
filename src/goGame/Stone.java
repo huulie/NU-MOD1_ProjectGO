@@ -9,19 +9,19 @@ package goGame;
 public enum Stone {
 	BLACK(GoGameConstants.BLACK), WHITE(GoGameConstants.WHITE), UNOCCUPIED(GoGameConstants.UNOCCUPIED); // TODO: vervangen door protocol messages?!
 	
-	private final String print;
+	private final char print;
 	
 	private Stone(char print) {
-		this.print = String.valueOf(print);
+		this.print = print;
 	}
 	
 	private char print() {
-		return this.print
+		return this.print;
 	}
     
     @Override
     public String toString() {
-    	return this.print;
+    	return String.valueOf(this.print);
     }
 
     /**

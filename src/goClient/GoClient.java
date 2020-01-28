@@ -204,6 +204,7 @@ public class GoClient { //implements ClientProtocol {
 				out.write(msg);
 				out.newLine();
 				out.flush();
+				if (printDebug) System.out.println("Client send: " + msg);
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 				throw new ServerUnavailableException("Could not write "
@@ -226,12 +227,23 @@ public class GoClient { //implements ClientProtocol {
 		if (in != null) {
 			try {
 				// Read and return answer from Server
-				String answer = in.readLine();
+				String answer = null;
+				
+//				while(answer == null || answer.equals("")) { // TODO keep trying while returning empty string
+				answer = in.readLine();
 				if (answer == null) {
 					throw new ServerUnavailableException("Could not read "
 							+ "from server.");
 				}
+				if (printDebug) System.out.println("Client read: " + answer);
+//				}
 				return answer;
+//				String answer = null;
+//				
+//				while ((answer = in.readLine()) != null) {
+//					System.out.println(in);
+//					return answer;
+//				}
 			} catch (IOException e) {
 				throw new ServerUnavailableException("Could not read "
 						+ "from server.");
@@ -430,31 +442,6 @@ public class GoClient { //implements ClientProtocol {
 		}
 	}
 	
-//	/**
-//	 * Sends a checkIn request to the server.
-//	 * 
-//	 * Given the name of a guest, the doIn() method sends the following message to
-//	 * the server: ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName
-//	 * 
-//	 * The result (one line) is then retrieved and forwarded to the view.
-//	 * 
-//	 * @requires guestName != null
-//	 * @param guestName Name of the guest
-//	 * @throws ServerUnavailableException if IO errors occur.
-//	 */
-//	public void doIn(String guestName) throws ServerUnavailableException {
-//        assert guestName != null : "guestName may not be null";
-//		
-//        this.sendMessage(ProtocolMessages.IN + ProtocolMessages.DELIMITER + guestName);
-//        
-//		String doInResponse = this.readLineFromServer();
-//		
-//		// System.out.println("DEBUG" + serverResponseMarker + doInResponse);
-//		TUI.showMessage(serverResponseMarker + doInResponse);
-//
-//	}
-
-
 
 	/**
 	 * Sends a message to the server indicating that this client will exit:

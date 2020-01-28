@@ -1,9 +1,13 @@
 package goGame;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
 import exceptions.InvalidFieldException;
+
+import org.apache.commons.codec.binary.Hex;
 
 /**
  * Model of board for the GO game. 
@@ -30,7 +34,8 @@ public class Board {
 	 * The previous states of the DIM by DIM intersections of the GO board. 
 	 * List index is in chronological order, with highest index being latest state
 	 */
-	private List<Stone[][]> previousStates = new ArrayList<Stone[][]>();  	// TODO: save whole boards or only hashes?!
+//	private List<Stone[][]> previousStates = new ArrayList<Stone[][]>();  	// TODO: save whole boards or only hashes?!
+	private List<String> previousStates = new ArrayList<String>();  	// TODO: save whole boards or only hashes?!
 
 	/**
 	 * Creates an empty board.
@@ -221,6 +226,7 @@ public class Board {
 			}
 			s = s + row;
 		}
+		s = s.replaceAll("\\s+",""); // TODO Remove all spaces and non-visible characters
 		return s;
 	}
 
@@ -241,6 +247,24 @@ public class Board {
 		}
 		return s;
 	}
+	
+	/**
+	 * Returns a String representation of an instersections array. 
+	 *
+	 * @return the game situation as String
+	 */
+	public String intersectionsToString(Stone[][] intersections) {
+		String s = "";
+		for (int i = 0; i < DIM; i++) {
+			String row = "";
+			for (int j = 0; j < DIM; j++) {
+				row = row + " " + intersections[i][j].toString() + " ";
+			}
+			s = s + row;
+		}
+		s = s.replaceAll("\\s+",""); // TODO Remove all spaces and non-visible characters
+		return s;
+	}
 
 	/**
 	 * Empties all intersections of this board (i.e., let them refer to the value Stone.UNOCCUPIED).
@@ -250,11 +274,13 @@ public class Board {
 	public void reset() throws InvalidFieldException {
 		for (int emptyRow = 0; emptyRow < DIM; emptyRow++) {
 			for (int emptyColumn = 0; emptyColumn < DIM; emptyColumn++) {
-				this.setField(emptyRow, emptyColumn, Stone.UNOCCUPIED);
+				intersections[emptyRow][emptyColumn] = Stone.UNOCCUPIED;
+				// this.setField(emptyRow, emptyColumn, Stone.UNOCCUPIED);
+				// TODO: do NOT use setField, because cannot add to previous state with nulls
 			}
 		}
 		this.previousStates.clear();
-		this.previousStates.add(intersections);
+		this.previousStates.add(getIntersectionsHash(intersections));
 	}
 
 	/**
@@ -296,7 +322,7 @@ public class Board {
 		if (this.isField(coordinate)) {
 
 			this.intersections[coordinate.getRow()][coordinate.getCol()] = color ; // TODO: check this stone object
-			this.previousStates.add(intersections);
+			this.previousStates.add(getIntersectionsHash(intersections));
 			return GoGameConstants.VALID ;
 		}
 		else {
@@ -315,7 +341,7 @@ public class Board {
 	public boolean checkSamePreviousState(Stone[][] newState) {
 		boolean sameFound;
 
-		if (this.previousStates.contains(newState) ) { // TODO: CHECK not wanting to compare object, but compare their contents> == ?!
+		if (this.previousStates.contains(getIntersectionsHash(newState)) ) { // TODO: CHECK not wanting to compare object, but compare their contents> == ?!
 			sameFound = true;
 		} else {
 			sameFound = false;
@@ -457,6 +483,27 @@ public class Board {
 			return -1; // to indicate outside board
 		}
 		return indexRight ;
+	}
+	
+	/**
+	 * TODO doc
+	 * @param intersections
+	 * @return
+	 */
+	private String getIntersectionsHash(Stone[][] intersections) {
+		String intersectionsString = this.intersectionsToString(intersections);
+		
+		try {
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		md.update(intersectionsString.getBytes());
+		return Hex.encodeHexString(md.digest()); 
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			System.out.println("No such algorithm");
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 package goGame;
 
+import exceptions.TimeOutException;
 import goServer.GoClientHandler;
 
 // TODO: documentation and implementation
@@ -27,8 +28,17 @@ public class RemotePlayer extends Player {
 	}
 	
 	@Override
-	public int determineMove(Board board) {
+	public int determineMove(Board board) throws TimeOutException {
 		return clientHandler.requestMove(); 
+	}
+	
+	/**
+	 * Shows the result of the move to the Player
+	 * @param board data to update
+	 */
+	 @Override
+	public void moveResult(char result, Board board) {
+		 clientHandler.resultMove(result, board);
 	}
 	
 //	/**

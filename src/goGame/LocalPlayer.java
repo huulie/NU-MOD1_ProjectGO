@@ -80,17 +80,17 @@ public class LocalPlayer extends Player {
 		if (move != GoGameConstants.PASSint) {
 			boolean validPlacement = board.isField(move) && board.isEmptyField(move);
 
-			Board checkPrevious = board.deepCopy();
+			Board checkSamePrevious = board.deepCopy();
 			try {
-				checkPrevious.setField(move, this.getColour()); // NOTE: checking on clone of board, not actually placing stone
+				checkSamePrevious.setField(move, this.getColour()); // NOTE: checking on clone of board, not actually placing stone
 			} catch (InvalidFieldException e) {
 				TUI.showMessage("Something went wrong when checking the stone: " + e.getLocalizedMessage());
 				e.printStackTrace();
 			}
 
-			boolean validPrevious = board.checkSamePreviousState(checkPrevious.returnIntersectionArray());
+			boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
 
-			boolean valid = validPlacement; // && validPrevious; //TODO: reanable previious 
+			boolean valid = validPlacement && validPrevious; //TODO: reanable previious 
 
 			while (!valid) {
 				TUI.showMessage("ERROR: field " + move + " is no valid move.");
@@ -126,6 +126,15 @@ public class LocalPlayer extends Player {
 		}
 	}
 
+	/**
+	 * Shows the result of the move to the Player
+	 * @param board data to update
+	 */
+	 @Override
+	public void moveResult(char result, Board board) {
+		 TUI.showMessage("Result: " + result);
+	}
+	
 	/**
 	 * Displays message on local TUI
 	 */

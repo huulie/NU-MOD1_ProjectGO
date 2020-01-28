@@ -3,6 +3,7 @@ package goGame;
 import java.util.Arrays;
 
 import exceptions.InvalidFieldException;
+import exceptions.TimeOutException;
 import goUI.GoTUI;
 
 
@@ -71,8 +72,9 @@ public abstract class Player {
 	 * @ensures the returned in is a valid field index and that field is empty, or -1 to pass
 	 * @param board the current game board
 	 * @return the player's choice
+	 * @throws TimeOutException 
 	 */
-	public abstract int determineMove(Board board);
+	public abstract int determineMove(Board board) throws TimeOutException;
 	
 	/**
 	 * Check if this Player has a (a field named) GUI
@@ -97,8 +99,8 @@ public abstract class Player {
 	 * @requires board is not null and not full
 	 * @param board the current board
 	 */
-	public char makeMove(Board board) {
-		int choice = determineMove(board);
+	public char makeMove(Board board, int choice) {
+		//int choice = determineMove(board);
 
 		if (choice == GoGameConstants.PASSint) {
 			return GoGameConstants.PASS;
@@ -124,6 +126,13 @@ public abstract class Player {
 	 * @param board data to update GUI with
 	 */
 	public void updateGUI(Board board) {
+	}
+	
+	/**
+	 * Shows the result of the move to the Player TODO
+	 * @param board data to update
+	 */
+	public void moveResult(char result, Board board) {
 	}
 
 }

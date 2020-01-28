@@ -8,6 +8,8 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import exceptions.ClientUnavailableException;
+import exceptions.TimeOutException;
+import goGame.Board;
 import goGame.Player;
 import goGame.RemotePlayer;
 import goGame.Stone;
@@ -37,6 +39,18 @@ public class GoClientHandler implements Runnable {
 	 * Associated Remote Player, taking part in the game
 	 */
 	Player remotePlayer;
+	
+	/** 
+	 * TODO: keep? then doc!
+	 */
+	private boolean printDebug = true;
+	
+	
+//	private boolean moveAnswer = false;
+	/**
+	 * MOVE TODO
+	 */
+	private String chosenMove = null; //TODO minus 2 to signal not set
 
 	/**
 	 * Constructs a new GoClientHandler. Opens the In- and OutputStreams.
@@ -73,8 +87,10 @@ public class GoClientHandler implements Runnable {
 			while (msg != null) {
 				System.out.println("> [" + clientName + "] Incoming: " + msg);
 				handleIncoming(msg);
-				out.newLine();
-				out.flush();
+				
+//				out.newLine(); TODO: DON'T send (only) a newline!
+//				out.flush();
+				
 				msg = in.readLine();
 			}
 			shutdown();
@@ -127,9 +143,14 @@ public class GoClientHandler implements Runnable {
 			srv.checkWaitingList();
 		    	break;
 		    	
-//		    case ProtocolMessages.MOVE: // TODO: this handled in requestmove?
-//		    	 // do something with move
-//		    	
+		    case ProtocolMessages.MOVE: // TODO: this handled in requestmove?
+		    	 // do something with move
+		    	this.chosenMove = param1;
+		    	
+		    	// TODO check if turn? (will do nothing if not in move function, only set next move
+		    	//this.chosenMove.notifyAll(); // wake waiting requestMove
+		    	
+		    	break;
 //		    	
 //		    	
 //		    	// TODO validation
@@ -180,14 +201,15 @@ public class GoClientHandler implements Runnable {
 		srv.removeClient(this);
 	}
 
-	public int requestMove() {
+	public int requestMove() throws TimeOutException { // TODO synchronized ?! (this.move concurrent)
 		String board = this.remotePlayer.getGame().getGameBoard().toString();
 		String opponentsLastMove = " "; // TODO also implement
 
-		String moveAnswer = null;
+		//String moveAnswer = null;
 		int move = -2; // TODO think of default
 		Boolean answerValid = false;
-		while (!answerValid) {
+
+		while (!answerValid) { // keep asking till valid integer
 
 			try {
 				this.sendMessage(ProtocolMessages.TURN + ProtocolMessages.DELIMITER 
@@ -197,36 +219,93 @@ public class GoClientHandler implements Runnable {
 				e.printStackTrace();
 			}
 
+			//			try {
+			//				chosenMove.wait();
+			//			} catch (InterruptedException e) {
+			//				// TODO Auto-generated catch block
+			//				e.printStackTrace();
+			//			}
+			//while (this.chosenMove == null) {
+//				String msg;
+//				try {
+//					msg = in.readLine();
+//					handleIncoming(msg); // TODO use handleIncoming to enable other commands
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+				
+			//}
+			
+			int secondsToWait = 30; // TODO: 30 sec timer, only for remote players
+			long endWaitTime = System.currentTimeMillis() + secondsToWait*1000;
+	        while ( (this.chosenMove == null)) { // System.currentTimeMillis() < endWaitTime &&
+	                if (System.currentTimeMillis() >= endWaitTime ) {
+	    	            throw new TimeOutException("TIME OUT: move not inside 8 sec");
+	                } else {
+	            	
+	            	try {
+						Thread.sleep(10); // TODO updating every 10 millisec
+						
+						long remaining = endWaitTime - System.currentTimeMillis();
+	        System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " + remaining);
+
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+	                }
+	            }
+	        
+			
+			
+			
+//			long startTime = System.currentTimeMillis();
+//			int timeout = 30000; // milliseconds
+//			while (this.chosenMove == null) {
+//			long remaining = System.currentTimeMillis() - startTime - timeout;
+//	        if (remaining < 0) {
+//	            throw new TimeOutException("TIME OUT: move not inside 3 sec");
+//	        }
+//	        System.out.println("DEBUG: waiting for move, remaining millisec: " + remaining);
+////	        try {
+////				this.chosenMove.wait(remaining);
+////			} catch (InterruptedException e) {
+////				// TODO Auto-generated catch block
+////				e.printStackTrace();
+////			}
+//			}
+
 			try {
-				moveAnswer = in.readLine();
-
-
-				move = Integer.parseInt(moveAnswer);
+				//moveAnswer = in.readLine();
+				move = Integer.parseInt(this.chosenMove);
 				answerValid = true;
 			} catch (NumberFormatException eFormat) {
 				System.out.println("DEBUG: answer not a int"); //TODO handle this elegantly
 				//		this.showMessage("ERROR> " + answer +  " is not an integer (" 
 				//				+ eFormat.getLocalizedMessage() + ") try again!");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+
 			}
 		}
 		// TODO validation
-
-		String result = ProtocolMessages.RESULT + ProtocolMessages.DELIMITER 
-				+ ProtocolMessages.VALID + ProtocolMessages.DELIMITER + board;
-		try {
-			this.sendMessage(result);
-		} catch (ClientUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
+		this.chosenMove = null;
 		return move;
-
-
 	}
+	
+	
+	public void resultMove(char result, Board board) {
+	// TODO implement
+	String resultMessage = ProtocolMessages.RESULT + ProtocolMessages.DELIMITER 
+			+ result + ProtocolMessages.DELIMITER + board;
+	// TODO check if result confirms to procotol messages
+	try {
+		this.sendMessage(resultMessage);
+	} catch (ClientUnavailableException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	}
+	
 	
 	/**
 	 * TODO doc
@@ -258,6 +337,7 @@ public class GoClientHandler implements Runnable {
 				out.write(msg);
 				out.newLine();
 				out.flush();
+				if (printDebug) System.out.println("Handler [" + clientName + "] send: " + msg);
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 				throw new ClientUnavailableException("Could not write "

@@ -19,9 +19,9 @@ import goGame.Stone;
  *
  */
 public class GoCaptureTest {		
-	private static final String WHITE = " " + Stone.WHITE.toString() + " ";
-	private static final String BLACK = " " + Stone.BLACK.toString() + " ";
-	private static final String UNOCCUPIED = " " + Stone.UNOCCUPIED.toString() + " ";
+	private static final String WHITE = (" " + Stone.WHITE.toString() + " ").replaceAll("\\s+","");
+	private static final String BLACK = (" " + Stone.BLACK.toString() + " ").replaceAll("\\s+","");
+	private static final String UNOCCUPIED = (" " + Stone.UNOCCUPIED.toString() + " ").replaceAll("\\s+","");
 
 	@Test
 	void testCaptureSingleWhiteSurroundedWithBlack() {
