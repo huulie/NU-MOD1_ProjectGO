@@ -6,7 +6,7 @@
 [subrepo]
 	remote = git@github.com:nedap/nu5_module1_protocolmessages.git
 	branch = master
-	commit = 959bbbf26dd269e996f92dacc97baee2329172dc
+	commit = e768f8d0bdeceabf5fe9456e5d97f9f4df51981b
 	parent = b0047e537d1c78ec1e571298747f79b49e457f7f
 	method = merge
 	cmdver = 0.4.1
