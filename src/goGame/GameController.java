@@ -1,6 +1,6 @@
 package goGame;
 
-import com.nedap.go.gui.GoGUIIntegrator;
+import com.nedap.go.gui.GoGuiIntegrator;
 
 import exceptions.TimeOutException;
 import goUI.GoGuiUpdater;
@@ -21,7 +21,7 @@ public class GameController implements Runnable{
 	 * GUI, to monitor current state of the game 
 	 * (use when two local players cannot open two GUIs or on server as monitor)
 	 */
-	private GoGUIIntegrator gameGUI;
+	private GoGuiIntegrator gameGUI;
 
 	/**
 	 * Updater of (optional) associated GUI
@@ -40,10 +40,10 @@ public class GameController implements Runnable{
 		this.game = new Game(boardDim, blackPlayer, whitePlayer);
 
 		if (GUI) {
-			this.gameGUI = new GoGUIIntegrator(true, true, boardDim);
+			this.gameGUI = new GoGuiIntegrator(true, true, boardDim);
 			this.gameGUI.startGUI();
 			this.gameGUI.setBoardSize(boardDim);
-			this.gameGUIupdater = new GoGuiUpdater(this.gameGUI, boardDim);
+			this.gameGUIupdater = new GoGuiUpdater(this.gameGUI);
 		}
 		// TODO: let GameController create Player objects? >> how to determine which type? Local starter or server knows!
 	}

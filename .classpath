@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="/Users/huub.lievestro/scr_NedapUniversity/MOD1_SoftwareSystems/ProjectGO/lib/commons-codec-1.3/commons-codec-1.13-test-sources.jar"/>
 	<classpathentry kind="lib" path="/Users/huub.lievestro/scr_NedapUniversity/MOD1_SoftwareSystems/ProjectGO/lib/commons-codec-1.3/commons-codec-1.13-tests.jar"/>
 	<classpathentry kind="lib" path="/Users/huub.lievestro/scr_NedapUniversity/MOD1_SoftwareSystems/ProjectGO/lib/commons-codec-1.3/commons-codec-1.13.jar"/>
+	<classpathentry kind="lib" path="/Users/huub.lievestro/scr_NedapUniversity/MOD1_SoftwareSystems/ProjectGO/lib/NedapGUI/gui-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

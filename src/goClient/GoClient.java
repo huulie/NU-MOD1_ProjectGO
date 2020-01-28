@@ -8,7 +8,7 @@ import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import com.nedap.go.gui.GoGUIIntegrator;
+import com.nedap.go.gui.GoGuiIntegrator;
 
 import exceptions.ExitProgram;
 import exceptions.ProtocolException;
@@ -74,7 +74,7 @@ public class GoClient { //implements ClientProtocol {
 	/** 
 	 * Associated GUI of this client.
 	 */
-	private GoGUIIntegrator GUI;
+	private GoGuiIntegrator GUI;
 
 	/** 
 	 * To update the associated GUI of this client.
@@ -377,10 +377,10 @@ public class GoClient { //implements ClientProtocol {
 		boolean startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
 		if (startGUI) {
 			this.TUI.showMessage("Player " + clientName + " will use a GUI");
-			this.GUI = new GoGUIIntegrator(true, true, boardDim);
+			this.GUI = new GoGuiIntegrator(true, true, boardDim);
 			this.GUI.startGUI();
 			this.GUI.setBoardSize(boardDim);
-			this.GUIupdater = new GoGuiUpdater(this.GUI, boardDim);
+			this.GUIupdater = new GoGuiUpdater(this.GUI);
 			this.outputBoardToTUI = false;
 		} else {
 			this.TUI.showMessage("Player " + clientName + " will use a TUI");
