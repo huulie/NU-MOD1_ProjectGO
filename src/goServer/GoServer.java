@@ -11,6 +11,7 @@ import java.util.List;
 import goGame.GameController;
 import goGame.GoLocalTUI;
 import goGame.Player;
+import goGame.Stone;
 import goProtocol.ProtocolMessages;
 
 
@@ -230,7 +231,9 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 	
 	private void startGameFromWaitingList() {
 		Player first = clientsWaitingList.get(0).getRemotePlayer();
+		first.setColour(Stone.BLACK);
 		Player second = clientsWaitingList.get(1).getRemotePlayer();
+		second.setColour(Stone.WHITE);
 		
 		GameController newGame = new GameController(this.boardDim, first, second, false);
 		first.setGame(newGame);

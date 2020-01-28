@@ -135,4 +135,20 @@ public abstract class Player {
 	public void moveResult(char result, Board board) {
 	}
 
+
+	/**
+	 * Ends game for player, showing result TODO
+	 * @param board data to update
+	 */
+	public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {
+		
+	}
+	
+	/**
+	 * Returns the colour of the player.
+	 */
+	public void setColour(Stone colour) {
+		this.colour = colour;
+	}
+
 }

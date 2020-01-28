@@ -12,7 +12,7 @@ public class Game {
 	 * The number of player of one game
 	 * @invariant NUMBER_PLAYERS is always 2
 	 */
-	private static final int NUMBER_PLAYERS = 2; 
+	private final int NUMBER_PLAYERS = 2; 
 
 	/**
 	 * The board, associated to this game..
@@ -154,7 +154,7 @@ public class Game {
 	 * Get the number of players of this game.
 	 * @return NUMBER_PLAYERS, the current number of players associated with this game.
 	 */
-	public static int getNumberPlayers() {
+	public int getNumberPlayers() {
 		return NUMBER_PLAYERS;
 	}
 

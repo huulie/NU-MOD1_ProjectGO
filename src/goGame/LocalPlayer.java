@@ -135,6 +135,20 @@ public class LocalPlayer extends Player {
 		 TUI.showMessage("Result: " + result);
 	}
 	
+	 /**
+	  * Ends game for player, showing result TODO
+	  * @param board data to update
+	  */
+	 @Override
+	 public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {
+		 System.out.println(" -- LOCAL GAME ENDED -- "); // TODO is printing for game, not for players!
+		TUI.showMessage(String.valueOf(reason));
+		 System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
+		 System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
+		 System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
+	 }
+	 
+	 
 	/**
 	 * Displays message on local TUI
 	 */

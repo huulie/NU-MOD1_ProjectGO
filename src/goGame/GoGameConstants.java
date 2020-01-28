@@ -20,4 +20,10 @@ import goProtocol.ProtocolMessages;
 		public static final char BLACK = ProtocolMessages.BLACK;
 		public static final char UNOCCUPIED = ProtocolMessages.UNOCCUPIED;
 		
+		public static final char FINISHED = ProtocolMessages.FINISHED; 
+		//From server, indicates normal end of game (after double pass)
+	public static final char DISCONNECT = ProtocolMessages.DISCONNECT; 
+		//From server, indicates that other player disconnected (= end of game)
+	public static final char CHEAT = ProtocolMessages.CHEAT; //From server, to players (the non-cheating player wins!)
+		
 	}

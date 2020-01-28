@@ -41,6 +41,15 @@ public class RemotePlayer extends Player {
 		 clientHandler.resultMove(result, board);
 	}
 	
+	
+	 /**
+	  * Ends game for player, showing result TODO
+	  * @param board data to update
+	  */
+	 @Override
+	 public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {
+		 clientHandler.clientEndGame(reason, winner, scoreBlack, scoreWhite);
+	 }
 //	/**
 //	 * Displays message on user interface of client
 //	 */

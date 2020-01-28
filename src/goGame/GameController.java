@@ -79,8 +79,10 @@ public class GameController implements Runnable{
 			} catch (TimeOutException e) {
 //				// TODO Auto-generated catch block
 //				e.printStackTrace();
-				System.out.println("Be faster, now passing!");
-				chosenMove = -1;
+				System.out.println("Be faster, now lost!");
+				gameOver = true;
+				this.endGame(GoGameConstants.CHEAT);
+				//chosenMove = -1;
 			}
 			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
 
@@ -94,6 +96,7 @@ public class GameController implements Runnable{
 			} else if (resultMove == GoGameConstants.INVALID) {
 				System.out.println("INVALID"); // TODO end game as loser
 				gameOver = true;
+				this.endGame(GoGameConstants.CHEAT);
 			} else {
 				
 				System.out.println("DEBUG: update game.."); // TODO: eventually remove/disable
@@ -116,34 +119,70 @@ public class GameController implements Runnable{
 				firstPassed = false;
 				this.game.moveToNextPlayer();
 			}
-
-
 		} 
+// if game over, loop ends
+		System.out.println("DEBUG: going to end game.."); // TODO: eventually remove/disable
+		this.endGame(GoGameConstants.FINISHED);
 
-		// TODO to seperate methods?! and make it server-client proof!
-		System.out.println(" -- GAME ENDED -- "); // TODO is printing for game, not for players!
+		
+	}
+	
+	/**
+	 * Plays the Go game. <br> TODO: take a second look 
+	 * First the (still empty) board is shown. Then the game is played until it is over. 
+	 * Players can make a move one after the other. After each move, the game state is updated
+	 */
+	public void endGame(char reason) {
 		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
-
 		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
 		double scoreBlack = Double.parseDouble(scores[0]);
 		double scoreWhite = Double.parseDouble(scores[1]);
 
-		String winner = null; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
+		char winner = GoGameConstants.UNOCCUPIED; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
 		if(scoreBlack>scoreWhite) {
-			winner = " BLACK ";
+			winner = GoGameConstants.BLACK; // " BLACK ";
 		} else {
-			winner = " WHITE ";
+			winner = GoGameConstants.WHITE; //" WHITE ";
+		}
+		
+		int noPlayers = this.game.getNumberPlayers();
+		for (int i = 1; i <= noPlayers; i++) {
+			
+			System.out.println("DEBUG: ending player" + i);
+			this.game.getCurrentPlayer().endGame(reason, winner, scoreBlack, scoreWhite);
+			if(i < noPlayers) {
+				this.game.moveToNextPlayer();
+			}
 		}
 
-		System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
-		System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
-		System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
+		
+		// TODO to seperate methods?! and make it server-client proof!
+//				System.out.println(" -- GAME ENDED -- "); // TODO is printing for game, not for players!
+//				String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
+//
+//				String[] scores = scoreString.split(GoGameConstants.DELIMITER);
+//				double scoreBlack = Double.parseDouble(scores[0]);
+//				double scoreWhite = Double.parseDouble(scores[1]);
+//
+//				String winner = null; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
+//				if(scoreBlack>scoreWhite) {
+//					winner = " BLACK ";
+//				} else {
+//					winner = " WHITE ";
+//				}
+
+//				System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
+//				System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
+//				System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
+		
+		
+		
 	}
 
 
 
 	/**
-	 * Returns if this GameController has an associated gameGUI
+	 * Returns if this GameController has an associated gameGUI.
 	 * @return true if it has a GUI, false if not
 	 */
 	public boolean hasGameGUI() {

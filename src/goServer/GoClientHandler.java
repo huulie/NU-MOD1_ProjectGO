@@ -10,6 +10,7 @@ import java.net.Socket;
 import exceptions.ClientUnavailableException;
 import exceptions.TimeOutException;
 import goGame.Board;
+import goGame.GoGameConstants;
 import goGame.Player;
 import goGame.RemotePlayer;
 import goGame.Stone;
@@ -93,8 +94,13 @@ public class GoClientHandler implements Runnable {
 				
 				msg = in.readLine();
 			}
+			
+			System.out.println("DEBUG: message was null ");
+			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT);
 			shutdown();
 		} catch (IOException e) {
+			System.out.println("DEBUG: IO exception: " +e.getLocalizedMessage());
+			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT);
 			shutdown();
 		}
 	}
@@ -245,7 +251,7 @@ public class GoClientHandler implements Runnable {
 	                } else {
 	            	
 	            	try {
-						Thread.sleep(10); // TODO updating every 10 millisec
+						Thread.sleep(1000); // TODO updating every sec
 						
 						long remaining = endWaitTime - System.currentTimeMillis();
 	        System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " + remaining);
@@ -324,6 +330,26 @@ public class GoClientHandler implements Runnable {
 	}
 	
 	/**
+	 * TODO doc and place in file
+	 * @param reason
+	 */
+	public void clientEndGame(char reason, char winner, double scoreBlack, double scoreWhite) {
+		String endGame = ProtocolMessages.END + ProtocolMessages.DELIMITER 
+				+ reason + ProtocolMessages.DELIMITER
+				+ winner + ProtocolMessages.DELIMITER 
+				+ scoreBlack + ProtocolMessages.DELIMITER 
+				+ scoreWhite;
+
+		try {
+			this.sendMessage(endGame);
+		} catch (ClientUnavailableException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
 	 * Sends a message to the connected client, followed by a new line. 
 	 * The stream is then flushed.
 	 * 
@@ -356,4 +382,5 @@ public class GoClientHandler implements Runnable {
 	public String getClientName() {
 		return this.clientName;
 	}
+
 }
