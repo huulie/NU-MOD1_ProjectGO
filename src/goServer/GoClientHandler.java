@@ -167,6 +167,12 @@ public class GoClientHandler implements Runnable {
 //		    	this.sendMessage(result);
 //		    	break;
     
+		    case ProtocolMessages.QUIT:
+		    	this.getRemotePlayer().getGame().endGame(ProtocolMessages.EXIT);
+		    	this.shutdown();
+		    	break;
+		    
+		    	
     		default:
     			System.out.println("DEBUG I don't understand this command, try again"); //TODO sent to system out
     			// and send invalid
