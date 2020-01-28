@@ -1,6 +1,6 @@
 package goGame;
 
-import com.nedap.go.gui.GoGuiIntegrator;
+import com.nedap.go.gui.GoGUIIntegrator;
 
 import exceptions.InvalidFieldException;
 import goUI.GoGuiUpdater;
@@ -23,7 +23,7 @@ public class LocalPlayer extends Player {
 	/** 
 	 * Associated GUI of this local Player.
 	 */
-	private GoGuiIntegrator GUI;
+	private GoGUIIntegrator GUI;
 
 	/** 
 	 * To update the associated GUI of this local Player.
@@ -53,10 +53,10 @@ public class LocalPlayer extends Player {
 
 		if (GUI) {
 			this.TUI.showMessage("Player " + name + " will use a GUI");
-			this.GUI = new GoGuiIntegrator(true, true, boardDim);
+			this.GUI = new GoGUIIntegrator(true, true, boardDim);
 			this.GUI.startGUI();
 			this.GUI.setBoardSize(boardDim);
-			this.GUIupdater = new GoGuiUpdater(this.GUI);
+			this.GUIupdater = new GoGuiUpdater(this.GUI, boardDim);
 			this.outputBoardToTUI = false;
 		} else {
 			this.TUI.showMessage("Player " + name + " will use a TUI");

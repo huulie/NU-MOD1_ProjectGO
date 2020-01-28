@@ -1,6 +1,6 @@
 package goUI;
 
-import com.nedap.go.gui.GoGuiIntegrator;
+import com.nedap.go.gui.GoGUIIntegrator;
 
 import goGame.Board;
 import goGame.Stone;
@@ -15,7 +15,7 @@ public class GoGuiUpdater {
 	/**
 	 * associated GUI to be updated
 	 */
-	private GoGuiIntegrator connectedGUI;
+	private GoGUIIntegrator connectedGUI;
 
 	/**
 	 * Dimensions of associated GUI
@@ -26,9 +26,11 @@ public class GoGuiUpdater {
 	 * Create a new GUI updater
 	 * @param connectedGUI associated GUI to be updated
 	 */
-	public GoGuiUpdater(GoGuiIntegrator connectedGUI) { 
+	public GoGuiUpdater(GoGUIIntegrator connectedGUI, int boardDim) { 
 		this.connectedGUI = connectedGUI;
-		boardDim = connectedGUI.getBoardSize();
+		this.boardDim = boardDim; 
+		// JAR-file has different implementation then source code in repo:
+		// "connectedGUI.getBoardSize();" is NOT supported 
 	}
 
 	public void updateWholeBoard(Board board) {
