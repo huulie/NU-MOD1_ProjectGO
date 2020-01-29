@@ -123,7 +123,7 @@ public class Game {
 	 * @return scores String, with scoreBlack + DELIMITER + scoreWhite.
 	 */
 	public String getScores() {
-		return boardTools.getScores(this);
+		return boardTools.getScores(this.getBoard(), this.getKomi());
 	}
 	
 	/**

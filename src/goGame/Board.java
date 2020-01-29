@@ -249,6 +249,28 @@ public class Board {
 	}
 	
 	/**
+	 * Creates a new Board object from a String representation of the board.
+	 * NOTE: creates a new board (will not be connected to the game)
+	 * TODO DOC
+	 */
+	public static Board newBoardFromString(String boardString) {
+		int boardDim = (int) Math.sqrt(boardString.length());
+		Board newBoard;
+		try {
+			newBoard = new Board(boardDim);
+
+			for (int i = 0; i < boardDim * boardDim; i++) {
+				newBoard.setField(i, Stone.charToStone(boardString.charAt(i)));
+			}
+		} catch (InvalidFieldException e) {
+			System.out.println("Invalid field exception: " + e.getLocalizedMessage());
+			e.printStackTrace();
+			newBoard = null;
+		}
+		return newBoard;
+	}
+	
+	/**
 	 * Returns a String representation of an instersections array. 
 	 *
 	 * @return the game situation as String

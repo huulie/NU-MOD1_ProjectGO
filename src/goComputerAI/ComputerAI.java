@@ -1,7 +1,7 @@
 package goComputerAI;
 
+import goClient.GoClient;
 import goComputerAI.Strategy;
-import goGame.Board;
 
 // TODO look at this when working on computer player / AI, think about how to integrate
 public class ComputerAI { // TODO extends Player?
@@ -44,10 +44,10 @@ public class ComputerAI { // TODO extends Player?
 //		this(mark, new NaiveStrategy());
 //	}
 	
-	public int determineMove() { // TODO Board board
+	public int calculateMove(GoClient client) { // TODO Board board
 		//System.out.println("Computer " + this.getName() + " makes a move!");
 		//return this.strategy.determineMove(board, this.getColour());
-		return strategy.determineMove();
+		return strategy.calculateMove(client);
 	}
 	
 

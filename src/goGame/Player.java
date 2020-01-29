@@ -133,11 +133,18 @@ public abstract class Player {
 
 			boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
 
-			boolean valid = validPlacement && validPrevious; //TODO: reanable previious 
+			boolean valid = validPlacement ;//&& validPrevious; //TODO: reanable previious 
 
 			if (!valid) {
 				return GoGameConstants.INVALID;
 			} else {
+				try {
+				board.setField(choice, this.getColour());
+				} catch (InvalidFieldException e) {
+					TUI.showMessage("Weird: invalid field was not detected, but now: " + e.getLocalizedMessage());
+					return GoGameConstants.INVALID;
+				}
+				
 				return GoGameConstants.VALID;
 
 			}

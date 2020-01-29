@@ -14,8 +14,10 @@ import exceptions.ExitProgram;
 import exceptions.ProtocolException;
 import exceptions.ServerUnavailableException;
 import goComputerAI.GoComputerTUI;
+import goGame.Board;
 import goGame.GoGameConstants;
 import goGame.GoLocalTUI;
+import goGame.Stone;
 import goProtocol.ProtocolMessages;
 import goUI.GoGuiUpdater;
 import goUI.GoTUI;
@@ -66,12 +68,13 @@ public class GoClient { //implements ClientProtocol {
 	/**
 	 * Color of the client in the current game
 	 */
-	private String playColour; // TODO change to Stone (and add conversion)
+	private Stone playColour; 
 	
 	/**
 	 * Local model of the board // TODO: convert from STring to Board
+	 * Note: has NO (direct) association to the board in the Game
 	 */
-	private String localBoard;
+	private Board localBoard;
 
 	/** 
 	 * TODO: keep? then doc!
@@ -108,13 +111,18 @@ public class GoClient { //implements ClientProtocol {
 	/**
 	 * TODO DOC
 	 */
-	boolean startBackgroundMusic = true;
+	boolean startBackgroundMusic;
 	
 	
 	//TODO
-	String backgroundMusicPath = "resources/InstrumentalAsianMusic.mp3";
-	Media backgroundMusicMedia; 
-	MediaPlayer mediaPlayer; 
+	private String backgroundMusicPath = "resources/InstrumentalAsianMusic.mp3";
+	private Media backgroundMusicMedia; 
+	private MediaPlayer mediaPlayer;
+	
+	/**
+	 * TODO doc
+	 */
+	private String opponentLastMove; 
 	
 	/**
 	 * Constructs a new GoClient. Initialises the TUI.
@@ -132,13 +140,29 @@ public class GoClient { //implements ClientProtocol {
 		}
 		
 		if (this.TUI.getBoolean("Do you want the computer AI to play for you? [true] or [false]")) {
-			this.TUI = new GoComputerTUI();
+			this.TUI = new GoComputerTUI(this);
 		}
 	}
 
 	public String getClientName() {
 		return clientName;
 	}
+	
+public Stone getPlayColour() {
+		return playColour;
+	}
+
+/**
+ * TODO doc
+ * @return
+ */
+	public Board getLocalBoard() {
+		return localBoard;
+	}
+
+	public String getOpponentLastMove() {
+	return opponentLastMove;
+}
 
 	/**
 	 * Starts a new GoClient by creating a connection, followed by the 
@@ -409,10 +433,14 @@ public class GoClient { //implements ClientProtocol {
 			}
 			String[] splitServerStarts = serverStarts.split(ProtocolMessages.DELIMITER);
 			if(splitServerStarts[0].equals(String.valueOf(ProtocolMessages.GAME))) {
-				this.localBoard = splitServerStarts[1]; // TODO convert from String to board
-				this.playColour = splitServerStarts[2];
+				String localBoardString = splitServerStarts[1];
 				
-				this.localBoardDim = (int) Math.sqrt(localBoard.length());
+				this.localBoard = Board.newBoardFromString(localBoardString);
+				
+				char playColourChar = splitServerStarts[2].charAt(0);
+				this.playColour = Stone.charToStone(playColourChar);
+				
+				this.localBoardDim = (int) Math.sqrt(localBoardString.length());
 				this.gameStarted = true;
 				TUI.showMessage("... game started!");
 			}
@@ -470,19 +498,20 @@ public class GoClient { //implements ClientProtocol {
 				switch(splitServerResponse[0].charAt(0)) {
 
 					case ProtocolMessages.TURN:
-						this.localBoard = splitServerResponse[1]; //TODO convert from String to board
+						String localBoardStringTURN = splitServerResponse[1]; 
+						this.localBoard =  Board.newBoardFromString(localBoardStringTURN);
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
 						// TODO check validity before sending
 						// TODO ook verder als GUI failt
 						}
 
-						String opponentLastMove = splitServerResponse[2];
-						if (this.GUI != null) {
-						this.GUIupdater.setMarkerAtOpponent(opponentLastMove);
-						} else {
-							TUI.showMessage("Last move of opponent was: " + opponentLastMove);
-						}
+						this.opponentLastMove = splitServerResponse[2];
+//						if (this.GUI != null) {
+//						this.GUIupdater.setMarkerAtOpponent(opponentLastMove);
+//						} else {
+//							TUI.showMessage("Last move of opponent was: " + opponentLastMove);
+//						}
 
 						String moveString = null;
 						
@@ -506,7 +535,8 @@ public class GoClient { //implements ClientProtocol {
 							TUI.showMessage("Idiot, you did sent an invalid move!");
 						}
 						
-						this.localBoard = splitServerResponse[2];
+						String localBoardStringRESULT = splitServerResponse[2];
+						this.localBoard = Board.newBoardFromString(localBoardStringRESULT);
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
 						}

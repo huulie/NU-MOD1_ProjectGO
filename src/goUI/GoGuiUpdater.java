@@ -32,6 +32,10 @@ public class GoGuiUpdater {
 		this.boardDim = connectedGUI.getBoardSize(); 
 	}
 
+	/**
+	 * TODO doc
+	 * @param board
+	 */
 	public void updateWholeBoard(Board board) {
 		for ( int i = 0; i < boardDim*boardDim; i++) {
 			Stone stoneAtField = board.getField(i);
@@ -52,30 +56,14 @@ public class GoGuiUpdater {
 
 	}
 
+	/**
+	 * Updates whole board from String TODO
+	 * Note: a new board is created, which is NOT associated with a Game
+	 * @param boardString
+	 */
 	public void updateWholeBoard(String boardString) {
-		// TODO: add conversion from string to board here or in board?!
-		// HERE, because cannot create a new board (will not be connected to the game)
-
-		for ( int i = 0; i < boardDim*boardDim; i++) {
-			Stone stoneAtField = Stone.charToStone(boardString.charAt(i));
-			
-			int row = i / boardDim; // TODO: check if safe enough
-			int col = i % boardDim; // TODO: check if safe enough
-			
-			
-			try {
-				if (stoneAtField==(Stone.WHITE) || stoneAtField==(Stone.BLACK) ) { 
-					connectedGUI.removeStone(col, row);
-					connectedGUI.addStone(col, row, stoneAtField.equals(Stone.WHITE));
-				} else if (stoneAtField == Stone.UNOCCUPIED ) {
-					connectedGUI.removeStone(col, row);
-				} else {
-					throw new Exception("ERROR GUI-UPDATER: I don't understand this Stone on this board");
-				}
-			} catch (Exception e) {
-				System.out.println(e.getLocalizedMessage());
-			}
-		}
+		Board newBoard = Board.newBoardFromString(boardString);
+		this.updateWholeBoard(newBoard);	
 	}
 
 	/**

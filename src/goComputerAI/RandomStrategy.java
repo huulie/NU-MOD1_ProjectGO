@@ -3,6 +3,7 @@ package goComputerAI;
 import java.util.ArrayList;
 import java.util.List;
 
+import goClient.GoClient;
 import goGame.Board;
 import goGame.Stone;
 
@@ -27,10 +28,13 @@ public class RandomStrategy implements Strategy {
 	}
 
 	@Override
-	public int determineMove() { // Board board, Stone color
+	public int calculateMove(GoClient client) { // Board board, Stone color
 
+		Board board = client.getLocalBoard();
+		int boardDim = board.getDim();
+		
 		int lower = 0; // TODO inclusive?
-		int upper = 19*19; // TODO hardcoded, exclusive?
+		int upper = boardDim*boardDim; // TODO exclusive?
 		
 		int move = (int) (Math.random() * (upper - lower)) + lower;
 		

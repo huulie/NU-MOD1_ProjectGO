@@ -19,7 +19,9 @@ import goUI.GoTUICommands;
  */
 public class GoComputerTUI extends GoTUI {
 
-	public ComputerAI connectedAI;
+	private ComputerAI connectedAI;
+	
+	private GoClient connectedClient;
 	
 	//	/** Constructor. TODO: need a TUI to know which player it's connected to? 
 	//	 * @param client corresponding client
@@ -31,10 +33,12 @@ public class GoComputerTUI extends GoTUI {
 
 	/** Creates a new local TUI, not bound to a player.
 	 */
-	public GoComputerTUI() {
+	public GoComputerTUI(GoClient client) {
 		super();
-		Strategy randomStrategy = new RandomStrategy();
-		this.connectedAI = new ComputerAI(randomStrategy);
+		//Strategy randomStrategy = new RandomStrategy();
+		Strategy chaseAndCaptureStrategy = new ChaseAndCaptureStrategy();
+		this.connectedAI = new ComputerAI(chaseAndCaptureStrategy);
+		this.connectedClient = client;
 	}
 
 	/**
@@ -237,15 +241,9 @@ public class GoComputerTUI extends GoTUI {
 	 */
 	@Override
 	public int getMove(String question) {
-		String answer = null;
-		int answerInt = 0;
+		int move = 0;
 		
-		int lower = 0; // TODO inclusive?
-		int upper = 19*19; // TODO hardcoded, exclusive?
-		
-		answerInt = (int) (Math.random() * (upper - lower)) + lower;
-		
-		answerInt = this.connectedAI.determineMove();
+		move = this.connectedAI.calculateMove(connectedClient);
 //		Boolean answerValid = false;
 //
 //		while (!answerValid) {
@@ -267,7 +265,7 @@ public class GoComputerTUI extends GoTUI {
 //				this.showMessage("IO Exception occurred");
 //			}
 //		}
-        return answerInt;
+        return move;
 	}
 
 	/**

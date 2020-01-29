@@ -58,8 +58,9 @@ public class BoardTools {
 	 * Check for captures of opponent's stones and excute them
 	 * @param board board to check
 	 * @param ownStone color of current player (opposite of opponent)
+	 * @return number of opponent stones which were captures
 	 */
-	public void doOpponentCaptures(Board board, Stone ownStone) { // TODO: return number of stones captured for AI		
+	public int doOpponentCaptures(Board board, Stone ownStone) { // TODO: return number of stones captured for AI		
 		allIndices.clear();
 		indexOwnUnoccupied.clear();
 		indicesOpponentFree.clear();
@@ -154,6 +155,7 @@ public class BoardTools {
 				}
 			}
 		}
+		return indicesOpponentCaptured.size();
 	}
 
 	/**
@@ -291,8 +293,8 @@ public class BoardTools {
 	 * @param board board to check
 	 * @param ownStone color of current player (opposite of opponent)
 	 */
-	public void doOwnCaptures(Board board, Stone ownStone) { // TODO: RENAME METHODS?
-		doOpponentCaptures(board,ownStone.other());
+	public int doOwnCaptures(Board board, Stone ownStone) { // TODO: RENAME METHODS?
+		return doOpponentCaptures(board,ownStone.other());
 	}
 
 
@@ -304,7 +306,7 @@ public class BoardTools {
 	 * @param board
 	 * @return String
 	 */
-	public String getScores(Game game) {
+	public String getScores(Board board, double komi) {
 		allIndices.clear();
 		checkedIndices.clear();
 
@@ -315,7 +317,7 @@ public class BoardTools {
 		whiteAreaIndices.clear(); 
 		unoccupiedAreaIndices.clear();
 
-		this.board = game.getBoard();
+		this.board = board;
 		int boardDim = board.getDim();
 
 		allIndices.addAll(IntStream.rangeClosed(0, boardDim*boardDim-1) 
@@ -449,7 +451,7 @@ public class BoardTools {
 			}
 		}
 
-		return calculateScore(game);
+		return calculateScore(board, komi);
 	}
 
 	/**
@@ -545,17 +547,17 @@ public class BoardTools {
 	 * @param game
 	 * @return
 	 */
-	private String calculateScore(Game game) {
+	private String calculateScore(Board board, double komi) {
 
 		double scoreBlack = blackStoneIndices.size() + blackAreaIndices.size();
-		double scoreWhite = whiteStoneIndices.size() + whiteAreaIndices.size()+ game.getKomi();
+		double scoreWhite = whiteStoneIndices.size() + whiteAreaIndices.size()+ komi;
 
 		String score = scoreBlack + GoGameConstants.DELIMITER + scoreWhite;
 
 		if (printDebug) {
-			int boardDim = game.getBoard().getDim();
+			int boardDim = board.getDim();
 
-			if (scoreBlack + scoreWhite + unoccupiedAreaIndices.size() - game.getKomi() == boardDim*boardDim) {
+			if (scoreBlack + scoreWhite + unoccupiedAreaIndices.size() - komi == boardDim*boardDim) {
 				System.out.println("DEBUG: number of intersections checksum: OK");
 			} else {
 				System.out.println("DEBUG: number of intersections checksum: FAILURE");
