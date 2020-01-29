@@ -85,6 +85,7 @@ public class GameController implements Runnable{
 				//chosenMove = -1;
 			}
 			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
+			this.game.getCurrentPlayer().moveResult(resultMove, this.game.getBoard());
 
 			if (resultMove == GoGameConstants.PASS) {
 				if(firstPassed) {
@@ -105,7 +106,7 @@ public class GameController implements Runnable{
 				// send new game state to players 
 				// TODO implement!
 
-				this.game.getCurrentPlayer().moveResult(resultMove, this.game.getBoard());
+				// TODO ALWAYS this.game.getCurrentPlayer().moveResult(resultMove, this.game.getBoard());
 				// if present, update GUI's for local player or gameController
 				if (this.game.getCurrentPlayer().hasGUI()) {
 					this.game.getCurrentPlayer().updateGUI(this.game.getBoard());

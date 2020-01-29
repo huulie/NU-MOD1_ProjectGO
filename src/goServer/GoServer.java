@@ -200,7 +200,7 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 	/**
 	 * Returns a String to be sent as a response to a Client HELLO request,
 	 * including the name of the hotel: ProtocolMessages.HELLO +
-	 * ProtocolMessages.DELIMITER + (Hotel Name);
+	 * ProtocolMessages.DELIMITER + (Hotel Name); TODO
 	 * 
 	 * @return String to be sent to client as a handshake response.
 	 */
