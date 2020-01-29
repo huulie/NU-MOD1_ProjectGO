@@ -96,7 +96,7 @@ public class GoGuiUpdater {
 		if(lastMove >= 0 && lastMove <boardDim*boardDim) {
 			int row = lastMove / boardDim; // TODO: check if safe enough
 			int col = lastMove % boardDim; // TODO: check if safe enough
-			connectedGUI.addHintIndicator(row, col);
+			connectedGUI.addHintIndicator(col, row);
 		}
 	}
 

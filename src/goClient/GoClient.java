@@ -110,8 +110,8 @@ public class GoClient { //implements ClientProtocol {
 	
 	
 	//TODO
-	String bip = "resources/InstrumentalAsianMusicShorter.mp3";
-	Media hit = new Media(new File(bip).toURI().toString());
+	String backgroundMusicPath = "resources/InstrumentalAsianMusicShorter.mp3";
+	Media backgroundMusicMedia; 
 	MediaPlayer mediaPlayer; 
 	
 	/**
@@ -124,7 +124,7 @@ public class GoClient { //implements ClientProtocol {
 		this.keepConnecting = true;
 		this.startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
 		if (this.startGUI) {
-			this.startBackgroundMusic = this.TUI.getBoolean("Start bakcground music for this client? [true] or [false]");
+			this.startBackgroundMusic = this.TUI.getBoolean("Start background music for this client? [true] or [false]");
 		} else {
 			this.startBackgroundMusic = false;
 		}
@@ -147,32 +147,32 @@ public class GoClient { //implements ClientProtocol {
 		
 		
 		
-		while(keepConnecting){
-		try {
-			this.createConnection();
-			this.sendHandshake();
-			
-			// TUI.start(); TODO no start TUI because locking thread?!!
-			
-			this.waitForStartGame();
-			this.playingGame();
-			
-			TUI.showMessage("Going to connect again...");
-			
-			// TODO: connect again? refine?
-			
-		} catch (ServerUnavailableException e) {
-			TUI.showMessage("Server unavailable!");
-			TUI.showMessage("Error while communicating with server: " + e.getLocalizedMessage());
-			e.printStackTrace();
-		} catch (ExitProgram e) { // from create connection
-			TUI.showMessage("CLIENT EXIT");
-			this.keepConnecting = false;
-			e.printStackTrace();
-		} catch (ProtocolException e) { // from handle hello
-			TUI.showMessage("Protocol exception:" + e.getLocalizedMessage());
-			e.printStackTrace();
-		}
+		while (keepConnecting) {
+			try {
+				this.createConnection();
+				this.sendHandshake();
+
+				// TUI.start(); TODO no start TUI because locking thread?!!
+
+				this.waitForStartGame();
+				this.playingGame();
+
+				TUI.showMessage("Going to connect again...");
+
+				// TODO: connect again? refine?
+
+			} catch (ServerUnavailableException e) {
+				TUI.showMessage("Server unavailable!");
+				TUI.showMessage("Error while communicating with server: " + e.getLocalizedMessage());
+				e.printStackTrace();
+			} catch (ExitProgram e) { // from create connection
+				TUI.showMessage("CLIENT EXIT");
+				this.keepConnecting = false;
+				e.printStackTrace();
+			} catch (ProtocolException e) { // from handle hello
+				TUI.showMessage("Protocol exception:" + e.getLocalizedMessage());
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -435,8 +435,8 @@ public class GoClient { //implements ClientProtocol {
 //				});
 //				musicThread.start();
 				
-				
-				mediaPlayer = new MediaPlayer(hit);		
+				backgroundMusicMedia = new Media(new File(backgroundMusicPath).toURI().toString());
+				mediaPlayer = new MediaPlayer(backgroundMusicMedia);		
 				mediaPlayer.play();
 //			        }
 
@@ -447,56 +447,62 @@ public class GoClient { //implements ClientProtocol {
 			this.outputBoardToTUI = true;
 		}
 		
-		
+		// TODO dit is eigenlijk playing, hiervoor prepare to play?
 		while (gameStarted == true) {
 			TUI.showMessage("Waiting for response from server..");
 			String serverResponse = null;
 
 			try {
 				serverResponse = this.readLineFromServer();
-				if (printDebug) TUI.showMessage("DEBUG server sends: " + serverResponse);
+				if (printDebug) { 
+					TUI.showMessage("DEBUG server sends: " + serverResponse); 
+				};
 
 				String[] splitServerResponse = serverResponse.split(ProtocolMessages.DELIMITER);
 
 				switch(splitServerResponse[0].charAt(0)) {
 
-				case ProtocolMessages.TURN:
-					this.localBoard = splitServerResponse[1]; // TODO convert from String to board
-					if (this.GUI != null) {
-						this.GUIupdater.updateWholeBoard(this.localBoard);
-					// TODO check validity before sending
+					case ProtocolMessages.TURN:
+						this.localBoard = splitServerResponse[1]; //TODO convert from String to board
+						if (this.GUI != null) {
+							this.GUIupdater.updateWholeBoard(this.localBoard);
+						// TODO check validity before sending
 						// TODO ook verder als GUI failt
-					}
+						}
 
-					String opponentLastMove = splitServerResponse[2];
-					this.GUIupdater.setMarkerAtOpponent(opponentLastMove);
+						String opponentLastMove = splitServerResponse[2];
+						if (this.GUI != null) {
+						this.GUIupdater.setMarkerAtOpponent(opponentLastMove);
+						} else {
+							TUI.showMessage("Last move of opponent was: " + opponentLastMove);
+						}
 
-					String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
+						String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
 							+ TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
-					this.sendMessage(makeMove);
-					break;
+						this.sendMessage(makeMove);
+						break;
 
-				case ProtocolMessages.RESULT:
-					String valid = splitServerResponse[1];
-					this.localBoard = splitServerResponse[2];
-					if (this.GUI != null) {
-						this.GUIupdater.updateWholeBoard(this.localBoard);
-					}
-					break;
+					case ProtocolMessages.RESULT:
+						String valid = splitServerResponse[1];
+						this.localBoard = splitServerResponse[2];
+						if (this.GUI != null) {
+							this.GUIupdater.updateWholeBoard(this.localBoard);
+						}
+						break;
 
-				case ProtocolMessages.END:
-					char reasonEnd = splitServerResponse[1].charAt(0);
-					String winner = splitServerResponse[2];
-					String scoreBlack = splitServerResponse[3];
-					String scoreWhite = splitServerResponse[4];
-					this.displayGameResult(reasonEnd, winner, scoreBlack, scoreWhite);
-					this.gameStarted = false;
-					break;
+					case ProtocolMessages.END:
+						char reasonEnd = splitServerResponse[1].charAt(0);
+						String winner = splitServerResponse[2];
+						String scoreBlack = splitServerResponse[3];
+						String scoreWhite = splitServerResponse[4];
+						this.displayGameResult(reasonEnd, winner, scoreBlack, scoreWhite);
+						this.gameStarted = false;
+						break;
 
-				case ProtocolMessages.ERROR:	
-					throw new ProtocolException("Invalid message received by server");
+					case ProtocolMessages.ERROR:	
+						throw new ProtocolException("Invalid message received by server");
 					// break; TODO unreachable code
-					
+
 					// TODO: add default?
 				}	
 
@@ -555,25 +561,25 @@ public class GoClient { //implements ClientProtocol {
 		//TUI.showMessage(String.valueOf(reasonEnd));
 		switch (reasonEnd) { 
 
-		case GoGameConstants.FINISHED:
-			TUI.showMessage(GoGameConstants.FINISHEDdescription);
-			break;
+			case GoGameConstants.FINISHED:
+				TUI.showMessage(GoGameConstants.FINISHEDdescription);
+				break;
 
-		case GoGameConstants.CHEAT:
-			TUI.showMessage(GoGameConstants.CHEATdescription);
-			break;
+			case GoGameConstants.CHEAT:
+				TUI.showMessage(GoGameConstants.CHEATdescription);
+				break;
 
-		case GoGameConstants.DISCONNECT:
-			TUI.showMessage(GoGameConstants.DISCONNECTdescription);
-			break;
+			case GoGameConstants.DISCONNECT:
+				TUI.showMessage(GoGameConstants.DISCONNECTdescription);
+				break;
 
-		case GoGameConstants.EXIT:
-			TUI.showMessage(GoGameConstants.EXITdescription);
-			break;
+			case GoGameConstants.EXIT:
+				TUI.showMessage(GoGameConstants.EXITdescription);
+				break;
 
-		default:
-			TUI.showMessage("Something unexpected happend");
-			break;
+			default:
+				TUI.showMessage("Something unexpected happend");
+				break;
 		}
 
 		

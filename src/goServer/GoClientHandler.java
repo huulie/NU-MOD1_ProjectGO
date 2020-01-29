@@ -15,6 +15,7 @@ import goGame.Player;
 import goGame.RemotePlayer;
 import goGame.Stone;
 import goProtocol.ProtocolMessages;
+import goUI.GoTUICommands;
 
 
 /**
@@ -260,7 +261,7 @@ public class GoClientHandler implements Runnable {
 				
 			//}
 			
-			int secondsToWait = 30; // TODO: 30 sec timer, only for remote players
+			int secondsToWait = 60; // TODO: 30 sec timer, only for remote players
 			long endWaitTime = System.currentTimeMillis() + secondsToWait*1000;
 	        while ( (this.chosenMove == null)) { // System.currentTimeMillis() < endWaitTime &&
 	                if (System.currentTimeMillis() >= endWaitTime ) {
@@ -304,10 +305,14 @@ public class GoClientHandler implements Runnable {
 				move = Integer.parseInt(this.chosenMove);
 				answerValid = true;
 			} catch (NumberFormatException eFormat) {
+				if (this.chosenMove.equalsIgnoreCase(String.valueOf(ProtocolMessages.PASS))) {
+					move = GoGameConstants.PASSint;
+					answerValid = true;
+				} else {
 				System.out.println("DEBUG: answer not a int"); //TODO handle this elegantly
 				//		this.showMessage("ERROR> " + answer +  " is not an integer (" 
 				//				+ eFormat.getLocalizedMessage() + ") try again!");
-
+				}
 			}
 		}
 		// TODO validation
