@@ -102,14 +102,44 @@ public abstract class Player {
 	public char makeMove(Board board, int choice) {
 		//int choice = determineMove(board);
 
+//		if (choice == GoGameConstants.PASSint) {
+//			return GoGameConstants.PASS;
+//		} else {
+//			try {
+//				if (board.isEmptyField(choice)) {
+//					board.setField(choice, this.getColour());
+//				} else {
+//					return GoGameConstants.INVALID; // TODO also return that field was not empty? 
+//				}
+//				return GoGameConstants.VALID;
+//			} catch (InvalidFieldException e) {
+//				return GoGameConstants.INVALID;
+//			}
+//		}
+
+		//TODO check if this validation works
 		if (choice == GoGameConstants.PASSint) {
 			return GoGameConstants.PASS;
 		} else {
+			boolean validPlacement = board.isField(choice) && board.isEmptyField(choice);
+
+			Board checkSamePrevious = board.deepCopy();
 			try {
-				board.setField(choice, this.getColour());
-				return GoGameConstants.VALID;
+				checkSamePrevious.setField(choice, this.getColour()); // NOTE: checking on clone of board, not actually placing stone
 			} catch (InvalidFieldException e) {
+				TUI.showMessage("Something went wrong when checking the stone: " + e.getLocalizedMessage()); // TODO TUI?
+				e.printStackTrace();
+			}
+
+			boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
+
+			boolean valid = validPlacement && validPrevious; //TODO: reanable previious 
+
+			if (!valid) {
 				return GoGameConstants.INVALID;
+			} else {
+				return GoGameConstants.VALID;
+
 			}
 		}
 	}

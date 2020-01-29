@@ -485,6 +485,8 @@ public class GoClient { //implements ClientProtocol {
 						}
 
 						String moveString = null;
+						
+						// TODO add checking if valid move?!
 						int getMove = TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
 								if (getMove == GoGameConstants.PASSint) {
 									moveString = String.valueOf(ProtocolMessages.PASS);
@@ -499,6 +501,11 @@ public class GoClient { //implements ClientProtocol {
 
 					case ProtocolMessages.RESULT:
 						String valid = splitServerResponse[1];
+						
+						if (valid.contains(String.valueOf(ProtocolMessages.INVALID))) {
+							TUI.showMessage("Idiot, you did sent an invalid move!");
+						}
+						
 						this.localBoard = splitServerResponse[2];
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
