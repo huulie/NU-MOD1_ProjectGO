@@ -148,6 +148,8 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 			Socket discoverLocalIP = new Socket(); // this ways, it returns the preferred outbound IP
 			try {
 				discoverLocalIP.connect(new InetSocketAddress("google.com", 80));
+			// TODO	discoverLocalIP.connect(new InetSocketAddress("192.168.1.1", 80));
+
 				localIP = discoverLocalIP.getLocalAddress();
 				TUI.showMessage("Discovering local IP address: " + discoverLocalIP.getLocalAddress());
 				discoverLocalIP.close();

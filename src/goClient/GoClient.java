@@ -19,6 +19,11 @@ import goProtocol.ProtocolMessages;
 import goUI.GoGuiUpdater;
 import goUI.GoTUICommands;
 
+// To play MP3
+import java.io.File;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
 /**
  * Client for Networked Go Game
  * 
@@ -94,6 +99,22 @@ public class GoClient { //implements ClientProtocol {
 	private boolean outputBoardToTUI;
 	
 	/**
+	 * TODO doc
+	 */
+	private int localBoardDim;
+	
+	/**
+	 * TODO DOC
+	 */
+	boolean startBackgroundMusic = true;
+	
+	
+	//TODO
+	String bip = "resources/InstrumentalAsianMusic.mp3";
+	Media hit = new Media(new File(bip).toURI().toString());
+	MediaPlayer mediaPlayer; 
+	
+	/**
 	 * Constructs a new GoClient. Initialises the TUI.
 	 */
 	public GoClient() {
@@ -102,6 +123,11 @@ public class GoClient { //implements ClientProtocol {
 		this.gameStarted = false;
 		this.keepConnecting = true;
 		this.startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
+		if (this.startGUI) {
+			this.startBackgroundMusic = this.TUI.getBoolean("Start bakcground music for this client? [true] or [false]");
+		} else {
+			this.startBackgroundMusic = false;
+		}
 	}
 
 	public String getClientName() {
@@ -119,6 +145,8 @@ public class GoClient { //implements ClientProtocol {
 	 */
 	public void start() {
 		
+		
+		
 		while(keepConnecting){
 		try {
 			this.createConnection();
@@ -128,6 +156,8 @@ public class GoClient { //implements ClientProtocol {
 			
 			this.waitForStartGame();
 			this.playingGame();
+			
+			TUI.showMessage("Going to connect again...");
 			
 			// TODO: connect again? refine?
 			
@@ -340,18 +370,23 @@ public class GoClient { //implements ClientProtocol {
 				if (splitHandshakeResponse[0].equals(String.valueOf(ProtocolMessages.HANDSHAKE))) {
 					 this.protocolVersion = splitHandshakeResponse[1];
 					 handshakeServerMessage = splitHandshakeResponse[2];
+					 TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
 				} else {
+				// TODO also support handshake without message String, make else for both 3 and 2
 					throw new ProtocolException("Handshake failed: server did not reply correctly (was " + handshakeResponse + " )");
 				}
+			}else if (splitHandshakeResponse.length == 2) {
+					 this.protocolVersion = splitHandshakeResponse[1];
+					 TUI.showMessage("Connected to the Go game server (no message)");
+
 			} else {
 				throw new ProtocolException("Handshake failed: Wrong number of arguments (" 
-			+ splitHandshakeResponse.length + " instead of 2) in response from server");
+			+ splitHandshakeResponse.length + " instead of 2 or 3) in response from server");
 			}
 		} else {
 			throw new ProtocolException("Handshake failed: Empty response from server");
 		}
 		// System.out.println("DEBUG" + Welcome to the Hotel booking system of hotel: " + hotelName);
-		TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
 	}
 	
 	/**
@@ -372,6 +407,8 @@ public class GoClient { //implements ClientProtocol {
 			if(splitServerStarts[0].equals(String.valueOf(ProtocolMessages.GAME))) {
 				this.localBoard = splitServerStarts[1]; // TODO convert from String to board
 				this.playColour = splitServerStarts[2];
+				
+				this.localBoardDim = (int) Math.sqrt(localBoard.length());
 				this.gameStarted = true;
 				TUI.showMessage("... game started!");
 			}
@@ -379,7 +416,7 @@ public class GoClient { //implements ClientProtocol {
 	}
 	
 	private void playingGame() {
-		int boardDim = 19; // TODO derive from sent board?!
+		int boardDim = this.localBoardDim; // TODO derive from sent board?!
 		
 		if (this.startGUI) {
 			this.TUI.showMessage("Player " + clientName + " will use a GUI");
@@ -388,10 +425,30 @@ public class GoClient { //implements ClientProtocol {
 			this.GUI.setBoardSize(boardDim);
 			this.GUIupdater = new GoGuiUpdater(this.GUI);
 			this.outputBoardToTUI = false;
+			
+			if (this.startBackgroundMusic) {
+// TODO starting mediaplayer in separate thread, but should not be necessary
+//				Thread musicThread = new Thread(new Runnable() {
+//					String bip = "resources/InstrumentalAsianMusic.mp3";
+//					Media hit = new Media(new File(bip).toURI().toString());
+//					MediaPlayer mediaPlayer = new MediaPlayer(hit); // to avoid garbare collection
+//					public void run() {
+//						mediaPlayer.play();
+//				});
+//				musicThread.start();
+				
+				
+				mediaPlayer = new MediaPlayer(hit);		
+				mediaPlayer.play();
+//			        }
+
+			}
+			
 		} else {
 			this.TUI.showMessage("Player " + clientName + " will use a TUI");
 			this.outputBoardToTUI = true;
 		}
+		
 		
 		while (gameStarted == true) {
 			TUI.showMessage("Waiting for response from server..");
@@ -409,6 +466,8 @@ public class GoClient { //implements ClientProtocol {
 					this.localBoard = splitServerResponse[1]; // TODO convert from String to board
 					if (this.GUI != null) {
 						this.GUIupdater.updateWholeBoard(this.localBoard);
+					// TODO check validity before sending
+						// TODO ook verder als GUI failt
 					}
 
 					String opponentLastMove = splitServerResponse[2];			

@@ -182,6 +182,7 @@ public class GoClientHandler implements Runnable {
 		} catch (ClientUnavailableException e) {
 			System.out.println("Error while communicating with client: " + e.getLocalizedMessage()); // TODO where to send this to? 
 			e.printStackTrace();
+			// TODO not crahs when cleint disconnect stream closed
 		}
 	}
 
@@ -216,14 +217,14 @@ public class GoClientHandler implements Runnable {
 
 	public int requestMove() throws TimeOutException { // TODO synchronized ?! (this.move concurrent)
 		String board = this.remotePlayer.getGame().getGameBoard().toString();
-		String opponentsLastMove = " "; // TODO also implement
+		String opponentsLastMove = "P"; // TODO also implement
 
 		//String moveAnswer = null;
 		int move = -2; // TODO think of default
 		Boolean answerValid = false;
 
 		while (!answerValid) { // keep asking till valid integer
-
+// TODO implement pass
 			try {
 				this.sendMessage(ProtocolMessages.TURN + ProtocolMessages.DELIMITER 
 						+ board + ProtocolMessages.DELIMITER + opponentsLastMove);
