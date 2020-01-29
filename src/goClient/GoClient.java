@@ -483,8 +483,16 @@ public class GoClient { //implements ClientProtocol {
 							TUI.showMessage("Last move of opponent was: " + opponentLastMove);
 						}
 
+						String moveString = null;
+						int getMove = TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
+								if (getMove == GoGameConstants.PASSint) {
+									moveString = String.valueOf(ProtocolMessages.PASS);
+								} else {
+									moveString = String.valueOf(getMove);
+								}
+						
 						String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
-							+ TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
+							+ moveString;
 						this.sendMessage(makeMove);
 						break;
 
