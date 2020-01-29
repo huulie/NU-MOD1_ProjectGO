@@ -13,6 +13,7 @@ import com.nedap.go.gui.GoGuiIntegrator;
 import exceptions.ExitProgram;
 import exceptions.ProtocolException;
 import exceptions.ServerUnavailableException;
+import goGame.GoGameConstants;
 import goGame.GoLocalTUI;
 import goProtocol.ProtocolMessages;
 import goUI.GoGuiUpdater;
@@ -71,6 +72,11 @@ public class GoClient { //implements ClientProtocol {
 	private boolean printDebug = true;
 	
 	
+	/**
+	 * TODO DOC
+	 */
+	boolean startGUI;
+	
 	/** 
 	 * Associated GUI of this client.
 	 */
@@ -95,6 +101,7 @@ public class GoClient { //implements ClientProtocol {
 		this.clientName = TUI.getString("What is your name?");
 		this.gameStarted = false;
 		this.keepConnecting = true;
+		this.startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
 	}
 
 	public String getClientName() {
@@ -374,8 +381,7 @@ public class GoClient { //implements ClientProtocol {
 	private void playingGame() {
 		int boardDim = 19; // TODO derive from sent board?!
 		
-		boolean startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
-		if (startGUI) {
+		if (this.startGUI) {
 			this.TUI.showMessage("Player " + clientName + " will use a GUI");
 			this.GUI = new GoGuiIntegrator(true, true, boardDim);
 			this.GUI.startGUI();
@@ -396,41 +402,45 @@ public class GoClient { //implements ClientProtocol {
 				if (printDebug) TUI.showMessage("DEBUG server sends: " + serverResponse);
 
 				String[] splitServerResponse = serverResponse.split(ProtocolMessages.DELIMITER);
-				
+
 				switch(splitServerResponse[0].charAt(0)) {
-				
+
 				case ProtocolMessages.TURN:
 					this.localBoard = splitServerResponse[1]; // TODO convert from String to board
 					if (this.GUI != null) {
 						this.GUIupdater.updateWholeBoard(this.localBoard);
-						}
-					
+					}
+
 					String opponentLastMove = splitServerResponse[2];			
 
 					String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
 							+ TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
 					this.sendMessage(makeMove);
 					break;
-					
+
 				case ProtocolMessages.RESULT:
 					String valid = splitServerResponse[1];
 					this.localBoard = splitServerResponse[2];
 					if (this.GUI != null) {
-					this.GUIupdater.updateWholeBoard(this.localBoard);
+						this.GUIupdater.updateWholeBoard(this.localBoard);
 					}
 					break;
-				
+
 				case ProtocolMessages.END:
-					String reasonEnd = splitServerResponse[1];
+					char reasonEnd = splitServerResponse[1].charAt(0);
 					String winner = splitServerResponse[2];
 					String scoreBlack = splitServerResponse[3];
 					String scoreWhite = splitServerResponse[4];
-					TUI.showMessage("This game has ended [DEBUG]");
+					this.displayGameResult(reasonEnd, winner, scoreBlack, scoreWhite);
 					this.gameStarted = false;
-					
+					break;
+
 				case ProtocolMessages.ERROR:	
 					throw new ProtocolException("Invalid message received by server");
-			}	
+					// break; TODO unreachable code
+					
+					// TODO: add default?
+				}	
 
 			} catch (ServerUnavailableException e) {
 				TUI.showMessage("Error while communicating with server: " + e.getLocalizedMessage());
@@ -478,6 +488,42 @@ public class GoClient { //implements ClientProtocol {
 //		TUI.showMessage(serverResponseMarker + doPrintResponse);
 //	}
 
+	/**
+	 * TODO doc 
+	 */
+	public void displayGameResult(char reasonEnd, String winner, String scoreBlack, String scoreWhite) {
+		TUI.showMessage("This game has ended [DEBUG]"); // TODO
+		
+		//TUI.showMessage(String.valueOf(reasonEnd));
+		switch (reasonEnd) { 
+
+		case GoGameConstants.FINISHED:
+			TUI.showMessage(GoGameConstants.FINISHEDdescription);
+			break;
+
+		case GoGameConstants.CHEAT:
+			TUI.showMessage(GoGameConstants.CHEATdescription);
+			break;
+
+		case GoGameConstants.DISCONNECT:
+			TUI.showMessage(GoGameConstants.DISCONNECTdescription);
+			break;
+
+		case GoGameConstants.EXIT:
+			TUI.showMessage(GoGameConstants.EXITdescription);
+			break;
+
+		default:
+			TUI.showMessage("Something unexpected happend");
+			break;
+		}
+
+		
+		TUI.showMessage("Black has scored: " + scoreBlack); 
+		TUI.showMessage("White has scored: " + scoreWhite);	
+		TUI.showMessage("The winner is: " + winner);	
+	}
+	
 	/**
 	 * This method starts a new GoClient.
 	 * 

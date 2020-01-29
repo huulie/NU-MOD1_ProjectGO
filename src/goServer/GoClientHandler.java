@@ -96,11 +96,11 @@ public class GoClientHandler implements Runnable {
 			}
 			
 			System.out.println("DEBUG: message was null ");
-			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT);
+			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
 			shutdown();
 		} catch (IOException e) {
 			System.out.println("DEBUG: IO exception: " +e.getLocalizedMessage());
-			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT);
+			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
 			shutdown();
 		}
 	}
@@ -168,7 +168,8 @@ public class GoClientHandler implements Runnable {
 //		    	break;
     
 		    case ProtocolMessages.QUIT:
-		    	this.getRemotePlayer().getGame().endGame(ProtocolMessages.EXIT);
+		    	this.getRemotePlayer().getGame().endGame(ProtocolMessages.EXIT,
+		    			this.getRemotePlayer().getColour().print());
 		    	this.shutdown();
 		    	break;
 		    

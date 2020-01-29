@@ -141,11 +141,35 @@ public class LocalPlayer extends Player {
 	  */
 	 @Override
 	 public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {
-		 System.out.println(" -- LOCAL GAME ENDED -- "); // TODO is printing for game, not for players!
-		TUI.showMessage(String.valueOf(reason));
-		 System.out.println("Black has scored: " + scoreBlack); // TODO is printing for game, not for players!	
-		 System.out.println("White has scored: " + scoreWhite);// TODO is printing for game, not for players!	
-		 System.out.println("The winner is: " + winner);	// TODO is printing for game, not for players!
+		 TUI.showMessage(" -- LOCAL GAME ENDED -- "); // TODO is printing for game, not for players!
+		 
+		 switch (reason) { 
+
+			case GoGameConstants.FINISHED:
+				TUI.showMessage(GoGameConstants.FINISHEDdescription);
+				break;
+
+			case GoGameConstants.CHEAT:
+				TUI.showMessage(GoGameConstants.CHEATdescription);
+				break;
+
+			case GoGameConstants.DISCONNECT:
+				TUI.showMessage(GoGameConstants.DISCONNECTdescription);
+				break;
+
+			case GoGameConstants.EXIT:
+				TUI.showMessage(GoGameConstants.EXITdescription);
+				break;
+
+			default:
+				TUI.showMessage("Something unexpected happend");
+				break;
+			}
+
+			
+			TUI.showMessage("Black has scored: " + scoreBlack); 
+			TUI.showMessage("White has scored: " + scoreWhite);	
+			TUI.showMessage("The winner is: " + winner);	
 	 }
 	 
 	 

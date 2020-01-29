@@ -15,7 +15,7 @@ public enum Stone {
 		this.print = print;
 	}
 	
-	private char print() {
+	public char print() {
 		return this.print;
 	}
     

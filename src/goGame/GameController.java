@@ -81,7 +81,7 @@ public class GameController implements Runnable{
 //				e.printStackTrace();
 				System.out.println("Be faster, now lost!");
 				gameOver = true;
-				this.endGame(GoGameConstants.CHEAT);
+				this.endGame(GoGameConstants.CHEAT, this.game.getCurrentPlayer().getColour().print());
 				//chosenMove = -1;
 			}
 			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
@@ -96,7 +96,7 @@ public class GameController implements Runnable{
 			} else if (resultMove == GoGameConstants.INVALID) {
 				System.out.println("INVALID"); // TODO end game as loser
 				gameOver = true;
-				this.endGame(GoGameConstants.CHEAT);
+				this.endGame(GoGameConstants.CHEAT,this.game.getCurrentPlayer().getColour().print());
 			} else {
 				
 				System.out.println("DEBUG: update game.."); // TODO: eventually remove/disable
@@ -122,7 +122,7 @@ public class GameController implements Runnable{
 		} 
 // if game over, loop ends
 		System.out.println("DEBUG: going to end game.."); // TODO: eventually remove/disable
-		this.endGame(GoGameConstants.FINISHED);
+		this.endGame(GoGameConstants.FINISHED, GoGameConstants.UNOCCUPIED);
 
 		
 	}
@@ -132,17 +132,22 @@ public class GameController implements Runnable{
 	 * First the (still empty) board is shown. Then the game is played until it is over. 
 	 * Players can make a move one after the other. After each move, the game state is updated
 	 */
-	public void endGame(char reason) {
+	public void endGame(char reason, char caller) {
 		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
 		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
 		double scoreBlack = Double.parseDouble(scores[0]);
 		double scoreWhite = Double.parseDouble(scores[1]);
 
 		char winner = GoGameConstants.UNOCCUPIED; // TODO: score should use players OR here convert color to player >> PROTOCOL USES COLORS?!
-		if(scoreBlack>scoreWhite) {
-			winner = GoGameConstants.BLACK; // " BLACK ";
+		
+		if (caller == GoGameConstants.UNOCCUPIED) {
+			if(scoreBlack>scoreWhite) {
+				winner = GoGameConstants.BLACK; // " BLACK ";
+			} else {
+				winner = GoGameConstants.WHITE; //" WHITE ";
+			}
 		} else {
-			winner = GoGameConstants.WHITE; //" WHITE ";
+			winner = Stone.charToStone(caller).other().print();
 		}
 		
 		int noPlayers = this.game.getNumberPlayers();
