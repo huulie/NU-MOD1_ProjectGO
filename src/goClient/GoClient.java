@@ -112,7 +112,7 @@ public class GoClient { //implements ClientProtocol {
 	
 	
 	//TODO
-	String backgroundMusicPath = "resources/InstrumentalAsianMusicShorter.mp3";
+	String backgroundMusicPath = "resources/InstrumentalAsianMusic.mp3";
 	Media backgroundMusicMedia; 
 	MediaPlayer mediaPlayer; 
 	
@@ -379,7 +379,7 @@ public class GoClient { //implements ClientProtocol {
 					TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
 				} else if (splitHandshakeResponse.length == 2) {
 					this.protocolVersion = splitHandshakeResponse[1];
-					TUI.showMessage("Connected to the Go game server (no message)");
+					TUI.showMessage("Connected to the Go game server (which did not send a welcome message, but be welcome anyway!)");
 				} else {
 					throw new ProtocolException("Handshake failed: Wrong number of arguments (" 
 							+ splitHandshakeResponse.length + " instead of 2 or 3) in response from server");
@@ -444,6 +444,7 @@ public class GoClient { //implements ClientProtocol {
 				backgroundMusicMedia = new Media(new File(backgroundMusicPath).toURI().toString());
 				mediaPlayer = new MediaPlayer(backgroundMusicMedia);		
 				mediaPlayer.play();
+				TUI.showMessage("Background music is played...");
 //			        }
 
 			}
