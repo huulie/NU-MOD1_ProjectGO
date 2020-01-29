@@ -13,10 +13,12 @@ import com.nedap.go.gui.GoGuiIntegrator;
 import exceptions.ExitProgram;
 import exceptions.ProtocolException;
 import exceptions.ServerUnavailableException;
+import goComputerAI.GoComputerTUI;
 import goGame.GoGameConstants;
 import goGame.GoLocalTUI;
 import goProtocol.ProtocolMessages;
 import goUI.GoGuiUpdater;
+import goUI.GoTUI;
 import goUI.GoTUICommands;
 
 // To play MP3
@@ -51,7 +53,7 @@ public class GoClient { //implements ClientProtocol {
 	 */
 	String protocolVersion = null;
 	
-	private GoLocalTUI TUI;
+	private GoTUI TUI; // TODO was GoLocalTUI
 	
 	private String serverResponseMarker = "> ";
 	private String localErrorMarker = "!ERROR: ";
@@ -127,6 +129,10 @@ public class GoClient { //implements ClientProtocol {
 			this.startBackgroundMusic = this.TUI.getBoolean("Start background music for this client? [true] or [false]");
 		} else {
 			this.startBackgroundMusic = false;
+		}
+		
+		if (this.TUI.getBoolean("Do you want the computer AI to play for you? [true] or [false]")) {
+			this.TUI = new GoComputerTUI();
 		}
 	}
 

@@ -1,4 +1,4 @@
-package goStrategy;
+package goComputerAI;
 
 import goGame.Board;
 import goGame.Stone;
@@ -12,5 +12,5 @@ public interface Strategy {
 	
 	public String getName();
 	
-	public int determineMove(Board board, Stone color);
+	public int determineMove(); // TODO Board board, Stone color
 }

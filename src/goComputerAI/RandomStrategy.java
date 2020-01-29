@@ -1,4 +1,4 @@
-package goStrategy;
+package goComputerAI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,14 @@ public class RandomStrategy implements Strategy {
 	}
 
 	@Override
-	public int determineMove(Board board, Stone color) {
-// TODO implement when working on computer players
+	public int determineMove() { // Board board, Stone color
+
+		int lower = 0; // TODO inclusive?
+		int upper = 19*19; // TODO hardcoded, exclusive?
+		
+		int move = (int) (Math.random() * (upper - lower)) + lower;
+		
+		// TODO implement when working on computer players
 		//		int middleDim = board.DIM / 2; // Note: will floor, if there is no single field in the middle
 		//		
 		//		if (board.isEmptyField(middleDim, middleDim)) { // if possible, place in middle and return
@@ -64,7 +70,7 @@ public class RandomStrategy implements Strategy {
 		//		// If nothing else: select random field
 		//		NaiveStrategy random = new NaiveStrategy();
 		//		return random.determineMove(board, mark);
-		return 0;
+		return move;
 	}
 
 }

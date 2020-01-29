@@ -273,7 +273,7 @@ public class GoClientHandler implements Runnable {
 						
 						long remaining = endWaitTime - System.currentTimeMillis();
 	        System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " + remaining);
-
+// TODO interrupt if client has disconnected
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
