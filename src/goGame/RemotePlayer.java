@@ -29,7 +29,7 @@ public class RemotePlayer extends Player {
 	
 	@Override
 	public int determineMove(Board board) throws TimeOutException {
-		return clientHandler.requestMove(); 
+		return clientHandler.requestMove(this.getGame().getPreviousMove()); 
 	}
 	
 	/**

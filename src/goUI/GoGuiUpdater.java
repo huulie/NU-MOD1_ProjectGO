@@ -3,6 +3,7 @@ package goUI;
 import com.nedap.go.gui.GoGuiIntegrator;
 
 import goGame.Board;
+import goGame.GoGameConstants;
 import goGame.Stone;
 
 /**
@@ -74,6 +75,28 @@ public class GoGuiUpdater {
 			} catch (Exception e) {
 				System.out.println(e.getLocalizedMessage());
 			}
+		}
+	}
+
+	/**
+	 * TODO doc
+	 * @param opponentLastMove
+	 */
+	public void setMarkerAtOpponent(String opponentLastMove) {
+		connectedGUI.removeHintIdicator();
+		
+		int lastMove = GoGameConstants.NOMOVEint;
+					
+		try {
+		lastMove = Integer.parseInt(opponentLastMove);
+		} catch (NumberFormatException eFormat) {
+			System.out.println("DEBUG opponent move was no int"); // TODO remove or make nice
+		}
+		
+		if(lastMove >= 0 && lastMove <boardDim*boardDim) {
+			int row = lastMove / boardDim; // TODO: check if safe enough
+			int col = lastMove % boardDim; // TODO: check if safe enough
+			connectedGUI.addHintIndicator(row, col);
 		}
 	}
 

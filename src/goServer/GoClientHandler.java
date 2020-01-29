@@ -215,9 +215,18 @@ public class GoClientHandler implements Runnable {
 		srv.removeClient(this);
 	}
 
-	public int requestMove() throws TimeOutException { // TODO synchronized ?! (this.move concurrent)
+	public int requestMove(int previousMove) throws TimeOutException { // TODO synchronized ?! (this.move concurrent)
 		String board = this.remotePlayer.getGame().getGameBoard().toString();
-		String opponentsLastMove = "P"; // TODO also implement
+		String opponentsLastMove = null;
+		
+		if (previousMove == GoGameConstants.PASSint) {
+		 opponentsLastMove = "P"; // TODO also implement
+		} else if(previousMove == GoGameConstants.NOMOVEint) {
+			 opponentsLastMove = null; // TODO also implement
+		} else {
+			 opponentsLastMove = String.valueOf(previousMove); // TODO also implement
+		}
+		
 
 		//String moveAnswer = null;
 		int move = -2; // TODO think of default

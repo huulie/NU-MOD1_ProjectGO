@@ -28,6 +28,12 @@ public class GameController implements Runnable{
 	 */
 	private GoGuiUpdater gameGUIupdater;
 
+	/**
+	 * TODO keep track of previous move, can be asked by a player
+	 */
+	private int previousMove = -2;
+
+	
 
 	/**
 	 * Creates a new GameController, including the game.
@@ -90,8 +96,12 @@ public class GameController implements Runnable{
 			if (resultMove == GoGameConstants.PASS) {
 				if(firstPassed) {
 					gameOver = true; // TODO properly end game
+					// if game over, loop ends
+					System.out.println("DEBUG: going to end game.."); // TODO: eventually remove/disable
+					this.endGame(GoGameConstants.FINISHED, GoGameConstants.UNOCCUPIED);
 				} else {
 					firstPassed = true;
+					this.previousMove = GoGameConstants.PASSint;
 					this.game.moveToNextPlayer();
 				}
 			} else if (resultMove == GoGameConstants.INVALID) {
@@ -118,12 +128,10 @@ public class GameController implements Runnable{
 				}
 
 				firstPassed = false;
+				this.previousMove = chosenMove;
 				this.game.moveToNextPlayer();
 			}
 		} 
-// if game over, loop ends
-		System.out.println("DEBUG: going to end game.."); // TODO: eventually remove/disable
-		this.endGame(GoGameConstants.FINISHED, GoGameConstants.UNOCCUPIED);
 
 		
 	}
@@ -213,6 +221,14 @@ public class GameController implements Runnable{
 	 */
 	public Board getGameBoard() {
 		return this.game.getBoard();
+	}
+	
+	/**
+	 * TODO doc, and implement like this?
+	 * @return
+	 */
+	public int getPreviousMove() {
+		return previousMove;
 	}
 
 	@Override

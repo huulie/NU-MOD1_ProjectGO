@@ -110,7 +110,7 @@ public class GoClient { //implements ClientProtocol {
 	
 	
 	//TODO
-	String bip = "resources/InstrumentalAsianMusic.mp3";
+	String bip = "resources/InstrumentalAsianMusicShorter.mp3";
 	Media hit = new Media(new File(bip).toURI().toString());
 	MediaPlayer mediaPlayer; 
 	
@@ -366,27 +366,25 @@ public class GoClient { //implements ClientProtocol {
 		
 		if (handshakeResponse != null && !handshakeResponse.equalsIgnoreCase("")) {
 			String[] splitHandshakeResponse = handshakeResponse.split(ProtocolMessages.DELIMITER);
-			if (splitHandshakeResponse.length == 3) {
-				if (splitHandshakeResponse[0].equals(String.valueOf(ProtocolMessages.HANDSHAKE))) {
-					 this.protocolVersion = splitHandshakeResponse[1];
-					 handshakeServerMessage = splitHandshakeResponse[2];
-					 TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
+			if (splitHandshakeResponse[0].equals(String.valueOf(ProtocolMessages.HANDSHAKE))) {
+				if (splitHandshakeResponse.length == 3) {
+					this.protocolVersion = splitHandshakeResponse[1];
+					handshakeServerMessage = splitHandshakeResponse[2];
+					TUI.showMessage("Connected to the Go game server: " + handshakeServerMessage);
+				} else if (splitHandshakeResponse.length == 2) {
+					this.protocolVersion = splitHandshakeResponse[1];
+					TUI.showMessage("Connected to the Go game server (no message)");
 				} else {
-				// TODO also support handshake without message String, make else for both 3 and 2
-					throw new ProtocolException("Handshake failed: server did not reply correctly (was " + handshakeResponse + " )");
+					throw new ProtocolException("Handshake failed: Wrong number of arguments (" 
+							+ splitHandshakeResponse.length + " instead of 2 or 3) in response from server");
 				}
-			}else if (splitHandshakeResponse.length == 2) {
-					 this.protocolVersion = splitHandshakeResponse[1];
-					 TUI.showMessage("Connected to the Go game server (no message)");
-
 			} else {
-				throw new ProtocolException("Handshake failed: Wrong number of arguments (" 
-			+ splitHandshakeResponse.length + " instead of 2 or 3) in response from server");
+				// TODO also support handshake without message String, make else for both 3 and 2
+				throw new ProtocolException("Handshake failed: server did not reply correctly (was " + handshakeResponse + " )");
 			}
 		} else {
 			throw new ProtocolException("Handshake failed: Empty response from server");
 		}
-		// System.out.println("DEBUG" + Welcome to the Hotel booking system of hotel: " + hotelName);
 	}
 	
 	/**
@@ -470,7 +468,8 @@ public class GoClient { //implements ClientProtocol {
 						// TODO ook verder als GUI failt
 					}
 
-					String opponentLastMove = splitServerResponse[2];			
+					String opponentLastMove = splitServerResponse[2];
+					this.GUIupdater.setMarkerAtOpponent(opponentLastMove);
 
 					String makeMove = ProtocolMessages.MOVE + ProtocolMessages.DELIMITER
 							+ TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");

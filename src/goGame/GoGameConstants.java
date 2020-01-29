@@ -14,6 +14,8 @@ public class GoGameConstants {
 	public static final char INVALID = ProtocolMessages.INVALID;
 	public static final char PASS = ProtocolMessages.PASS; //used to indicate a pass move, when using char
 	public static final int PASSint = -1; //used to indicate a pass move, when using int
+	public static final int NOMOVEint = -2; // used to initialize, and indicate no move is set
+	
 	public static final String DELIMITER = ProtocolMessages.DELIMITER;
 
 	public static final char WHITE = ProtocolMessages.WHITE;
@@ -32,5 +34,6 @@ public class GoGameConstants {
 	public static final String DISCONNECTdescription = "The non-winning player has disconnected";
 	public static final String CHEATdescription = "The non-winning player has tried to do an invalid move or waited to long";
 	public static final String EXITdescription = "The non-winning player has quit";
+
 	
 }
