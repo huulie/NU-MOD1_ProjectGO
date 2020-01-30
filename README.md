@@ -3,7 +3,7 @@ Final assignment of Nedap University module 1
 
 _Play without GUI and background music (please answer no/false to these questions!)_
 
-1. First, download GoServer.jar and GoClient.jar from https://huulie.stackstorage.com/s/LDyxYGfy4zMVk0z (password nedapGO)
+1. First, download GoServer.jar and GoClient.jar (available in release)
 
 2. To start a server, open a terminal window and navigate to the folder containing GoServer.jar. Then type:
 
@@ -41,7 +41,7 @@ To get the program up and running, open a command line terminal.
 
 `cd ProjectGO`
 
-Because of the file size, the .jar files have to be download separately from https://huulie.stackstorage.com/s/LDyxYGfy4zMVk0z (password nedapGO). Place them in the same ProjectGO directory.
+Because of the file size, the .jar files have to be download separately (available in release). Place them in the same ProjectGO directory.
 
 2. Then, start the server by typing this line in the command line and hitting enter:
 
