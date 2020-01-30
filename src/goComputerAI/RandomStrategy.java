@@ -2,6 +2,7 @@ package goComputerAI;
 
 import goClient.GoClient;
 import goGame.Board;
+import goGame.GoGameConstants;
 
 /**
  * Strategy to randomly make moves.
@@ -24,16 +25,24 @@ public class RandomStrategy implements Strategy {
 	}
 
 	@Override
-	public int calculateMove(GoClient client) { // Board board, Stone color
+	public int calculateMove(GoClient client) {
 
 		Board board = client.getLocalBoard();
 		int boardDim = board.getDim();
 		
+		int move = GoGameConstants.NOMOVEint;
+		boolean valid = false;
+		
 		int lower = 0; // TODO inclusive?
 		int upper = boardDim * boardDim; // TODO exclusive?
 		
-		int move = (int) (Math.random() * (upper - lower)) + lower;
-		//TODO check if empty field? 
+		while (!valid) {
+			move = (int) (Math.random() * (upper - lower)) + lower;
+
+			if (board.isField(move) && board.isEmptyField(move)) {
+				valid = true;
+			}
+		}
 		
 		return move;
 	}
