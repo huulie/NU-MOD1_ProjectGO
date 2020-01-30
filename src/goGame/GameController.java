@@ -92,7 +92,12 @@ public class GameController implements Runnable {
 				this.endGame(GoGameConstants.CHEAT, this.game.getCurrentPlayer().getColour().print());
 			}
 			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
-			this.game.getCurrentPlayer().moveResult(resultMove, this.game.getBoard());
+			
+			if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
+				this.game.getCurrentPlayer().moveResult(GoGameConstants.VALID, this.game.getBoard());
+			} else if (resultMove == GoGameConstants.INVALID) {
+				this.game.getCurrentPlayer().moveResult(GoGameConstants.INVALID, this.game.getBoard());
+			}
 
 			if (resultMove == GoGameConstants.PASS) {
 				if (firstPassed) {

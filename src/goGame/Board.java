@@ -357,16 +357,7 @@ public class Board {
 	 * NOTE: do checking BEFORE adding the new state to the list, otherwise it will always be true
 	 */
 	public boolean checkSamePreviousState(Stone[][] newState) {
-		boolean sameFound;
-
-		if (this.previousStates.contains(getIntersectionsHash(newState)) ) {
-			// TODO: CHECK not wanting to compare object, but compare their contents> == ?!
-			sameFound = true;
-		} else {
-			sameFound = false;
-		}
-		return sameFound;
-
+		return this.previousStates.contains(getIntersectionsHash(newState));
 	}
 
 	@Override
