@@ -18,15 +18,8 @@ import goUI.GoTUICommands;
  */
 public class GoLocalTUI extends GoTUI {
 
-	//	/** Constructor. TODO: need a TUI to know which player it's connected to? 
-	//	 * @param client corresponding client
-	//	 */
-	//	public GoLocalTUI(LocalPlayer player) {
-	//		super();
-	//		this.player = player; 
-	//	}
-
-	/** Creates a new local TUI, not bound to a player.
+	/** 
+	 * Creates a new local TUI.
 	 */
 	public GoLocalTUI() {
 		super();
@@ -34,7 +27,7 @@ public class GoLocalTUI extends GoTUI {
 
 	/**
 	 * Split the user input on a space and handle it accordingly. 
-	 * - If the input is valid, take the corresponding action via the controller LocalPlayer
+	 * - If the input is valid, take the corresponding action via the controller
 	 * - If the input is invalid, show a message to the user and print the help menu.
 	 * 
 	 * @param input The user input.
@@ -42,7 +35,7 @@ public class GoLocalTUI extends GoTUI {
 	 */
 	@Override
 	public void handleUserInput(String input) throws ExitProgram {
-		String [] split = input.split("\\s+");
+		String[] split = input.split("\\s+");
 
 		char command = split[0].charAt(0);
 		String param = null;
@@ -56,34 +49,33 @@ public class GoLocalTUI extends GoTUI {
 		}
 
 		switch (command) {
+			case GoTUICommands.HELP:
+				this.showMessage(" - Help for the GO game - ");
+				// Could be implemented: controller."help" TODO: add something about player?
+				printHelpMenu();
+				break;
 
-		case GoTUICommands.HELP:
-			this.showMessage(" - Help for the GO game - ");
-			// Could be implemented: controller."help" TODO: add something about player?
-			printHelpMenu();
-			break;
+			case GoTUICommands.EXIT:
+				String confirmation = null;
 
-		case GoTUICommands.EXIT:
-			String confirmation = null;
+				while (confirmation == null) {
+					confirmation = this.getString("Are you sure? [Y]es / [N]o ");
 
-			while (confirmation == null) {
-				confirmation = this.getString("Are you sure? [Y]es / [N]o ");
-
-				if (confirmation.equalsIgnoreCase("Y")) {
-					this.showMessage("Bye bye! ");
-					throw new ExitProgram("User requested EXIT");
-				} else if (confirmation.equalsIgnoreCase("N")) {
-					this.showMessage("Okay, continue to run client ");
-				} else {
-					confirmation = null; // all other inputs are ignored
+					if (confirmation.equalsIgnoreCase("Y")) {
+						this.showMessage("Bye bye! ");
+						throw new ExitProgram("User requested EXIT");
+					} else if (confirmation.equalsIgnoreCase("N")) {
+						this.showMessage("Okay, continue to run client ");
+					} else {
+						confirmation = null; // all other inputs are ignored
+					}
 				}
-			}
-			break;
+				break;
 
-		default:
-			this.showMessage("I don't understand this command, try again");
-			this.showMessage("Maybe this helps:");
-			printHelpMenu();
+			default:
+				this.showMessage("I don't understand this command, try again");
+				this.showMessage("Maybe this helps:");
+				printHelpMenu();
 		}
 	}
 

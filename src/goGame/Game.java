@@ -72,7 +72,7 @@ public class Game {
 	 * Resets the game. <br>
 	 * The board is emptied and player[0] becomes the current player.
 	 */
-	public void reset() { // TODO: set visibility to protected? https://docs.oracle.com/javase/tutorial/java/javaOO/accesscontrol.html
+	public void reset() { 
 		currentTotalTurn = 0;
 		try {
 			board.reset();
@@ -84,25 +84,25 @@ public class Game {
 	}
 
 	/**
-	 * Returns the current player
+	 * Returns the current player.
 	 * @return Player current player
 	 */
-	public Player getCurrentPlayer() { // TODO: set visibility to protected?
+	public Player getCurrentPlayer() { 
 		return players[currentTotalTurn % NUMBER_PLAYERS];
 	}
 	
 	/**
-	 * Moves game to the next player
+	 * Moves game to the next player.
 	 * 
 	 */
-	public void moveToNextPlayer() { // TODO: set visibility to protected?
+	public void moveToNextPlayer() { 
 		currentTotalTurn++;
 	}
 
 	/**
 	 * Prints the game situation, to the standard system output (of the VM running the game).
 	 */
-	public void print() { // TODO: set visibility to protected?
+	public void print() { 
 		System.out.println("\n [GAME] Current game situation: \n\n" + board.toStringFormatted()
 		+ "\n");
 	}
@@ -113,7 +113,7 @@ public class Game {
 	 *   from the board when all the intersections directly adjacent to it are occupied by the enemy. 
 	 *   (Capture of the enemy takes precedence over self-capture.)
 	 */
-	public void update() { // TODO: set visibility to protected?
+	public void update() { 
 	boardTools.doOpponentCaptures(this.board, this.getCurrentPlayer().getColour());
 	boardTools.doOwnCaptures(this.board, this.getCurrentPlayer().getColour());
 	}
@@ -127,7 +127,7 @@ public class Game {
 	}
 	
 	/**
-	 * Get the Komi as currently set for this game
+	 * Get the Komi as currently set for this game.
 	 * @return Komi for this game
 	 */
 	public double getKomi() {
@@ -135,7 +135,7 @@ public class Game {
 	}
 
 	/**
-	 * Set the Komi for this game
+	 * Set the Komi for this game.
 	 * @ensures this game has Komi set to requested komi
 	 */
 	public void setKomi(double komi) {

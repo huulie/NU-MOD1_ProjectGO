@@ -63,7 +63,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = boardTools.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame.getBoard(), testGame.getKomi()); 
 		double scoreBlack = 8; // calculate yourself
 		double scoreWhite = 8+testGame.getKomi(); // calculate yourself, think of Komi!
 
@@ -108,7 +108,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = boardTools.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame.getBoard(), testGame.getKomi()); 
 		double scoreBlack = 8; // calculate yourself
 		double scoreWhite = 8+testGame.getKomi(); // calculate yourself, think of Komi!
 
@@ -154,7 +154,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = boardTools.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame.getBoard(), testGame.getKomi()); 
 		double scoreBlack = 12; // calculate yourself
 		double scoreWhite = 4+testGame.getKomi(); // calculate yourself, think of Komi!
 
@@ -198,7 +198,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = boardTools.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame.getBoard(), testGame.getKomi()); 
 		double scoreBlack = 4; // calculate yourself
 		double scoreWhite = 4+testGame.getKomi(); // calculate yourself, think of Komi!
 
@@ -285,7 +285,7 @@ public class GoScoringTest {
 
 		System.out.println(testBoard.toStringFormatted());
 		System.out.println("Calculating scores...");
-		String testScore = boardTools.getScores(testGame); 
+		String testScore = boardTools.getScores(testGame.getBoard(), testGame.getKomi()); 
 		double scoreBlack = 38; // calculate yourself
 		double scoreWhite = 15+testGame.getKomi(); // calculate yourself, think of Komi!
 

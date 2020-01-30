@@ -25,7 +25,7 @@ import goProtocol.ProtocolMessages;
  *  
  * @author Huub Lievestro
  */
-public class GoServer implements Runnable { // TODO , ServerProtocol
+public class GoServer implements Runnable { 
 
 	/** The ServerSocket of this GoServer. */
 	private ServerSocket ssock;
@@ -198,7 +198,6 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 	 */
 	public void removeClient(GoClientHandler client) {
 		this.clients.remove(client);
-		
 		// TODO also remove games and waitinglist etc! (seperate methods?)
 		
 	}
@@ -226,15 +225,14 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 	}
 	
 	/**
-	 * TODO DOC
+	 * Checks waiting list if two or more players are waiting = start new game.
 	 */
 	public void checkWaitingList() {
 		TUI.showMessage("Current waiting list: " + clientsWaitingList); // TODO client/player names?!
 		while (clientsWaitingList.size() >= 2) {
 			TUI.showMessage("Two or more players are waiting: starting new game(s)...");
-			this.startGameFromWaitingList(); // TODO first sent handshake to second player!
+			this.startGameFromWaitingList();
 		}
-		
 	}
 	
 	private void startGameFromWaitingList() {
@@ -251,29 +249,16 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 
 		
 		this.games.add(newGame);
-		new Thread(this.games.get(games.size()-1)).start(); // TODO before starting, switch clients to in game mode!
+		new Thread(this.games.get(games.size() - 1)).start();
 		TUI.showMessage("New game started: " + first.getName() + " vs " + second.getName());
 		
-		clientsWaitingList.remove(1); // TODO note order: when removing 0, List shifts!
+		clientsWaitingList.remove(1);
 		clientsWaitingList.remove(0);
 		
 	}
-	
-	
-//	/**
-//	 * Returns name and network information to client
-//	 * 
-//	 * @return the string representation of the Hotel
-//	 */
-//	//@Override
-//	public synchronized String doHelp() {
-//		return "#SERVER#[INFO]: GoServer " + this.getServerName() + "listening: " + this.localIP + " on port " + this.port; 
-//	 // TODO: synchronzed here not neseccary because not one model?!!
-//	}
+
 
 	// ------------------ Main --------------------------
-
-	
 
 	/** Start a new GoServer. */
 	public static void main(String[] args) {
@@ -281,7 +266,5 @@ public class GoServer implements Runnable { // TODO , ServerProtocol
 		System.out.println("Welcome to the GO Server! \n Starting...");
 		new Thread(server).start();
 	}
-
-	
 	
 }

@@ -3,7 +3,6 @@ package goGame;
 import exceptions.TimeOutException;
 import goServer.GoClientHandler;
 
-// TODO: documentation and implementation
 public class RemotePlayer extends Player {
 
 	// Inherited from Player: name, colour and TUI
@@ -33,29 +32,22 @@ public class RemotePlayer extends Player {
 	}
 	
 	/**
-	 * Shows the result of the move to the Player
+	 * Shows the result of the move to the Player.
 	 * @param board data to update
 	 */
 	 @Override
 	public void moveResult(char result, Board board) {
-		 clientHandler.resultMove(result, board);
+		clientHandler.resultMove(result, board);
 	}
 	
 	
 	 /**
-	  * Ends game for player, showing result TODO
+	  * Ends game for player, showing result.
 	  * @param board data to update
 	  */
 	 @Override
 	 public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {
-		 clientHandler.clientEndGame(reason, winner, scoreBlack, scoreWhite);
+		clientHandler.clientEndGame(reason, winner, scoreBlack, scoreWhite);
 	 }
-//	/**
-//	 * Displays message on user interface of client
-//	 */
-//	@Override
-//	public void displayMessage(String message) {
-//		this.clientHandler.showMessage(message);
-//	}
 
 }

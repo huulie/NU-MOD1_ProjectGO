@@ -3,7 +3,7 @@ package exceptions;
 /**
  * Exception to indicate requested field on specific board is invalid.
  * @author huub.lievestro
- *
+ * 
  */
 public class InvalidFieldException extends Exception {
 

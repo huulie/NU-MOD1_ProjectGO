@@ -100,23 +100,6 @@ public abstract class Player {
 	 * @param board the current board
 	 */
 	public char makeMove(Board board, int choice) {
-		//int choice = determineMove(board);
-
-//		if (choice == GoGameConstants.PASSint) {
-//			return GoGameConstants.PASS;
-//		} else {
-//			try {
-//				if (board.isEmptyField(choice)) {
-//					board.setField(choice, this.getColour());
-//				} else {
-//					return GoGameConstants.INVALID; // TODO also return that field was not empty? 
-//				}
-//				return GoGameConstants.VALID;
-//			} catch (InvalidFieldException e) {
-//				return GoGameConstants.INVALID;
-//			}
-//		}
-
 		//TODO check if this validation works
 		if (choice == GoGameConstants.PASSint) {
 			return GoGameConstants.PASS;
@@ -125,48 +108,50 @@ public abstract class Player {
 
 			Board checkSamePrevious = board.deepCopy();
 			try {
-				checkSamePrevious.setField(choice, this.getColour()); // NOTE: checking on clone of board, not actually placing stone
+				checkSamePrevious.setField(choice, this.getColour()); 
+				// NOTE: checking on clone of board, not actually placing stone
 			} catch (InvalidFieldException e) {
-				TUI.showMessage("Something went wrong when checking the stone: " + e.getLocalizedMessage()); // TODO TUI?
+				TUI.showMessage("Something went wrong when checking the stone: " 
+						+ e.getLocalizedMessage()); // TODO TUI?
 				e.printStackTrace();
 			}
 
-			boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
+			boolean validPrevious = 
+					board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
 
-			boolean valid = validPlacement ;//&& validPrevious; //TODO: reanable previious 
+			boolean valid = validPlacement;//&& validPrevious; //TODO: reanable previious 
 
 			if (!valid) {
 				return GoGameConstants.INVALID;
 			} else {
 				try {
-				board.setField(choice, this.getColour());
+					board.setField(choice, this.getColour());
 				} catch (InvalidFieldException e) {
-					TUI.showMessage("Weird: invalid field was not detected, but now: " + e.getLocalizedMessage());
+					TUI.showMessage("Weird: invalid field was not detected, but now: " 
+							+ e.getLocalizedMessage());
 					return GoGameConstants.INVALID;
 				}
-				
 				return GoGameConstants.VALID;
-
 			}
 		}
 	}
 
 	/**
-	 * Displays message on user interface
+	 * Displays message on user interface.
 	 */
 	public void displayMessage(String message) {
 		this.TUI.showMessage(message);
 	}
 
 	/**
-	 * Updates the GUI of the Player with this board
+	 * Updates the GUI of the Player with this board.
 	 * @param board data to update GUI with
 	 */
 	public void updateGUI(Board board) {
 	}
 	
 	/**
-	 * Shows the result of the move to the Player TODO
+	 * Shows the result of the move to the Player.
 	 * @param board data to update
 	 */
 	public void moveResult(char result, Board board) {
@@ -174,7 +159,7 @@ public abstract class Player {
 
 
 	/**
-	 * Ends game for player, showing result TODO
+	 * Ends game for player, showing result.
 	 * @param board data to update
 	 */
 	public void endGame(char reason, char winner, double scoreBlack, double scoreWhite) {

@@ -17,25 +17,25 @@ import org.apache.commons.codec.binary.Hex;
 public class Board {
 
 	/**
-	 * Dimension of the board (defined as number of intersections on one side)
+	 * Dimension of the board (defined as number of intersections on one side).
 	 */
 	private int DIM;
 
 	/**
 	 * The DIM by DIM intersections of the GO board, represented as Stone objects. 
 	 * Intersections are numbered with a linear index, row-major order, starting at zero
-	 * These intersections are stored in 2D array, first index is horizontal axis and second index is vertical axis.
+	 * These intersections are stored in 2D array, 
+	 * first index is horizontal axis and second index is vertical axis.
 	 * @invariant there are always DIM*DIM intersections
 	 * @invariant all intersections are either Stone.BLACK, Stone.WHITE or Stone.UNOCCUPIED
 	 */
 	private Stone[][] intersections;
 
 	/**
-	 * The previous states of the DIM by DIM intersections of the GO board. 
+	 * The previous states of the DIM by DIM intersections of the GO board, saved as hash. 
 	 * List index is in chronological order, with highest index being latest state
 	 */
-//	private List<Stone[][]> previousStates = new ArrayList<Stone[][]>();  	// TODO: save whole boards or only hashes?!
-	private List<String> previousStates = new ArrayList<String>();  	// TODO: save whole boards or only hashes?!
+	private List<String> previousStates = new ArrayList<String>(); // save only hashes
 
 	/**
 	 * Creates an empty board.
@@ -45,7 +45,7 @@ public class Board {
 	public Board(int dimension) throws InvalidFieldException {
 		DIM = dimension;
 		intersections = new Stone[DIM][DIM];
-		this.reset(); // to set all intersection to empty (instead of default null), also (re)sets previous states
+		this.reset(); // set all to empty (instead of default null), also resets previous states
 	}
 
 	/** 
@@ -69,13 +69,14 @@ public class Board {
 	 * Calculates the index in the linear array of intersections from a (row, col) pair.
 	 * @requires row to be between 0 and DIM
 	 * @requires col to be between 0 and DIM
-	 * @return the index belonging to the (row,col)-intersection, or -1 if 2D is outside board TODO use exception?
+	 * @return the index belonging to the (row,col)-intersection, 
+	 * or -1 if 2D is outside board TODO use exception?
 	 */
 	public int indexLinear(int row, int col) {
-		if( !(row >= 0 && row < DIM) || !(col >= 0 && col < DIM) ) {
+		if (!(row >= 0 && row < DIM) || !(col >= 0 && col < DIM)) {
 			return -1;
 		}
-		return (row) * DIM + col;
+		return row * DIM + col;
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class Board {
 	 * @return the corresponding (row,col) index, or null if outside board TODO use exception?
 	 */
 	public Coordinate2D index(int i) {
-		if( !(i >= 0) && !(i < DIM * DIM)) {
+		if (!(i >= 0) && !(i < DIM * DIM)) {
 			return null;
 		}
 		Coordinate2D index = new Coordinate2D(i / DIM, i % DIM);
@@ -98,8 +99,8 @@ public class Board {
 	 * @return the corresponding (row,col) index
 	 */
 	public Coordinate2D index(int row, int col) {
-		assert (row >= 0 && row < DIM) : "Row should be between zero and DIM";
-		assert (col >= 0 && col < DIM) : "Col should be between zero and DIM";		
+		assert row >= 0 && row < DIM : "Row should be between zero and DIM";
+		assert col >= 0 && col < DIM : "Col should be between zero and DIM";		
 		// what TODO with assertions? 
 
 		Coordinate2D index = new Coordinate2D(row, col);
@@ -121,7 +122,7 @@ public class Board {
 	 * @return true if 0 <= row < DIM && 0 <= col < DIM
 	 */
 	public boolean isField(int row, int col) {
-		return isField(this.index(row,col));
+		return isField(this.index(row, col));
 	}
 
 	/**
@@ -146,7 +147,7 @@ public class Board {
 	 * @return the Stone on the intersection
 	 */
 	public Stone getField(int i) {
-		assert (this.isField(i)) : "Non-valid intersection for this board!"; // TODO not in .index anymore
+		assert this.isField(i) : "Non-valid intersection for this board!";
 		return getField(this.index(i));
 	}
 
@@ -159,8 +160,8 @@ public class Board {
 	 * @return the stone on the intersection
 	 */
 	public Stone getField(int row, int col) {
-		assert (this.isField(row, col)) : "Non-valid intersection for this board!"; // TODO not in .index anymore
-		return getField(this.index(row,col));
+		assert this.isField(row, col) : "Non-valid intersection for this board!";
+		return getField(this.index(row, col));
 	}
 
 	/**
@@ -171,7 +172,7 @@ public class Board {
 	 * @return the stone on the intersection
 	 */
 	public Stone getField(Coordinate2D coordinate) {
-		assert (this.isField(coordinate)) : "Non-valid intersection for this board!"; // TODO not in .index anymore
+		assert this.isField(coordinate) : "Non-valid intersection for this board!";
 		return this.intersections[coordinate.getRow()][coordinate.getCol()];
 	}
 
@@ -183,7 +184,7 @@ public class Board {
 	 * @return true if the intersection is empty
 	 */
 	public boolean isEmptyField(int i) {
-		assert (this.isField(i)) : "Non-valid intersection for this board!"; // TODO not in .index anymore
+		assert this.isField(i) : "Non-valid intersection for this board!";
 		return isEmptyField(this.index(i));
 	}
 
@@ -196,7 +197,7 @@ public class Board {
 	 * @return true if the intersection is empty
 	 */
 	public boolean isEmptyField(int row, int col) {
-		assert (this.isField(row, col)) : "Non-valid intersection for this board!"; // TODO not in .index anymore
+		assert this.isField(row, col) : "Non-valid intersection for this board!";
 		return isEmptyField(this.index(row, col));
 	}
 
@@ -208,8 +209,8 @@ public class Board {
 	 * @return true if the intersection is empty
 	 */
 	public boolean isEmptyField(Coordinate2D coordinate) {
-		assert (this.isField(coordinate)) : "Non-valid intersection for this board!"; // not in .index anymore
-		return (getField(coordinate) == Stone.UNOCCUPIED);
+		assert this.isField(coordinate) : "Non-valid intersection for this board!"; 
+		return getField(coordinate) == Stone.UNOCCUPIED;
 	}
 
 	/**
@@ -226,7 +227,7 @@ public class Board {
 			}
 			s = s + row;
 		}
-		s = s.replaceAll("\\s+",""); // TODO Remove all spaces and non-visible characters
+		s = s.replaceAll("\\s+", "");
 		return s;
 	}
 
@@ -241,7 +242,7 @@ public class Board {
 		for (int i = 0; i < DIM; i++) {
 			String row = "";
 			for (int j = 0; j < DIM; j++) {
-				row = row + " " + getField(i, j).toString() ;
+				row = row + " " + getField(i, j).toString();
 			}
 			s = s + row + "\n";
 		}
@@ -251,7 +252,8 @@ public class Board {
 	/**
 	 * Creates a new Board object from a String representation of the board.
 	 * NOTE: creates a new board (will not be connected to the game)
-	 * TODO DOC
+	 * @param boardString to parse
+	 * @return newBoard from String
 	 */
 	public static Board newBoardFromString(String boardString) {
 		int boardDim = (int) Math.sqrt(boardString.length());
@@ -271,8 +273,9 @@ public class Board {
 	}
 	
 	/**
-	 * Returns a String representation of an instersections array. 
+	 * Returns a String representation of an intersections array. 
 	 *
+	 * @param intersections to parse
 	 * @return the game situation as String
 	 */
 	public String intersectionsToString(Stone[][] intersections) {
@@ -284,21 +287,19 @@ public class Board {
 			}
 			s = s + row;
 		}
-		s = s.replaceAll("\\s+",""); // TODO Remove all spaces and non-visible characters
+		s = s.replaceAll("\\s+", "");
 		return s;
 	}
 
 	/**
 	 * Empties all intersections of this board (i.e., let them refer to the value Stone.UNOCCUPIED).
 	 * @throws InvalidFieldException 
-	 * @ensures all intersections are EMPTY
+	 * @ensures all intersections are UNOCCUPIED
 	 */
 	public void reset() throws InvalidFieldException {
 		for (int emptyRow = 0; emptyRow < DIM; emptyRow++) {
 			for (int emptyColumn = 0; emptyColumn < DIM; emptyColumn++) {
 				intersections[emptyRow][emptyColumn] = Stone.UNOCCUPIED;
-				// this.setField(emptyRow, emptyColumn, Stone.UNOCCUPIED);
-				// TODO: do NOT use setField, because cannot add to previous state with nulls
 			}
 		}
 		this.previousStates.clear();
@@ -314,7 +315,7 @@ public class Board {
 	 * @throws InvalidFieldException 
 	 */
 	public void setField(int i, Stone color) throws InvalidFieldException {
-		this.setField(this.index(i),color);
+		this.setField(this.index(i), color);
 		return;
 	}
 
@@ -328,7 +329,7 @@ public class Board {
 	 * @throws InvalidFieldException 
 	 */
 	public void setField(int row, int col, Stone color) throws InvalidFieldException {
-		this.setField(this.index(row,col),color);
+		this.setField(this.index(row, col), color);
 		return;
 	}
 
@@ -342,33 +343,28 @@ public class Board {
 	 */
 	public char setField(Coordinate2D coordinate, Stone color) throws InvalidFieldException {
 		if (this.isField(coordinate)) {
-
-			this.intersections[coordinate.getRow()][coordinate.getCol()] = color ; // TODO: check this stone object
+			this.intersections[coordinate.getRow()][coordinate.getCol()] = color;
 			this.previousStates.add(getIntersectionsHash(intersections));
-			return GoGameConstants.VALID ;
-		}
-		else {
-			throw new InvalidFieldException(coordinate.toString() + " is not a valid field on this board!");
+			return GoGameConstants.VALID;
+		} else {
+			throw new InvalidFieldException(coordinate.toString() 
+					+ " is not a valid field on this board!");
 		}
 	}
 
 	/**
-	 * Check if the current board state is equal to any previos state.
+	 * Check if the current board state is equal to any previous state.
 	 * NOTE: do checking BEFORE adding the new state to the list, otherwise it will always be true
-	 * @requires 2D coordinate be a valid intersection
-	 * @ensures 2D coordinate to be set to Stone s
-	 * @param coordinate the intersection's 2D coordinate
-	 * @param s the stone to be placed
 	 */
 	public boolean checkSamePreviousState(Stone[][] newState) {
 		boolean sameFound;
 
-		if (this.previousStates.contains(getIntersectionsHash(newState)) ) { // TODO: CHECK not wanting to compare object, but compare their contents> == ?!
+		if (this.previousStates.contains(getIntersectionsHash(newState)) ) {
+			// TODO: CHECK not wanting to compare object, but compare their contents> == ?!
 			sameFound = true;
 		} else {
 			sameFound = false;
 		}
-
 		return sameFound;
 
 	}
@@ -379,12 +375,14 @@ public class Board {
 		try {
 			boardClone = new Board(this.DIM);
 		} catch (InvalidFieldException e) {
-			System.out.println("ERROR> something went wrong while cloning the board: " + e.getLocalizedMessage());
+			System.out.println("ERROR> something went wrong while cloning the board: " 
+					+ e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 		for (int indexRow = 0; indexRow < DIM; indexRow++) {
 			for (int indexColumn = 0; indexColumn < DIM; indexColumn++) {
-				boardClone.intersections[indexRow][indexColumn] = this.intersections[indexRow][indexColumn];
+				boardClone.intersections[indexRow][indexColumn] = 
+						this.intersections[indexRow][indexColumn];
 			}
 		}
 		return boardClone;
@@ -439,25 +437,26 @@ public class Board {
 
 
 	/**
-	 * Returns the index of the intersection above the given intersection, or -1 if outside board
+	 * Returns the index of the intersection above the given intersection, or -1 if outside board.
 	 * @requires index to refer to a valid intersection
 	 * @returns index of the intersection above the given intersection, or -1 if outside board
 	 * @param index intersection to start from
 	 */
 	public int above(int index) { // TODO: static, cannot because need to know dimensions
-		Coordinate2D currentIntersection = index(index); // cannot directly convert to row, col: cannot return mutiple values
+		Coordinate2D currentIntersection = index(index);
 
-		int indexAbove = this.indexLinear(currentIntersection.getRow()-1, currentIntersection.getCol());
+		int indexAbove = 
+				this.indexLinear(currentIntersection.getRow() - 1, currentIntersection.getCol());
 
 		//	if( (currentIntersection.getRow()-1)<0 || !this.isField(indexAbove)) { TODO: already here check if row in bounds? 
-		if(!this.isField(indexAbove)) {
+		if (!this.isField(indexAbove)) {
 			return -1; // to indicate outside board
 		}
-		return indexAbove ;
+		return indexAbove;
 	}
 
 	/**
-	 * Returns the index of the intersection below the given intersection, or -1 if outside board
+	 * Returns the index of the intersection below the given intersection, or -1 if outside board.
 	 * @requires index to refer to a valid intersection
 	 * @returns index of the intersection below the given intersection, or -1 if outside board
 	 * @param index intersection to start from
@@ -465,16 +464,17 @@ public class Board {
 	public int below(int index) { 
 		Coordinate2D currentIntersection = index(index);
 
-		int indexBelow = this.indexLinear(currentIntersection.getRow()+1, currentIntersection.getCol());
+		int indexBelow = 
+				this.indexLinear(currentIntersection.getRow() + 1, currentIntersection.getCol());
 
-		if(!this.isField(indexBelow)) {
+		if (!this.isField(indexBelow)) {
 			return -1; // to indicate outside board
 		}
-		return indexBelow ;
+		return indexBelow;
 	}
 
 	/**
-	 * Returns the index of the intersection left the given intersection, or -1 if outside board
+	 * Returns the index of the intersection left the given intersection, or -1 if outside board.
 	 * @requires index to refer to a valid intersection
 	 * @returns index of the intersection left the given intersection, or -1 if outside board
 	 * @param index intersection to start from
@@ -482,16 +482,17 @@ public class Board {
 	public int left(int index) { 
 		Coordinate2D currentIntersection = index(index); 
 
-		int indexLeft = this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol()-1);
-		int col = currentIntersection.getCol()-1;
-		if(!this.isField(indexLeft)) {
+		int indexLeft = 
+				this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol() - 1);
+		int col = currentIntersection.getCol() - 1;
+		if (!this.isField(indexLeft)) {
 			return -1; // to indicate outside board
 		}
-		return indexLeft ;
+		return indexLeft;
 	}
 
 	/**
-	 * Returns the index of the intersection right of the given intersection, or -1 if outside board
+	 * Returns index of the intersection right of the given intersection, or -1 if outside board.
 	 * @requires index to refer to a valid intersection
 	 * @returns index of the intersection right of the given intersection, or -1 if outside board
 	 * @param index intersection to start from
@@ -499,33 +500,32 @@ public class Board {
 	public int right(int index) { 
 		Coordinate2D currentIntersection = index(index); 
 
-		int indexRight = this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol()+1);
+		int indexRight = 
+				this.indexLinear(currentIntersection.getRow(), currentIntersection.getCol() + 1);
 
-		if(!this.isField(indexRight)) {
+		if (!this.isField(indexRight)) {
 			return -1; // to indicate outside board
 		}
-		return indexRight ;
+		return indexRight;
 	}
 	
 	/**
-	 * TODO doc
+	 * Calculates the hash of 2D-array representing intersections.
 	 * @param intersections
-	 * @return
+	 * @return string with hash of intersections
 	 */
 	private String getIntersectionsHash(Stone[][] intersections) {
 		String intersectionsString = this.intersectionsToString(intersections);
 		
 		try {
-		MessageDigest md = MessageDigest.getInstance("MD5");
-		md.update(intersectionsString.getBytes());
-		return Hex.encodeHexString(md.digest()); 
+			MessageDigest md = MessageDigest.getInstance("MD5");
+			md.update(intersectionsString.getBytes());
+			return Hex.encodeHexString(md.digest()); 
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			System.out.println("No such algorithm");
+			System.out.println("No such algorithm: " + e.getLocalizedMessage());
 			e.printStackTrace();
 			return null;
 		}
-		
 	}
 
 }

@@ -25,7 +25,7 @@ public enum Stone {
     }
 
     /**
-     * Convert char to Stone TODO: DOC
+     * Convert char to Stone. 
      * @param name
      * @return
      */
@@ -35,9 +35,6 @@ public enum Stone {
                 return stone;
 
         return null;
-    	
-        // TODO: JAVA 8, but no Arrays in enum?
-    	//return Arrays.stream(FileType.values()).filter(f -> f.name == name).findAny().orElseThrow(IllegalArgumentException::new);
     }
     
     /**
