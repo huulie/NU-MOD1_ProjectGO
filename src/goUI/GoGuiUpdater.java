@@ -58,7 +58,7 @@ public class GoGuiUpdater {
 	}
 
 	/**
-	 * Updates whole board from String TODO
+	 * Updates whole board from String
 	 * Note: a new board is created, which is NOT associated with a Game
 	 * @param boardString
 	 */
