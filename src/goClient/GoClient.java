@@ -142,15 +142,15 @@ public class GoClient {
 		this.clientName = TUI.getString("What is your name?");
 		this.gameStarted = false;
 		this.keepConnecting = true;
-		this.startGUI = this.TUI.getBoolean("Start a GUI for this client? [true] or [false]");
+		this.startGUI = this.TUI.getBoolean("Start a GUI for this client?");
 		if (this.startGUI) {
 			this.startBackgroundMusic = 
-				this.TUI.getBoolean("Start background music for this client? [true] or [false]");
+				this.TUI.getBoolean("Start background music for this client?");
 		} else {
 			this.startBackgroundMusic = false;
 		}
 
-		if (this.TUI.getBoolean("Do you want the computer AI to play for you? [true] or [false]")) {
+		if (this.TUI.getBoolean("Do you want the computer AI to play for you?")) {
 			this.TUI = new GoComputerTUI(this);
 		}
 	}

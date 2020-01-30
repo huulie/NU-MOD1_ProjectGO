@@ -194,11 +194,20 @@ public class GoTUI  { // TODO implements Runnable ?
 				BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 				answer = in.readLine();
 
-				answerBool = Boolean.parseBoolean(answer);
+				// answerBool = Boolean.parseBoolean(answer); 
+				// PM: use own switch, so everything not [T]/[t]rue is not automatically false
 				answerValid = true;
-			} catch (NumberFormatException eFormat) {
-				this.showMessage("ERROR> " + answer +  " is not an boolean (" 
-						+ eFormat.getLocalizedMessage() + ") try again!");
+				if (answer.equalsIgnoreCase("true") 
+						|| answer.equalsIgnoreCase("yes") 
+						|| answer.equalsIgnoreCase("y")) {
+					answerBool = true;
+				} else if (answer.equalsIgnoreCase("false") 
+						|| answer.equalsIgnoreCase("no") 
+						|| answer.equalsIgnoreCase("n")) {
+					answerBool = false;
+				} else {
+					answerValid = false;
+				}
 			} catch (IOException e) {
 				this.showMessage("IO Exception occurred");
 			}
