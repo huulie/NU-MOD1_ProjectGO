@@ -40,6 +40,11 @@ public class GameController implements Runnable {
 	 */
 	boolean gameOver;
 	
+	/** 
+	 * Setting to print debugging information.
+	 */
+	private boolean printDebug = true;
+	
 
 	/**
 	 * Creates a new GameController, including the game.
@@ -61,17 +66,16 @@ public class GameController implements Runnable {
 
 	/**
 	 * Starts the Go game. <br>
-	 * Asks after each ended game if the user want to continue. Continues until
-	 * the user does not want to play anymore. TODO implementation?
+	 *
 	 */
 	public void startGame() {
-		System.out.println("DEBUG: Game controller is starting..."); // TODO: eventually remove/disable
-		this.game.reset(); // TODO: current player in game controller? 
+		if (printDebug) System.out.println("DEBUG: Game controller is starting..."); 
+		this.game.reset(); 
 		play();
 	}
 
 	/**
-	 * Plays the Go game. <br> TODO: take a second look 
+	 * Plays the Go game. <br> 
 	 * First the (still empty) board is shown. Then the game is played until it is over. 
 	 * Players can make a move one after the other. After each move, the game state is updated
 	 */
@@ -80,29 +84,34 @@ public class GameController implements Runnable {
 		boolean firstPassed = false;
 
 		while (gameOver != true) { 
-			System.out.println("DEBUG: make a new move..."); // TODO: eventually remove/disable
-			// TODO implement checks on validity / previous state etc -> in player?
+			if (printDebug) System.out.println("DEBUG: make a new move...");
 			
 			int chosenMove = GoGameConstants.NOMOVEint;
+			
 			try {
 				chosenMove = this.game.getCurrentPlayer().determineMove(this.game.getBoard());
 			} catch (TimeOutException e) {
 				System.out.println("Be faster, now lost!");
 				gameOver = true;
-				this.endGame(GoGameConstants.CHEAT, this.game.getCurrentPlayer().getColour().print());
+				this.endGame(GoGameConstants.CHEAT, 
+						this.game.getCurrentPlayer().getColour().print());
 			}
-			char resultMove = this.game.getCurrentPlayer().makeMove(this.game.getBoard(),chosenMove);
+			
+			char resultMove = this.game.getCurrentPlayer()
+					.makeMove(this.game.getBoard(), chosenMove);
 			
 			if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
-				this.game.getCurrentPlayer().moveResult(GoGameConstants.VALID, this.game.getBoard());
+				this.game.getCurrentPlayer()
+					.moveResult(GoGameConstants.VALID, this.game.getBoard());
 			} else if (resultMove == GoGameConstants.INVALID) {
-				this.game.getCurrentPlayer().moveResult(GoGameConstants.INVALID, this.game.getBoard());
+				this.game.getCurrentPlayer()
+					.moveResult(GoGameConstants.INVALID, this.game.getBoard());
 			}
 
 			if (resultMove == GoGameConstants.PASS) {
 				if (firstPassed) {
 					gameOver = true;
-					System.out.println("DEBUG: going to end game.."); // TODO: eventually remove/disable
+					if (printDebug) System.out.println("DEBUG: going to end game.."); 
 					this.endGame(GoGameConstants.FINISHED, GoGameConstants.UNOCCUPIED);
 				} else {
 					firstPassed = true;
@@ -112,13 +121,11 @@ public class GameController implements Runnable {
 			} else if (resultMove == GoGameConstants.INVALID) {
 				System.out.println("INVALID"); 
 				gameOver = true;
-				this.endGame(GoGameConstants.CHEAT,this.game.getCurrentPlayer().getColour().print());
+				this.endGame(GoGameConstants.CHEAT,
+						this.game.getCurrentPlayer().getColour().print());
 			} else {
-				
-				System.out.println("DEBUG: update game.."); // TODO: eventually remove/disable
-				this.game.update(); // TODO: pattern render view something
-
-				// send new game state to players // TODO implemented?!
+				if (printDebug) System.out.println("DEBUG: update game.."); 
+				this.game.update();
 
 				// if present, update GUI's for local player or gameController
 				if (this.game.getCurrentPlayer().hasGUI()) {
@@ -127,7 +134,7 @@ public class GameController implements Runnable {
 				if (this.hasGameGUI()) {
 					this.updateGameGUI(this.game.getBoard());
 				} else {
-					this.game.print(); // TODO printing for gamecontroller, not for players: keep?
+					if (printDebug) this.game.print(); 
 				}
 
 				firstPassed = false;
@@ -140,13 +147,13 @@ public class GameController implements Runnable {
 	}
 	
 	/**
-	 * Ends the Go game. <br> TODO: take a second look 
+	 * Ends the Go game. <br> 
 	 * Can also be called from other methods, e.g. when ending because of disconnect
 	 */
 	public void endGame(char reason, char caller) {
 		gameOver = true;
 		
-		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
+		String scoreString = this.game.getScores();
 		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
 		double scoreBlack = Double.parseDouble(scores[0]);
 		double scoreWhite = Double.parseDouble(scores[1]);
@@ -154,7 +161,7 @@ public class GameController implements Runnable {
 		char winner = GoGameConstants.UNOCCUPIED; 
 		
 		if (caller == GoGameConstants.UNOCCUPIED) {
-			if (scoreBlack>scoreWhite) {
+			if (scoreBlack > scoreWhite) {
 				winner = GoGameConstants.BLACK; 
 			} else {
 				winner = GoGameConstants.WHITE;
@@ -166,7 +173,7 @@ public class GameController implements Runnable {
 		int noPlayers = this.game.getNumberPlayers();
 		for (int i = 1; i <= noPlayers; i++) {
 			
-			System.out.println("DEBUG: ending player" + i);
+			if (printDebug) System.out.println("DEBUG: ending player" + i);
 			this.game.getCurrentPlayer().endGame(reason, winner, scoreBlack, scoreWhite);
 			if (i < noPlayers) {
 				this.game.moveToNextPlayer();
@@ -179,7 +186,7 @@ public class GameController implements Runnable {
 	 * @return true if it has a GUI, false if not
 	 */
 	public boolean hasGameGUI() {
-		return (this.gameGUI != null);
+		return this.gameGUI != null;
 	}
 
 	/**
@@ -189,9 +196,8 @@ public class GameController implements Runnable {
 		if (this.hasGameGUI()) {
 			this.gameGUIupdater.updateWholeBoard(board);
 		} else {
-			System.out.println("There is no GUI to update!");
+			if (printDebug) System.out.println("There is no GUI to update!");
 		}
-
 	}
 	
 	public boolean isGameOver() {

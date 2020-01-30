@@ -77,11 +77,11 @@ public abstract class Player {
 	public abstract int determineMove(Board board) throws TimeOutException;
 	
 	/**
-	 * Check if this Player has a (a field named) GUI
+	 * Check if this Player has a (a field named) GUI.
 	 */
 	public boolean hasGUI() {
 		return Arrays.stream(this.getClass().getFields())
-				.anyMatch(f -> f.getName().equals("GUI"));
+					.anyMatch(f -> f.getName().equals("GUI"));
 	}
 	
 	public GameController getGame() {
@@ -100,7 +100,6 @@ public abstract class Player {
 	 * @param board the current board
 	 */
 	public char makeMove(Board board, int choice) {
-		//TODO check if this validation works
 		if (choice == GoGameConstants.PASSint) {
 			return GoGameConstants.PASS;
 		} else {
@@ -112,14 +111,15 @@ public abstract class Player {
 				// NOTE: checking on clone of board, not actually placing stone
 			} catch (InvalidFieldException e) {
 				TUI.showMessage("Something went wrong when checking the stone: " 
-						+ e.getLocalizedMessage()); // TODO TUI?
-				//TODO e.printStackTrace();
+						+ e.getLocalizedMessage()); 
+				
 			}
 
 			boolean validPrevious = 
 					board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
 
-			boolean valid = validPlacement;//&& validPrevious; //TODO: reanable previious 
+			boolean valid = validPlacement;//&& validPrevious; 
+			//TODO: fix validPrevious being always returning invalid, and enable again
 
 			if (!valid) {
 				return GoGameConstants.INVALID;

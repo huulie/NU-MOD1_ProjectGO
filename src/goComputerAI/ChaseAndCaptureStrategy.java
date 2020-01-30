@@ -1,9 +1,6 @@
 package goComputerAI;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
 import exceptions.InvalidFieldException;
 import goClient.GoClient;
 import goGame.Board;
@@ -38,21 +35,34 @@ public class ChaseAndCaptureStrategy implements Strategy {
 		int move;
 
 		Board board = client.getLocalBoard();
-		BoardTools boardTools = new BoardTools(false); // TODO leave debugging?
+		BoardTools boardTools = new BoardTools(false);
 		String opponentLastMove = client.getOpponentLastMove();
 		Stone ownStone = client.getPlayColour();
 
 
-		if (opponentLastMove == null || opponentLastMove.equals("null") 
-				|| opponentLastMove.equals(String.valueOf(ProtocolMessages.PASS))) {
+		if (opponentLastMove == null || opponentLastMove.equals("null")) {
 			move = new RandomStrategy().calculateMove(client);
+		} else if (opponentLastMove.equals(String.valueOf(ProtocolMessages.PASS))) {
+			double komi = 0.5; // TODO hardcoded
+			String scoreString = boardTools.getScores(board,komi); 
+			String[] scores = scoreString.split(GoGameConstants.DELIMITER);
+			double scoreBlack = Double.parseDouble(scores[0]);
+			double scoreWhite = Double.parseDouble(scores[1]);
+
+			if ((client.getPlayColour() == Stone.BLACK) && (scoreBlack > scoreWhite)) {
+				move = GoGameConstants.PASSint;
+			} else if ((client.getPlayColour() == Stone.WHITE) && (scoreBlack < scoreWhite)) {
+				move = GoGameConstants.PASSint;
+			} else {
+				move = new RandomStrategy().calculateMove(client); 
+			}
 		} else {
 
 			int opponentMoveInt = Integer.parseInt(opponentLastMove);
 
 			int[] indices = new int[4]; // above, right, below, left
 			Board[] boards = new Board[4]; // above, right, below, left
-			int[] captures = new int[4]; // above, right, below, left
+			Integer[] captures = new Integer[4]; // above, right, below, left
 
 
 			for (int i = 0; i < indices.length; i++) {
@@ -62,6 +72,8 @@ public class ChaseAndCaptureStrategy implements Strategy {
 						boards[i] = board.clone();
 						boards[i].setField(indices[0], ownStone);
 						captures[i] = boardTools.doOpponentCaptures(boards[i], ownStone);
+					} else {
+						captures[i] = -1; // never place stone
 					}
 				} catch (InvalidFieldException e) {
 					System.out.println("Invalid field:" + e.getLocalizedMessage());
@@ -69,10 +81,16 @@ public class ChaseAndCaptureStrategy implements Strategy {
 				}
 			}
 
-			int indexMaxCaptures = Arrays.stream(captures).max().getAsInt(); 
-			// TODO order of checking when equal max
+			//find the maximum value using stream API of the java 8
+			Integer max = Arrays.stream(captures) .max(Integer::compare).get();
+			// TODO order of checking when equal max: chosing first max
 
-			if (Math.random() > 0.8) { // TODO adjust chance? 
+			// find the index of that value
+			int indexMaxCaptures  = Arrays.asList(captures).indexOf(max);
+			
+			if (indices[indexMaxCaptures] == -1) { // all are invalid fields
+				move = new RandomStrategy().calculateMove(client); 
+			} else if (Math.random() > 0.8) { // TODO adjust chance? 
 				double komi = 0.5; // TODO hardcoded
 				String scoreString = boardTools.getScores(board,komi); 
 				String[] scores = scoreString.split(GoGameConstants.DELIMITER);

@@ -421,6 +421,8 @@ public class GoClient {
 	private void playingGame() {
 		if (this.startGUI) {
 			this.TUI.showMessage("Player " + clientName + " will use a GUI");
+			
+			// TODO: stop any JavaFX that is already running, to avoid errors with the GUI
 			this.GUI = new GoGuiIntegrator(true, true, this.localBoardDim);
 			this.GUI.startGUI();
 			this.GUI.setBoardSize(this.localBoardDim);
@@ -452,7 +454,6 @@ public class GoClient {
 			this.outputBoardToTUI = true;
 		}
 
-		// TODO this is actual playing, separate code above into "prepare to play"?
 		while (gameStarted == true) {
 			TUI.showMessage("Waiting for response from server..");
 			String serverResponse = null;
@@ -469,7 +470,7 @@ public class GoClient {
 						this.localBoard =  Board.newBoardFromString(localBoardStringTURN);
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
-							// TODO ook verder als GUI failt
+							// TODO ook verder als GUI faalt
 						}
 
 						this.opponentLastMove = splitServerResponse[2];
@@ -520,7 +521,6 @@ public class GoClient {
 					case ProtocolMessages.ERROR:	
 						throw new ProtocolException("Invalid message received by server");
 
-					// TODO: add default?
 				}	
 
 			} catch (ServerUnavailableException e) {

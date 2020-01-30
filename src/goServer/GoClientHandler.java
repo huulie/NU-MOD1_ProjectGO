@@ -82,25 +82,27 @@ public class GoClientHandler implements Runnable {
 		try {
 			msg = in.readLine();
 			while (msg != null) {
-				System.out.println("> [" + clientName + "] Incoming: " + msg);
+				if (printDebug) System.out.println("> [" + clientName + "] Incoming: " + msg);
 				handleIncoming(msg);
 				
 				msg = in.readLine();
 			}
 			
-			System.out.println("DEBUG: message was null ");
+			if (printDebug) System.out.println("DEBUG: message was null ");
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			if (this.getRemotePlayer().getGame() != null) {
 				this.getRemotePlayer().getGame()
-					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+					.endGame(GoGameConstants.DISCONNECT,
+							this.getRemotePlayer().getColour().print());
 			}
 			shutdown();
 		} catch (IOException e) {
-			System.out.println("DEBUG: IO exception: " + e.getLocalizedMessage());
+			if (printDebug) System.out.println("DEBUG: IO exception: " + e.getLocalizedMessage());
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			if (this.getRemotePlayer().getGame() != null) {
 				this.getRemotePlayer().getGame()
-					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+					.endGame(GoGameConstants.DISCONNECT,
+							this.getRemotePlayer().getColour().print());
 			}
 			shutdown();
 		}
@@ -108,12 +110,10 @@ public class GoClientHandler implements Runnable {
 
 	/**
 	 * Handles commands received from the client by calling the according 
-	 * methods at the GoServer. For example, when the message "i Name" 
-	 * is received, the method doIn() of HotelServer should be called 
-	 * and the output must be sent to the client.
+	 * methods at the RemotePlayer and/or GoServer. 
 	 * 
-	 * If the received input is not valid, send an "Unknown Command" 
-	 * message to the server.
+	 * If the received input is not valid according to the protocol,
+	 *  send an "Unknown Command" message to the Client.
 	 * 
 	 * @param msg command from client
 	 * @throws IOException if an IO errors occur.
@@ -139,9 +139,9 @@ public class GoClientHandler implements Runnable {
 		try {
 			switch (command) {
 				case ProtocolMessages.HANDSHAKE:
-					String requestedVersion = param1; // TODO something with requested version?
+					String requestedVersion = param1; //TODO something with requested version: fixed
 					String playerName = param2;
-					String requestColour = param3; // TODO something with requested colour?
+					String requestColour = param3; //TODO something with requested colour: now fixed
 					
 					this.remotePlayer = createRemotePlayer(playerName);	
 					this.sendMessage(srv.respondHandshake(this));
@@ -160,13 +160,12 @@ public class GoClientHandler implements Runnable {
 					break;
 
 				default:
-					System.out.println("DEBUG I don't understand this command, try again");
-					// and send invalid
+					if (printDebug) System.out.println("DEBUG I don't understand this command, try again");
 					this.sendMessage(ProtocolMessages.ERROR + ProtocolMessages.DELIMITER 
 							+ "unknown command");
 			}
 		} catch (ClientUnavailableException e) {
-			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			if (printDebug) System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			if (this.getRemotePlayer().getGame() != null) {
 				this.getRemotePlayer().getGame()
@@ -202,7 +201,7 @@ public class GoClientHandler implements Runnable {
 		srv.removeClient(this);
 	}
 
-	public int requestMove(int previousMove) throws TimeOutException { // TODO synchronized ?! (this.move concurrent)
+	public int requestMove(int previousMove) throws TimeOutException {
 		String board = this.remotePlayer.getGame().getGameBoard().toString();
 		String opponentsLastMove = null;
 		
@@ -222,32 +221,33 @@ public class GoClientHandler implements Runnable {
 				this.sendMessage(ProtocolMessages.TURN + ProtocolMessages.DELIMITER 
 						+ board + ProtocolMessages.DELIMITER + opponentsLastMove);
 			} catch (ClientUnavailableException e) {
-				System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+				if (printDebug) System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
 				System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 				if (this.getRemotePlayer().getGame() != null) {
 					this.getRemotePlayer().getGame()
-					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+						.endGame(GoGameConstants.DISCONNECT, 
+							this.getRemotePlayer().getColour().print());
 				}
 				shutdown();
 			}
 			
-			int secondsToWait = 60; // TODO: 60 sec timer, only for remote players
+			int secondsToWait = 60; // hardcoded from protocol: 60 sec timer
 			long endWaitTime = System.currentTimeMillis() + secondsToWait * 1000;
-	        while (this.chosenMove == null ) { 
+	        while (this.chosenMove == null) { 
 	        	if (this.getRemotePlayer().getGame().isGameOver()) {
-	        		System.out.println("DEBUG: [" + clientName + "] = waiting for move interrupted: GAME OVER");
-	        		return GoGameConstants.PASSint; // do a PASS. to avoid further changes and not break makemove
+	        		if (printDebug) System.out.println("DEBUG: [" + clientName 
+	        				+ "] = waiting for move interrupted: GAME OVER");
+	        		return GoGameConstants.PASSint; // to avoid further changes and not break makemove
 	        	} else if (System.currentTimeMillis() >= endWaitTime ) {
 	        		throw new TimeOutException("TIME OUT: move not inside 60 sec");
 	        	} else {
 	            	try {
 						Thread.sleep(1000); // updating every sec
 						long remaining = endWaitTime - System.currentTimeMillis();
-						System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " 
+						if (printDebug) System.out.println("DEBUG: [" + clientName 
+								+ "] = waiting for move, remaining millisec: " 
 						+ remaining);
-						// TODO interrupt if client has disconnected
 	            	} catch (InterruptedException e) {
-	            		// TODO Auto-generated catch block
 	            		e.printStackTrace();
 	            	}
 	        	}
@@ -265,7 +265,6 @@ public class GoClientHandler implements Runnable {
 				}
 			}
 		}
-		// TODO validation in player?
 		this.chosenMove = null;
 		return move;
 	}
@@ -276,7 +275,7 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(resultMessage);
 		} catch (ClientUnavailableException e) {
-			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			if (printDebug) System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			if (this.getRemotePlayer().getGame() != null) {
 				this.getRemotePlayer().getGame()
@@ -296,7 +295,7 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(startGame);
 		} catch (ClientUnavailableException e) {
-			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			if (printDebug) System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			if (this.getRemotePlayer().getGame() != null) {
 				this.getRemotePlayer().getGame()
@@ -308,7 +307,10 @@ public class GoClientHandler implements Runnable {
 	
 	/**
 	 * Signal remote client that Game has ended.
-	 * @param reason TODO complete
+	 * @param reason for ending
+	 * @param winner BLACK or WHITE
+	 * @param scoreBlack score of BLACK player
+	 * @param scoreWhite score of WHITE player
 	 */
 	public void clientEndGame(char reason, char winner, double scoreBlack, double scoreWhite) {
 		String endGame = ProtocolMessages.END + ProtocolMessages.DELIMITER 
@@ -320,7 +322,7 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(endGame);
 		} catch (ClientUnavailableException e) {
-			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			if (printDebug) System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
 			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
 			// do NOT try to end game again
 			shutdown();

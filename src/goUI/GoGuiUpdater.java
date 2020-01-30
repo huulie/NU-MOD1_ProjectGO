@@ -37,13 +37,14 @@ public class GoGuiUpdater {
 	 * @param board
 	 */
 	public void updateWholeBoard(Board board) {
-		for ( int i = 0; i < boardDim*boardDim; i++) {
+		for (int i = 0; i < boardDim * boardDim; i++) {
 			Stone stoneAtField = board.getField(i);
 
 			try {
-				if (stoneAtField==(Stone.WHITE) || stoneAtField==(Stone.BLACK) ) { 
+				if (stoneAtField == (Stone.WHITE) || stoneAtField == (Stone.BLACK)) { 
 					connectedGUI.removeStone(board.index(i).getCol(), board.index(i).getRow());
-					connectedGUI.addStone(board.index(i).getCol(), board.index(i).getRow(), stoneAtField.equals(Stone.WHITE));
+					connectedGUI.addStone(board.index(i).getCol(),
+							board.index(i).getRow(), stoneAtField.equals(Stone.WHITE));
 				} else if (stoneAtField == Stone.UNOCCUPIED ) {
 					connectedGUI.removeStone(board.index(i).getCol(), board.index(i).getRow());
 				} else {
@@ -67,7 +68,7 @@ public class GoGuiUpdater {
 	}
 
 	/**
-	 * TODO doc
+	 * Sets marker at index of last move of opponent
 	 * @param opponentLastMove
 	 */
 	public void setMarkerAtOpponent(String opponentLastMove) {
@@ -76,20 +77,16 @@ public class GoGuiUpdater {
 		int lastMove = GoGameConstants.NOMOVEint;
 					
 		try {
-		lastMove = Integer.parseInt(opponentLastMove);
+			lastMove = Integer.parseInt(opponentLastMove);
 		} catch (NumberFormatException eFormat) {
 			System.out.println("DEBUG opponent move was no int"); // TODO remove or make nice
 		}
 		
-		if(lastMove >= 0 && lastMove <boardDim*boardDim) {
+		if (lastMove >= 0 && lastMove < boardDim * boardDim ) {
 			int row = lastMove / boardDim; // TODO: check if safe enough
 			int col = lastMove % boardDim; // TODO: check if safe enough
 			connectedGUI.addHintIndicator(col, row);
 		}
 	}
-
-//		public updateOne(int index) { // TODO IMPLEMENT?
-//			
-//		}
 
 }

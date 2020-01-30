@@ -39,8 +39,8 @@ public class GoServer implements Runnable {
 	/** Next client number, increasing for every new connection. */
 	private int next_client_no;
 
-	/** The TUI of this HotelServer. */
-	private GoLocalTUI TUI; // TODO: make a server TUI?!
+	/** The TUI of this GoServer. */
+	private GoLocalTUI TUI; 
 
 	/** The name of this server. */
 	private static String SERVERNAME = null; // final
@@ -75,7 +75,7 @@ public class GoServer implements Runnable {
 	/**
 	 * Returns the name of the server.
 	 * 
-	 * @requires hotel != null;
+	 * @requires SERVERNAME != null;
 	 * @return the name of the sever.
 	 */
 	public String getServerName() {
@@ -94,7 +94,6 @@ public class GoServer implements Runnable {
 		boolean openNewSocket = true;
 		while (openNewSocket) {
 			try {
-				// Sets up the hotel application
 				setup();
 
 				while (true) {
@@ -146,20 +145,24 @@ public class GoServer implements Runnable {
 		while (ssock == null) {
 			port = TUI.getInt("Please enter the server port.");
 			
-			Socket discoverLocalIP = new Socket(); // this ways, it returns the preferred outbound IP
+			Socket discoverLocalIP = new Socket(); 
+			// this ways, it returns the preferred outbound IP:
 			try {
-//				try {
-//				discoverLocalIP.connect(new InetSocketAddress("google.com", 80));
-//				} catch (UnknownHostException eUnknownHost) {
+				try {
+					discoverLocalIP.connect(new InetSocketAddress("google.com", 80));
+					localIP = discoverLocalIP.getLocalAddress();
+					TUI.showMessage("Discovering local IP address: " 
+							+ discoverLocalIP.getLocalAddress());
+					discoverLocalIP.close();
+				} catch (UnknownHostException eUnknownHost) {
 					TUI.showMessage("No internet access, trying locally to reach 192.168.1.1");
-					discoverLocalIP.connect(new InetSocketAddress("192.168.1.1", 80));
-//				}
-
-
-				localIP = discoverLocalIP.getLocalAddress();
-				TUI.showMessage("Discovering local IP address: " 
-						+ discoverLocalIP.getLocalAddress());
-				discoverLocalIP.close();
+					Socket discoverLocalIPonLAN = new Socket(); 
+					discoverLocalIPonLAN.connect(new InetSocketAddress("192.168.1.1", 80));
+					localIP = discoverLocalIPonLAN.getLocalAddress();
+					TUI.showMessage("Discovering local IP address: " 
+							+ discoverLocalIPonLAN.getLocalAddress());
+					discoverLocalIPonLAN.close();
+				}
 			} catch (IOException e1) {
 				TUI.showMessage("IO Exception while Discovering local IP address: " 
 						+ e1.getLocalizedMessage());
@@ -202,15 +205,13 @@ public class GoServer implements Runnable {
 		if (this.clientsWaitingList.contains(client)) {
 			this.clientsWaitingList.remove(client);
 		}
-		// if client in game, this will be terminated by GameController
+		// if client in game, this game will be terminated by GameController
 	}
 
 	// ------------------ Server Methods --------------------------
 
 	/**
-	 * Returns a String to be sent as a response to a Client HELLO request,
-	 * including the name of the hotel: ProtocolMessages.HELLO +
-	 * ProtocolMessages.DELIMITER + (Hotel Name); TODO
+	 * Returns a String to be sent as a response to a Client handshake request.
 	 * 
 	 * @return String to be sent to client as a handshake response.
 	 */
@@ -221,7 +222,8 @@ public class GoServer implements Runnable {
 		String message = " Welcome to the server " + this.getServerName();
 		
 		clientsWaitingList.add(handler);
-		TUI.showMessage("Player [" + handler.getRemotePlayer().getName() + "] on client [" + handler.getClientName() + "] added to the waiting list");
+		TUI.showMessage("Player [" + handler.getRemotePlayer().getName() + "] "
+				+ "on client [" + handler.getClientName() + "] added to the waiting list");
 
 		return ProtocolMessages.HANDSHAKE + ProtocolMessages.DELIMITER + finalVersion 
 				+ ProtocolMessages.DELIMITER + message;
