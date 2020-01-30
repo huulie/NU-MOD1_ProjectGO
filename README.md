@@ -1,9 +1,32 @@
 # NU-MOD1_ProjectGO
 Final assignment of Nedap University module 1
 
-_Method to make JAR and GUI working kindly adapted from Eline and her coach (with Eline's approval)_
+_Play without GUI and background music (please answer no/false to these questions!)_
+
+1. First, download GoServer.jar and GoClient.jar from https://huulie.stackstorage.com/s/LDyxYGfy4zMVk0z (password nedapGO)
+
+2. To start a server, open a terminal window and navigate to the folder containing GoServer.jar. Then type:
+
+`java -jar GoServer.jar`
+
+and answer the questions in the terminal
+
+
+
+3. To start a client, open a terminal window and navigate to the folder containing GoClient.jar. Then type:
+
+`java -jar GoClient.jar`
+
+and answer the questions in the terminal
+
+4. Start another client, following step 3. When two clients are connected, a game starts!
+
+
+Enjoy the game, and let’s *GO*!
+
 
 --------------------------------------------------------------------------
+_Method to make JAR and GUI working kindly adapted from Eline and her coach (with Eline's approval)_
 
 Take care: this program  __only works if you have Java 11 installed__. Please install Java 11 if necessary.
 
@@ -61,4 +84,4 @@ __Both types of users:__ _Follow the prompts in the terminal. IP and port number
 
 If wanted, you can add more clients. For every two clients added, a game will be started. Clients on other computers running the same program (or a different program with the same communication protocol) can also connect to your server. Similarly, you can connect as a client to another computer running a server with the same communication protocol. 
 
-enjoy the game, and let’s *GO*!
+Enjoy the game, and let’s *GO*!
