@@ -1,1 +1,8 @@
-goStrategy
+exceptions
+goClient
+goComputerAI
+goGame
+goProtocol
+goServer
+goTest
+goUI

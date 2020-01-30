@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"goStrategy"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"exceptions"},{"l":"goClient"},{"l":"goComputerAI"},{"l":"goGame"},{"l":"goProtocol"},{"l":"goServer"},{"l":"goTest"},{"l":"goUI"}]
