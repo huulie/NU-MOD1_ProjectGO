@@ -32,7 +32,13 @@ public class GameController implements Runnable {
 	 * keep track of previous move, can be asked by a player.
 	 */
 	private int previousMove = GoGameConstants.NOMOVEint;
-
+	
+	/**
+	 * Track if game is actively playing or over
+	 * (also used externally, e.g. to interrupt waiting for move 
+	 *  from a player while other player has gone)
+	 */
+	boolean gameOver;
 	
 
 	/**
@@ -70,7 +76,7 @@ public class GameController implements Runnable {
 	 * Players can make a move one after the other. After each move, the game state is updated
 	 */
 	private void play() {
-		boolean gameOver = false;
+		gameOver = false;
 		boolean firstPassed = false;
 
 		while (gameOver != true) { 
@@ -129,11 +135,12 @@ public class GameController implements Runnable {
 	}
 	
 	/**
-	 * Plays the Go game. <br> TODO: take a second look 
-	 * First the (still empty) board is shown. Then the game is played until it is over. 
-	 * Players can make a move one after the other. After each move, the game state is updated
+	 * Ends the Go game. <br> TODO: take a second look 
+	 * Can also be called from other methods, e.g. when ending because of disconnect
 	 */
 	public void endGame(char reason, char caller) {
+		gameOver = true;
+		
 		String scoreString = this.game.getScores(); // TODO is printing for game, not for players!
 		String[] scores = scoreString.split(GoGameConstants.DELIMITER);
 		double scoreBlack = Double.parseDouble(scores[0]);
@@ -182,6 +189,10 @@ public class GameController implements Runnable {
 
 	}
 	
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
 	/** 
 	 * Get board from the game associated to this GameController.
 	 * @return board from the game associated to this GameController

@@ -183,12 +183,18 @@ public class GoClient {
 	public void start() {
 		while (keepConnecting) {
 			try {
+				
+				if (out != null) {
+					TUI.showMessage("Going to connect again...");
+					TUI.showMessage("(connection reset: sending exit to server)");
+					this.sendQuit();
+				}
+				
 				this.createConnection();
 				this.sendHandshake();
 				this.waitForStartGame();
 				this.playingGame();
 
-				TUI.showMessage("Going to connect again...");
 				
 			} catch (ServerUnavailableException e) {
 				TUI.showMessage("Server unavailable!");
@@ -197,7 +203,6 @@ public class GoClient {
 			} catch (ExitProgram e) { // from create connection
 				TUI.showMessage("CLIENT EXIT");
 				this.keepConnecting = false;
-				e.printStackTrace();
 			} catch (ProtocolException e) { // from handle hello
 				TUI.showMessage("Protocol exception:" + e.getLocalizedMessage());
 				e.printStackTrace();
@@ -253,6 +258,7 @@ public class GoClient {
 			out.close();
 			serverSock.close();
 		} catch (IOException e) {
+			TUI.showMessage("Protocol exception: " + e.getLocalizedMessage());
 			e.printStackTrace();
 		}
 	}
@@ -392,7 +398,9 @@ public class GoClient {
 				serverStarts = this.readLineFromServer();
 			} catch (ServerUnavailableException e) {
 				TUI.showMessage("Error while reading from server: " + e.getLocalizedMessage());
-				e.printStackTrace();
+				this.closeConnection();
+				this.clearConnection();
+				this.start(); // start over again
 			}
 			String[] splitServerStarts = serverStarts.split(ProtocolMessages.DELIMITER);
 			if (splitServerStarts[0].equals(String.valueOf(ProtocolMessages.GAME))) {
@@ -473,7 +481,8 @@ public class GoClient {
 
 						String moveString = null;
 
-						int getMove = TUI.getMove("What is your move? (index or " + GoTUICommands.PASS + " to PASS)");
+						int getMove = TUI.getMove("What is your move? (index or " 
+								+ GoTUICommands.PASS + " to PASS)");
 						if (getMove == GoGameConstants.PASSint) {
 							moveString = String.valueOf(ProtocolMessages.PASS);
 						} else {
@@ -516,10 +525,12 @@ public class GoClient {
 
 			} catch (ServerUnavailableException e) {
 				TUI.showMessage("Error while communicating: " + e.getLocalizedMessage());
-				e.printStackTrace();
+				this.closeConnection();
+				this.clearConnection();
+				this.start(); // start over again
 			} catch (ProtocolException e) {
 				TUI.showMessage("Protocol violation: " + e.getLocalizedMessage());
-				e.printStackTrace();
+				// and continue playing game
 			}
 		}
 	}
@@ -533,8 +544,8 @@ public class GoClient {
 	 * 
 	 * @throws ServerUnavailableException if IO errors occur.
 	 */
-	public void sendExit() throws ServerUnavailableException {
-		this.sendMessage(String.valueOf(ProtocolMessages.EXIT));
+	public void sendQuit() throws ServerUnavailableException {
+		this.sendMessage(String.valueOf(ProtocolMessages.QUIT));
 		this.closeConnection();
 		this.clearConnection();
 	}

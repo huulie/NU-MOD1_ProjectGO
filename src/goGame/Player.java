@@ -113,7 +113,7 @@ public abstract class Player {
 			} catch (InvalidFieldException e) {
 				TUI.showMessage("Something went wrong when checking the stone: " 
 						+ e.getLocalizedMessage()); // TODO TUI?
-				e.printStackTrace();
+				//TODO e.printStackTrace();
 			}
 
 			boolean validPrevious = 

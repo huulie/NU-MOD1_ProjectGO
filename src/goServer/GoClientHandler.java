@@ -89,11 +89,19 @@ public class GoClientHandler implements Runnable {
 			}
 			
 			System.out.println("DEBUG: message was null ");
-			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			if (this.getRemotePlayer().getGame() != null) {
+				this.getRemotePlayer().getGame()
+					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			}
 			shutdown();
 		} catch (IOException e) {
-			System.out.println("DEBUG: IO exception: " +e.getLocalizedMessage());
-			this.getRemotePlayer().getGame().endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			System.out.println("DEBUG: IO exception: " + e.getLocalizedMessage());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			if (this.getRemotePlayer().getGame() != null) {
+				this.getRemotePlayer().getGame()
+					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			}
 			shutdown();
 		}
 	}
@@ -111,9 +119,9 @@ public class GoClientHandler implements Runnable {
 	 * @throws IOException if an IO errors occur.
 	 */
 	private void handleIncoming(String msg) throws IOException {
-		String [] split = msg.split(ProtocolMessages.DELIMITER);
+		String[] split = msg.split(ProtocolMessages.DELIMITER);
 
-		char command = split[0].charAt(0); // convert to char
+		char command = split[0].charAt(0);
 		String param1 = null;
 		String param2 = null;
 		String param3 = null;
@@ -131,9 +139,9 @@ public class GoClientHandler implements Runnable {
 		try {
 			switch (command) {
 				case ProtocolMessages.HANDSHAKE:
-					String requestedVersion = param1;
+					String requestedVersion = param1; // TODO something with requested version?
 					String playerName = param2;
-					String requestColor = param3;
+					String requestColour = param3; // TODO something with requested colour?
 					
 					this.remotePlayer = createRemotePlayer(playerName);	
 					this.sendMessage(srv.respondHandshake(this));
@@ -152,25 +160,27 @@ public class GoClientHandler implements Runnable {
 					break;
 
 				default:
-					System.out.println("DEBUG I don't understand this command, try again"); //TODO sent to system out?
+					System.out.println("DEBUG I don't understand this command, try again");
 					// and send invalid
 					this.sendMessage(ProtocolMessages.ERROR + ProtocolMessages.DELIMITER 
 							+ "unknown command");
 			}
 		} catch (ClientUnavailableException e) {
-			System.out.println("Error while communicating with client: " + e.getLocalizedMessage()); // TODO where to send this to? 
-			e.printStackTrace();
-			// TODO not crash when client disconnect stream closed
+			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			if (this.getRemotePlayer().getGame() != null) {
+				this.getRemotePlayer().getGame()
+				.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			}
+			shutdown();
 		}
 	}
 	
 	/** 
-	 * 
+	 * Creates a new Remote Player, with a yet unknown stone colour (will be set at start game).
 	 */
 	public Player createRemotePlayer(String name) {
-		// TODO LET IT ASK FOR COLOUR
-		
-		Stone colour = Stone.BLACK;
+		Stone colour = null;
 		
 		this.remotePlayer = new RemotePlayer(name, colour, this);
 		return this.remotePlayer;
@@ -198,7 +208,7 @@ public class GoClientHandler implements Runnable {
 		
 		if (previousMove == GoGameConstants.PASSint) {
 			opponentsLastMove = "P"; 
-		} else if(previousMove == GoGameConstants.NOMOVEint) {
+		} else if (previousMove == GoGameConstants.NOMOVEint) {
 			opponentsLastMove = null; 
 		} else {
 			opponentsLastMove = String.valueOf(previousMove);
@@ -212,20 +222,29 @@ public class GoClientHandler implements Runnable {
 				this.sendMessage(ProtocolMessages.TURN + ProtocolMessages.DELIMITER 
 						+ board + ProtocolMessages.DELIMITER + opponentsLastMove);
 			} catch (ClientUnavailableException e) {
-				System.out.println("Error while communicating with client: " + e.getLocalizedMessage()); // TODO where to send this to? 
-				e.printStackTrace();
+				System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+				System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+				if (this.getRemotePlayer().getGame() != null) {
+					this.getRemotePlayer().getGame()
+					.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+				}
+				shutdown();
 			}
 			
 			int secondsToWait = 60; // TODO: 60 sec timer, only for remote players
 			long endWaitTime = System.currentTimeMillis() + secondsToWait * 1000;
-	        while (this.chosenMove == null) { 
-	        	if (System.currentTimeMillis() >= endWaitTime ) {
+	        while (this.chosenMove == null ) { 
+	        	if (this.getRemotePlayer().getGame().isGameOver()) {
+	        		System.out.println("DEBUG: [" + clientName + "] = waiting for move interrupted: GAME OVER");
+	        		return GoGameConstants.PASSint; // do a PASS. to avoid further changes and not break makemove
+	        	} else if (System.currentTimeMillis() >= endWaitTime ) {
 	        		throw new TimeOutException("TIME OUT: move not inside 60 sec");
 	        	} else {
 	            	try {
 						Thread.sleep(1000); // updating every sec
 						long remaining = endWaitTime - System.currentTimeMillis();
-						System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " + remaining);
+						System.out.println("DEBUG: [" + clientName + "] = waiting for move, remaining millisec: " 
+						+ remaining);
 						// TODO interrupt if client has disconnected
 	            	} catch (InterruptedException e) {
 	            		// TODO Auto-generated catch block
@@ -257,8 +276,13 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(resultMessage);
 		} catch (ClientUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			if (this.getRemotePlayer().getGame() != null) {
+				this.getRemotePlayer().getGame()
+				.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			}
+			shutdown();
 		}
 	}
 	
@@ -272,8 +296,13 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(startGame);
 		} catch (ClientUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			if (this.getRemotePlayer().getGame() != null) {
+				this.getRemotePlayer().getGame()
+				.endGame(GoGameConstants.DISCONNECT, this.getRemotePlayer().getColour().print());
+			}
+			shutdown();
 		}
 	}
 	
@@ -291,8 +320,10 @@ public class GoClientHandler implements Runnable {
 		try {
 			this.sendMessage(endGame);
 		} catch (ClientUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error while communicating with client: " + e.getLocalizedMessage());
+			System.out.println("TERMINATING CLIENT HANDLER [" + clientName + "]");
+			// do NOT try to end game again
+			shutdown();
 		}
 		
 	}
@@ -304,8 +335,7 @@ public class GoClientHandler implements Runnable {
 	 * @param msg the message to write to the OutputStream.
 	 * @throws ClientUnavailableException if IO errors occur.
 	 */
-	public synchronized void sendMessage(String msg) 
-			throws ClientUnavailableException {
+	public synchronized void sendMessage(String msg) throws ClientUnavailableException {
 		if (out != null) {
 			try {
 				out.write(msg);
@@ -313,13 +343,13 @@ public class GoClientHandler implements Runnable {
 				out.flush();
 				if (printDebug) System.out.println("Handler [" + clientName + "] send: " + msg);
 			} catch (IOException e) {
-				System.out.println(e.getMessage());
 				throw new ClientUnavailableException("Could not write "
-						+ "to client: IO esception > " + e.getLocalizedMessage());
+						+ "to client [" + clientName + "]: IO exception > " 
+						+ e.getLocalizedMessage());
 			}
 		} else {
 			throw new ClientUnavailableException("Could not write "
-					+ "to client: no out writer");
+					+ "to client [" + clientName + "]: no out writer");
 		}
 	}
 

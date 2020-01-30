@@ -157,7 +157,8 @@ public class GoServer implements Runnable {
 
 
 				localIP = discoverLocalIP.getLocalAddress();
-				TUI.showMessage("Discovering local IP address: " + discoverLocalIP.getLocalAddress());
+				TUI.showMessage("Discovering local IP address: " 
+						+ discoverLocalIP.getLocalAddress());
 				discoverLocalIP.close();
 			} catch (IOException e1) {
 				TUI.showMessage("IO Exception while Discovering local IP address: " 
@@ -198,8 +199,10 @@ public class GoServer implements Runnable {
 	 */
 	public void removeClient(GoClientHandler client) {
 		this.clients.remove(client);
-		// TODO also remove games and waitinglist etc! (seperate methods?)
-		
+		if (this.clientsWaitingList.contains(client)) {
+			this.clientsWaitingList.remove(client);
+		}
+		// if client in game, this will be terminated by GameController
 	}
 
 	// ------------------ Server Methods --------------------------
