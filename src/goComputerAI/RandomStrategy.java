@@ -44,6 +44,7 @@ public class RandomStrategy implements Strategy {
 			}
 		}
 		
+		System.out.println("Doing random move...");
 		return move;
 	}
 

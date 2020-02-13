@@ -9,4 +9,5 @@ ProjectGO.jar\
 :./lib/javafx-sdk-11.0.2/lib/javafx.controls.jar\
 :./lib/javafx-sdk-11.0.2/lib/javafx.base.jar\
 :./lib/goGui/gui-1.2.jar\
+:./lib/commons-codec-1.3/commons-codec-1.13.jar\
  goClient.GoClient

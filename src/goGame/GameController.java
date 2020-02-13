@@ -100,15 +100,17 @@ public class GameController implements Runnable {
 			char resultMove = this.game.getCurrentPlayer()
 					.makeMove(this.game.getBoard(), chosenMove);
 			
-			if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
-				this.game.getCurrentPlayer()
-					.moveResult(GoGameConstants.VALID, this.game.getBoard());
-			} else if (resultMove == GoGameConstants.INVALID) {
-				this.game.getCurrentPlayer()
-					.moveResult(GoGameConstants.INVALID, this.game.getBoard());
-			}
+//			if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
+//				this.game.getCurrentPlayer()
+//					.moveResult(GoGameConstants.VALID, this.game.getBoard());
+//			} else if (resultMove == GoGameConstants.INVALID) {
+//				this.game.getCurrentPlayer()
+//					.moveResult(GoGameConstants.INVALID, this.game.getBoard());
+//			}
 
 			if (resultMove == GoGameConstants.PASS) {
+				this.game.getCurrentPlayer()
+				.moveResult(GoGameConstants.VALID, this.game.getBoard());
 				if (firstPassed) {
 					gameOver = true;
 					if (printDebug) System.out.println("DEBUG: going to end game.."); 
@@ -135,6 +137,14 @@ public class GameController implements Runnable {
 					this.updateGameGUI(this.game.getBoard());
 				} else {
 					if (printDebug) this.game.print(); 
+				}
+				
+				if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
+					this.game.getCurrentPlayer()
+						.moveResult(GoGameConstants.VALID, this.game.getBoard());
+				} else if (resultMove == GoGameConstants.INVALID) {
+					this.game.getCurrentPlayer()
+						.moveResult(GoGameConstants.INVALID, this.game.getBoard());
 				}
 
 				firstPassed = false;
