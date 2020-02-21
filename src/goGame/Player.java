@@ -105,24 +105,38 @@ public abstract class Player {
 		} else {
 			boolean validPlacement = board.isField(choice) && board.isEmptyField(choice);
 
-			Board checkSamePrevious = board.deepCopy();
+//			Board checkSamePrevious = board.deepCopy();
+//			try {
+//				checkSamePrevious.setField(choice, this.getColour()); 
+//				// NOTE: checking on clone of board, not actually placing stone
+//			} catch (InvalidFieldException e) {
+//				TUI.showMessage("Something went wrong when checking the stone: " 
+//						+ e.getLocalizedMessage()); 
+//				
+//			}
+//			boolean invalidPrevious = 
+//					board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
+			
+			boolean invalidPrevious = false;
 			try {
-				checkSamePrevious.setField(choice, this.getColour()); 
-				// NOTE: checking on clone of board, not actually placing stone
+			invalidPrevious = 
+					board.checkSamePreviousState(choice, this.getColour());
 			} catch (InvalidFieldException e) {
 				TUI.showMessage("Something went wrong when checking the stone: " 
-						+ e.getLocalizedMessage()); 
-				
+						+ e.getLocalizedMessage()); 			
 			}
+			
+			boolean valid = validPlacement && !invalidPrevious; 
+			//TODO: fix validPrevious being always returning invalid, and enable again >> faulty name
 
-			boolean validPrevious = 
-					board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
-
-			boolean valid = validPlacement;//&& validPrevious; 
-			//TODO: fix validPrevious being always returning invalid, and enable again
-
-			if (!valid) {
-				return GoGameConstants.INVALID;
+//			if (!valid) {
+//				return GoGameConstants.INVALID;
+//			} 
+			if (!validPlacement) {
+				return GoGameConstants.INVALIDPLACEMENT;
+			} 
+			else if (invalidPrevious) {
+				return GoGameConstants.INVALIDPREVIOUS;
 			} else {
 				try {
 					board.setField(choice, this.getColour());
@@ -154,7 +168,7 @@ public abstract class Player {
 	 * Shows the result of the move to the Player.
 	 * @param board data to update
 	 */
-	public void moveResult(char result, Board board) {
+	public void moveResult(char result, String boardOrMessage) {
 	}
 
 

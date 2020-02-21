@@ -110,7 +110,7 @@ public class GameController implements Runnable {
 
 			if (resultMove == GoGameConstants.PASS) {
 				this.game.getCurrentPlayer()
-				.moveResult(GoGameConstants.VALID, this.game.getBoard());
+				.moveResult(GoGameConstants.VALID, this.game.getBoard().toString());
 				if (firstPassed) {
 					gameOver = true;
 					if (printDebug) System.out.println("DEBUG: going to end game.."); 
@@ -123,12 +123,29 @@ public class GameController implements Runnable {
 			} else if (resultMove == GoGameConstants.INVALID) {
 				System.out.println("INVALID"); 
 				gameOver = true;
+				this.game.getCurrentPlayer()
+				.moveResult(GoGameConstants.INVALID, "You lost, because you did an invalid move!");
 				this.endGame(GoGameConstants.CHEAT,
 						this.game.getCurrentPlayer().getColour().print());
-			} else {
+			} else if (resultMove == GoGameConstants.INVALIDPLACEMENT) {
+				System.out.println("INVALID"); 
+				gameOver = true;
+				this.game.getCurrentPlayer()
+				.moveResult(GoGameConstants.INVALID, "You lost, because you tried to place an invalid stone!");
+				this.endGame(GoGameConstants.CHEAT,
+						this.game.getCurrentPlayer().getColour().print());
+			} else if (resultMove == GoGameConstants.INVALIDPREVIOUS) {
+				System.out.println("INVALID"); 
+				gameOver = true;
+				this.game.getCurrentPlayer()
+				.moveResult(GoGameConstants.INVALID, "You lost, because you tried to recreate a previous boardstate!");
+				this.endGame(GoGameConstants.CHEAT,
+						this.game.getCurrentPlayer().getColour().print());
+			} else { // valid move, and no pass
 				if (printDebug) System.out.println("DEBUG: update game.."); 
 				this.game.update();
-
+				this.getGameBoard().addPreviousStateWithCaptures(this.getGameBoard(), this.game.getCurrentPlayer().getColour());
+				
 				// if present, update GUI's for local player or gameController
 				if (this.game.getCurrentPlayer().hasGUI()) {
 					this.game.getCurrentPlayer().updateGUI(this.game.getBoard());
@@ -139,13 +156,13 @@ public class GameController implements Runnable {
 					if (printDebug) this.game.print(); 
 				}
 				
-				if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
-					this.game.getCurrentPlayer()
-						.moveResult(GoGameConstants.VALID, this.game.getBoard());
-				} else if (resultMove == GoGameConstants.INVALID) {
-					this.game.getCurrentPlayer()
-						.moveResult(GoGameConstants.INVALID, this.game.getBoard());
-				}
+//				if (resultMove == GoGameConstants.PASS || resultMove == GoGameConstants.VALID) {
+//					this.game.getCurrentPlayer()
+//						.moveResult(GoGameConstants.VALID, this.game.getBoard().toString());
+//				} else if (resultMove == GoGameConstants.INVALID) {
+//					this.game.getCurrentPlayer()
+//						.moveResult(GoGameConstants.INVALID, this.game.getBoard());
+//				}
 
 				firstPassed = false;
 				this.previousMove = chosenMove;

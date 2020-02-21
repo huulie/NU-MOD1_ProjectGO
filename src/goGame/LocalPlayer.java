@@ -88,12 +88,27 @@ public class LocalPlayer extends Player {
 				e.printStackTrace();
 			}
 
-			boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
+			//boolean validPrevious = board.checkSamePreviousState(checkSamePrevious.returnIntersectionArray());
+			boolean invalidPrevious = false;
+			try {
+			invalidPrevious = 
+					board.checkSamePreviousState(move, this.getColour());
+			} catch (InvalidFieldException e) {
+				TUI.showMessage("Something went wrong when checking the stone: " 
+						+ e.getLocalizedMessage()); 			
+			}
+			
 
-			boolean valid = validPlacement && validPrevious; //TODO: reanable previious 
+			boolean valid = validPlacement && invalidPrevious; //TODO: reanable previious 
 
 			while (!valid) {
 				TUI.showMessage("ERROR: field " + move + " is no valid move.");
+				if (!validPlacement) {
+					TUI.showMessage("No valid placement!");
+				} else if (invalidPrevious) {
+					TUI.showMessage("Recreacting previous board state!");
+				}
+				
 				move = TUI.getInt(question);
 				valid = board.isField(move) && board.isEmptyField(move);
 			}
@@ -131,8 +146,8 @@ public class LocalPlayer extends Player {
 	 * @param board data to update
 	 */
 	 @Override
-	public void moveResult(char result, Board board) {
-		 TUI.showMessage("Result: " + result);
+	public void moveResult(char result, String boardOrMessage) {
+		 TUI.showMessage("Result: " + result + ">>" + boardOrMessage);
 	}
 	
 	 /**

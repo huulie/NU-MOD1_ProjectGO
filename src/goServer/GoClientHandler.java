@@ -269,9 +269,9 @@ public class GoClientHandler implements Runnable {
 		return move;
 	}
 	
-	public void resultMove(char result, Board board) {
+	public void resultMove(char result, String boardOrMessage) {
 		String resultMessage = ProtocolMessages.RESULT + ProtocolMessages.DELIMITER 
-				+ result + ProtocolMessages.DELIMITER + board;
+				+ result + ProtocolMessages.DELIMITER + boardOrMessage;
 		try {
 			this.sendMessage(resultMessage);
 		} catch (ClientUnavailableException e) {

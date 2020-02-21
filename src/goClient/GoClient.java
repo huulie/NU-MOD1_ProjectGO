@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.nedap.go.gui.GoGuiIntegrator;
 
@@ -73,14 +75,15 @@ public class GoClient {
 	/**
 	 * Local model of the board.
 	 * Note: has NO (direct) association to the board in the Game
+	 * PM: should NOT be OVERWRITTEN every time a new board is received from server
 	 */
 	private Board localBoard;
-
+	
 	/**
 	 * Dimension of the Board, as derived from the received board (square root).
 	 */
 	private int localBoardDim;
-
+	
 	/** 
 	 * Setting to print debugging information.
 	 */
@@ -467,7 +470,8 @@ public class GoClient {
 
 					case ProtocolMessages.TURN:
 						String localBoardStringTURN = splitServerResponse[1]; 
-						this.localBoard =  Board.newBoardFromString(localBoardStringTURN);
+						// this.localBoard =  Board.newBoardFromString(localBoardStringTURN); TODO
+						this.localBoard.overrideBoardFromString(localBoardStringTURN);
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
 							// TODO ook verder als GUI faalt
@@ -499,11 +503,15 @@ public class GoClient {
 						String valid = splitServerResponse[1];
 
 						if (valid.contains(String.valueOf(ProtocolMessages.INVALID))) {
+							String invalidMessage = splitServerResponse[2];
+							
 							TUI.showMessage("Idiot, you did sent an invalid move!");
+							TUI.showMessage(invalidMessage);
 						}
 
 						String localBoardStringRESULT = splitServerResponse[2];
-						this.localBoard = Board.newBoardFromString(localBoardStringRESULT);
+						// this.localBoard = Board.newBoardFromString(localBoardStringRESULT); TODO
+						this.localBoard.overrideBoardFromString(localBoardStringRESULT);
 						if (this.GUI != null) {
 							this.GUIupdater.updateWholeBoard(this.localBoard);
 						}

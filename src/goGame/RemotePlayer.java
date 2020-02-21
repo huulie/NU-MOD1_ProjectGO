@@ -36,8 +36,8 @@ public class RemotePlayer extends Player {
 	 * @param board data to update
 	 */
 	 @Override
-	public void moveResult(char result, Board board) {
-		clientHandler.resultMove(result, board);
+	public void moveResult(char result, String boardOrMessage) {
+		clientHandler.resultMove(result, boardOrMessage);
 	}
 	
 	

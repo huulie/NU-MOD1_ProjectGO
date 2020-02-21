@@ -273,6 +273,27 @@ public class Board {
 	}
 	
 	/**
+	 * Overrides a existing Board object from a String representation of the board.
+	 * NOTE: modifies an existing board (will not be connected to the game, but previous states are remembered)
+	 * NOTE: does NOT process any captures before adding the overridden board state to the current state
+	 * @param boardString to parse
+	 * @return void
+	 */
+	public void overrideBoardFromString(String boardString) {
+		int boardDim = (int) Math.sqrt(boardString.length());
+		try {
+			for (int i = 0; i < boardDim * boardDim; i++) {
+				this.setField(i, Stone.charToStone(boardString.charAt(i)));
+			}
+		} catch (InvalidFieldException e) {
+			System.out.println("Invalid field exception: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+		this.previousStates.add(this.getIntersectionsHash(this.returnIntersectionArray()));
+		System.out.println("Add overridden: " + this.toString());
+	}
+	
+	/**
 	 * Returns a String representation of an intersections array. 
 	 *
 	 * @param intersections to parse
@@ -344,7 +365,11 @@ public class Board {
 	public char setField(Coordinate2D coordinate, Stone color) throws InvalidFieldException {
 		if (this.isField(coordinate)) {
 			this.intersections[coordinate.getRow()][coordinate.getCol()] = color;
-			this.previousStates.add(getIntersectionsHash(intersections));
+			
+			// TODO only add state AFTER processing the captures, to 
+			// this.previousStates.add(getIntersectionsHash(intersections));
+			//System.out.println("Add set field: " + this.toString());
+			
 			return GoGameConstants.VALID;
 		} else {
 			throw new InvalidFieldException(coordinate.toString() 
@@ -353,13 +378,46 @@ public class Board {
 	}
 
 	/**
+	 * Add the current board state to the list of previous states.
+	 * NOTE: when interpreting the rule as "move may not lead to any previous state", also process captures
+	 * @throws InvalidFieldException 
+	 */
+	public void addPreviousStateWithCaptures(Board stateToAdd, Stone currentPlayer) {
+			BoardTools boardTools = new BoardTools(false);
+			boardTools.doOpponentCaptures(stateToAdd, currentPlayer);
+			boardTools.doOwnCaptures(stateToAdd, currentPlayer);
+			this.previousStates.add(getIntersectionsHash(stateToAdd.returnIntersectionArray()));
+	}
+	
+	/**
 	 * Check if the current board state is equal to any previous state.
 	 * NOTE: do checking BEFORE adding the new state to the list, otherwise it will always be true
+	 * NOTE: when interpreting the rule as "move may not lead to any previous state", also process captures
+	 * @throws InvalidFieldException 
+	 * @return true if there is an same previous board state
 	 */
-	public boolean checkSamePreviousState(Stone[][] newState) {
-		return this.previousStates.contains(getIntersectionsHash(newState));
-	}
+	public boolean checkSamePreviousState(int choice, Stone colour) throws InvalidFieldException {
+		// checkSamePreviousState(Stone[][] newState) {
+		//return this.previousStates.contains(getIntersectionsHash(newState));
+		
+		
+		Board checkSamePrevious = this.deepCopy();
+		
+		checkSamePrevious.setField(choice, colour); 
+		
+		BoardTools boardTools = new BoardTools(false);
+		boardTools.doOpponentCaptures(checkSamePrevious, colour);
+		boardTools.doOwnCaptures(checkSamePrevious, colour);
 
+		// NOTE: checking on clone of board, not actually placing stone
+		System.out.println("DEBUG: checking this board: " + checkSamePrevious.toString());
+		System.out.println("DEBUG: contains previous state: "+ this.previousStates.contains(
+				getIntersectionsHash(checkSamePrevious.returnIntersectionArray())));
+		return this.previousStates.contains(
+				getIntersectionsHash(checkSamePrevious.returnIntersectionArray()));
+		
+	}
+	
 	@Override
 	public Board clone() {
 		Board boardClone = null;
@@ -518,5 +576,22 @@ public class Board {
 			return null;
 		}
 	}
-
+	
+	/** 
+	 * Returns List of integers with all empty intersections
+	 */
+	public List<Integer> getEmptyFields() {
+		List<Integer> emptyFields = new ArrayList<Integer>();
+		
+		for (int indexRow = 0; indexRow < DIM; indexRow++) {
+			for (int indexColumn = 0; indexColumn < DIM; indexColumn++) {
+				if (this.isEmptyField(indexRow, indexColumn)){
+					emptyFields.add(this.indexLinear(indexRow, indexColumn));
+				}
+			}
+		}
+		
+		return emptyFields;
+	}
+	
 }

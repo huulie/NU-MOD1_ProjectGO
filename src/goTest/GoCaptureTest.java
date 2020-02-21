@@ -641,4 +641,223 @@ public class GoCaptureTest {
 			e.printStackTrace();
 		}
 	}
+	
+	@Test
+	void testNoCaptureWitLibertiesFromDebugging() {
+		try {
+			BoardTools boardTools = new BoardTools(true);
+			int boardDim = 4;
+			// U B B U	 0  1  2  3
+			// U U W U 	 4  5  6  7
+			// U B W B 	 8  9 10 11
+			// U U B U	12 13 14 15
+
+
+			// Get a board, check if it is indeed empty
+			Board testBoard = new Board(boardDim); //game.getBoard();
+			testBoard.reset();
+			assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
+
+			// Check when black stones surround three white stones, the white stones are removed
+			testBoard.setField(6, Stone.WHITE); // see map on top of this test
+			testBoard.setField(10, Stone.WHITE); // see map on top of this test
+			//testBoard.setField(9, Stone.WHITE); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + UNOCCUPIED + UNOCCUPIED + UNOCCUPIED
+					+ UNOCCUPIED + UNOCCUPIED + WHITE + UNOCCUPIED 
+					+ UNOCCUPIED + UNOCCUPIED + WHITE + UNOCCUPIED
+					+ UNOCCUPIED + UNOCCUPIED + UNOCCUPIED +  UNOCCUPIED)); 
+
+			testBoard.setField(1, Stone.BLACK); // see map on top of this test
+			testBoard.setField(2, Stone.BLACK); // see map on top of this test
+			testBoard.setField(9, Stone.BLACK); // see map on top of this test
+			testBoard.setField(11, Stone.BLACK); // see map on top of this test
+			testBoard.setField(14, Stone.BLACK); // see map on top of this test
+//			testBoard.setField(10, Stone.BLACK); // see map on top of this test
+//			testBoard.setField(13, Stone.BLACK); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + BLACK + BLACK + UNOCCUPIED
+					+ UNOCCUPIED + UNOCCUPIED + WHITE + UNOCCUPIED 
+					+ UNOCCUPIED + BLACK + WHITE + BLACK
+					+ UNOCCUPIED + UNOCCUPIED + BLACK +  UNOCCUPIED)); 
+
+			System.out.println(testBoard.toStringFormatted());
+			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
+
+			Board testBoardFirst = testBoard.clone();
+			boardTools.doOpponentCaptures(testBoardFirst, Stone.BLACK);// do capture, owning BLACK
+			System.out.println(testBoardFirst.toStringFormatted());
+			assertThat(testBoardFirst.toString(), containsString(
+					UNOCCUPIED + BLACK + BLACK + UNOCCUPIED
+					+ UNOCCUPIED + UNOCCUPIED + WHITE + UNOCCUPIED 
+					+ UNOCCUPIED + BLACK + WHITE + BLACK
+					+ UNOCCUPIED + UNOCCUPIED + BLACK +  UNOCCUPIED)); 
+
+			// U B B U	 0  1  2  3
+			// U U W U 	 4  5  6  7
+			// U B W B 	 8  9 10 11
+			// U U B U	12 13 14 15
+			// SHOULD BE NO CAPTURES
+		} catch (InvalidFieldException e) {
+			System.out.println("ERROR: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testCaptureonEdgeFromDebugging() {
+		try {
+			BoardTools boardTools = new BoardTools(true);
+			int boardDim = 3;
+			// U U U	 0  1  2
+			// W W B 	 3  4  5
+			// W B W 	 6  7  8
+
+
+
+			// Get a board, check if it is indeed empty
+			Board testBoard = new Board(boardDim); //game.getBoard();
+			testBoard.reset();
+			assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
+
+			// Check when black stones surround three white stones, the white stones are removed
+			testBoard.setField(3, Stone.WHITE); // see map on top of this test
+			testBoard.setField(4, Stone.WHITE); // see map on top of this test
+			testBoard.setField(6, Stone.WHITE); // see map on top of this test
+			testBoard.setField(8, Stone.WHITE); // see map on top of this test
+			//testBoard.setField(9, Stone.WHITE); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + UNOCCUPIED + UNOCCUPIED 
+					+ WHITE + WHITE + UNOCCUPIED 
+					+ WHITE + UNOCCUPIED + WHITE )); 
+
+			testBoard.setField(5, Stone.BLACK); // see map on top of this test
+			testBoard.setField(7, Stone.BLACK); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + UNOCCUPIED + UNOCCUPIED 
+					+ WHITE + WHITE + BLACK 
+					+ WHITE + BLACK + WHITE )); 
+
+			System.out.println(testBoard.toStringFormatted());
+			System.out.println("        || \n [capturing BLACK] \n        || \n        \\/");
+
+			boardTools.doOpponentCaptures(testBoard, Stone.WHITE);// do capture, owning WHITE
+			System.out.println(testBoard.toStringFormatted());
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + UNOCCUPIED + UNOCCUPIED 
+					+ WHITE + WHITE + BLACK 
+					+ WHITE + UNOCCUPIED + WHITE )); 
+
+			// U U U	 0  1  2
+			// W W B 	 3  4  5
+			// W * W 	 6  7  8
+			// * = should be caputerd
+		} catch (InvalidFieldException e) {
+			System.out.println("ERROR: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testNoCaptureOnEdgeWitLibertiesFromDebugging() {
+		try {
+			BoardTools boardTools = new BoardTools(true);
+			int boardDim = 4;
+			// B U U B	 0  1  2  3
+			// W W B U 	 4  5  6  7
+			// W U W B 	 8  9 10 11
+			// B W U W	12 13 14 15
+
+
+			// Get a board, check if it is indeed empty
+			Board testBoard = new Board(boardDim); //game.getBoard();
+			testBoard.reset();
+			assertThat(testBoard.toString(), containsString(UNOCCUPIED.repeat(boardDim*boardDim)));
+
+			// Check when black stones surround three white stones, the white stones are removed
+			testBoard.setField(4, Stone.WHITE); // see map on top of this test
+			testBoard.setField(5, Stone.WHITE); // see map on top of this test
+			testBoard.setField(8, Stone.WHITE); // see map on top of this test
+			testBoard.setField(10, Stone.WHITE); // see map on top of this test
+			testBoard.setField(13, Stone.WHITE); // see map on top of this test
+			testBoard.setField(15, Stone.WHITE); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					UNOCCUPIED + UNOCCUPIED + UNOCCUPIED + UNOCCUPIED
+					+ WHITE + WHITE + UNOCCUPIED + UNOCCUPIED 
+					+ WHITE + UNOCCUPIED + WHITE + UNOCCUPIED
+					+ UNOCCUPIED + WHITE + UNOCCUPIED +  WHITE)); 
+
+			testBoard.setField(0, Stone.BLACK); // see map on top of this test
+			testBoard.setField(3, Stone.BLACK); // see map on top of this test
+			testBoard.setField(6, Stone.BLACK); // see map on top of this test
+			testBoard.setField(11, Stone.BLACK); // see map on top of this test
+			testBoard.setField(12, Stone.BLACK); // see map on top of this test
+			assertThat(testBoard.toString(), containsString(
+					BLACK + UNOCCUPIED + UNOCCUPIED + BLACK
+					+ WHITE + WHITE + BLACK + UNOCCUPIED 
+					+ WHITE + UNOCCUPIED + WHITE + BLACK
+					+ BLACK + WHITE + UNOCCUPIED +  WHITE)); 
+
+			System.out.println(testBoard.toStringFormatted());
+			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
+
+			boardTools.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning BLACK
+			System.out.println(testBoard.toStringFormatted());
+			assertThat(testBoard.toString(), containsString(
+					BLACK + UNOCCUPIED + UNOCCUPIED + BLACK
+					+ WHITE + WHITE + BLACK + UNOCCUPIED 
+					+ WHITE + UNOCCUPIED + WHITE + BLACK
+					+ BLACK + WHITE + UNOCCUPIED +  WHITE)); 
+
+			// B U U U	 0  1  2  3
+			// W W B U 	 4  5  6  7
+			// W U W B 	 8  9 10 11
+			// B W U W	12 13 14 15
+			// SHOULD BE NO CAPTURES
+		} catch (InvalidFieldException e) {
+			System.out.println("ERROR: " + e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	void testNoCaptureOnEdgePlusOneWitLibertiesFromDebugging() {
+			BoardTools boardTools = new BoardTools(true);
+			int boardDim = 4;
+			// B U U B	 0  1  2  3
+			// W W B U 	 4  5  6  7
+			// W B W B 	 8  9 10 11
+			// B W U W	12 13 14 15
+
+
+			Board testBoard = Board.newBoardFromString(
+			"BUUB"+
+			"WWBU" +
+			"WBWB" + 	 
+			"BWUW");
+			assertThat(testBoard.toString(), containsString(
+					BLACK + UNOCCUPIED + UNOCCUPIED + BLACK
+					+ WHITE + WHITE + BLACK + UNOCCUPIED 
+					+ WHITE + BLACK + WHITE + BLACK
+					+ BLACK + WHITE + UNOCCUPIED +  WHITE)); 
+
+			System.out.println(testBoard.toStringFormatted());
+			System.out.println("        || \n [capturing WHITE] \n        || \n        \\/");
+
+			boardTools.doOpponentCaptures(testBoard, Stone.BLACK);// do capture, owning BLACK
+			boardTools.doOwnCaptures(testBoard, Stone.BLACK);// do capture, owning BLACK
+
+			System.out.println(testBoard.toStringFormatted());
+			assertThat(testBoard.toString(), containsString(
+					BLACK + UNOCCUPIED + UNOCCUPIED + BLACK
+					+ WHITE + WHITE + BLACK + UNOCCUPIED 
+					+ WHITE + UNOCCUPIED + WHITE + BLACK
+					+ UNOCCUPIED + WHITE + UNOCCUPIED +  WHITE)); 
+
+			// B U U B	 0  1  2  3
+			// W W B U 	 4  5  6  7
+			// W * W B 	 8  9 10 11
+			// * W U W	12 13 14 15
+			// * = own stone should be captured
+	}
 }

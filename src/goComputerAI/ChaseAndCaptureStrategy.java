@@ -33,7 +33,6 @@ public class ChaseAndCaptureStrategy implements Strategy {
 	@Override
 	public int calculateMove(GoClient client) {
 		int move;
-
 		Board board = client.getLocalBoard();
 		BoardTools boardTools = new BoardTools(false);
 		String opponentLastMove = client.getOpponentLastMove();
@@ -62,7 +61,9 @@ public class ChaseAndCaptureStrategy implements Strategy {
 
 			int[] indices = new int[4]; // above, right, below, left
 			Board[] boards = new Board[4]; // above, right, below, left
-			Integer[] captures = new Integer[4]; // above, right, below, left
+			Integer[] opponentCaptures = new Integer[4]; // above, right, below, left
+			Integer[] ownCaptures = new Integer[4]; // above, right, below, left
+
 
 
 			indices[0] = board.above(opponentMoveInt); // TODO this outside loop!
@@ -73,12 +74,19 @@ public class ChaseAndCaptureStrategy implements Strategy {
 			
 			for (int i = 0; i < indices.length; i++) {
 				try {
-					if (board.isField(indices[i]) && board.isEmptyField(indices[i])) { // TODO isField was 0 instead of i
+					if (board.isField(indices[i]) && board.isEmptyField(indices[i]) // TODO isField was 0 instead of i
+							&& !board.checkSamePreviousState(indices[i], ownStone)) { 
 						boards[i] = board.clone();
 						boards[i].setField(indices[i], ownStone); // TODO set field 0 instead of i
-						captures[i] = boardTools.doOpponentCaptures(boards[i], ownStone);
+						opponentCaptures[i] = boardTools.doOpponentCaptures(boards[i], ownStone);
+						ownCaptures[i] = boardTools.doOwnCaptures(boards[i], ownStone);
+						
+						if (ownCaptures[i] > opponentCaptures[i]) {
+							opponentCaptures[i] = -1; // never place stone
+						}
+
 					} else {
-						captures[i] = -1; // never place stone
+						opponentCaptures[i] = -1; // never place stone
 					}
 				} catch (InvalidFieldException e) {
 					System.out.println("Invalid field:" + e.getLocalizedMessage());
@@ -87,15 +95,15 @@ public class ChaseAndCaptureStrategy implements Strategy {
 			}
 
 			//find the maximum value using stream API of the java 8
-			Integer max = Arrays.stream(captures).max(Integer::compare).get();
+			Integer max = Arrays.stream(opponentCaptures).max(Integer::compare).get();
 			// TODO order of checking when equal max: chosing first max
 
 			// find the index of that value
-			int indexMaxCaptures  = Arrays.asList(captures).indexOf(max);
+			int indexMaxCaptures  = Arrays.asList(opponentCaptures).indexOf(max);
 			
-			if (indices[indexMaxCaptures] == -1) { // all are invalid fields
+			if (opponentCaptures[indexMaxCaptures] == -1) { // all are invalid fields TODO NOT INDICES, USE CAPTURES
 				move = new RandomStrategy().calculateMove(client); 
-			} else if (Math.random() > 0.8) { // TODO adjust chance? 
+			} else if (Math.random() > 1) { // TODO adjust chance? 
 				double komi = 0.5; // TODO hardcoded
 				String scoreString = boardTools.getScores(board, komi); 
 				String[] scores = scoreString.split(GoGameConstants.DELIMITER);

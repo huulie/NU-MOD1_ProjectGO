@@ -103,6 +103,7 @@ public class BoardTools {
 
 				// thus: it's a opponent's stone
 			} else if (hasLiberty(checkingIndex)) {
+				indicesOpponentFree.add(checkingIndex);
 				if (printDebug) {
 					System.out.println("DEBUG: stone " + checkingIndex + " has liberties, so not captured");
 				}
@@ -210,8 +211,16 @@ public class BoardTools {
 		if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " \\/ subchecking stone at index " + index);
 
 		if (checkedIndices.contains(index)) {
-			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ Already found opponent stone at index " + index + ": now skipping");
-			return true; // TODO: should already checked be false or true?!
+			if (printDebug) System.out.println("DEBUG: " + "==".repeat(searchDepth) + " /\\ Already found opponent stone at index " + index + ":");
+			
+			
+			if(indicesOpponentFree.contains(index)) {
+				if (printDebug) System.out.println(" > opponent stone was free, so blocking capture");
+				return false; 
+			} else {
+				if (printDebug) System.out.println(" > opponent stone was not free, so not blocking capture");
+				return true; 
+			}
 		} else {
 			checkedIndices.add(index);
 		}
@@ -275,6 +284,12 @@ public class BoardTools {
 	 * @return true if current stone has one or more liberties, false if not
 	 */
 	public boolean hasLiberty(int index) {
+		if (printDebug) System.out.println("Checking liberties..");
+		if (printDebug) System.out.println("above: " + board.above(index));
+		if (printDebug) System.out.println("right: " + board.right(index));
+		if (printDebug) System.out.println("below: " + board.below(index));
+		if (printDebug) System.out.println("left: " + board.left(index));
+		
 		if ((board.above(index) != -1 && board.isEmptyField(board.above(index))) 
 				|| (board.right(index) != -1 && board.isEmptyField(board.right(index))) 
 				|| (board.below(index) != -1 && board.isEmptyField(board.below(index)))
@@ -290,6 +305,12 @@ public class BoardTools {
 	 * @return true if surrounded by own stones, false if not
 	 */
 	public boolean surroundedOwn(int index) { // all are outside or own
+		if (printDebug) System.out.println("Checking liberties..");
+		if (printDebug) System.out.println("above: " + board.above(index));
+		if (printDebug) System.out.println("right: " + board.right(index));
+		if (printDebug) System.out.println("below: " + board.below(index));
+		if (printDebug) System.out.println("left: " + board.left(index));
+		
 		if ((board.above(index) == -1 || board.getField(board.above(index)) == ownStone)
 				&& (board.right(index) == -1 || board.getField(board.right(index)) == ownStone)
 				&& (board.below(index) == -1 || board.getField(board.below(index)) == ownStone) 
@@ -301,22 +322,31 @@ public class BoardTools {
 
 	/**
 	 * Check if this stone is surrounded by own stones 
-	 * (above, right, below and left), ignoring already checked stones.
+	 * (above, right, below and left), ignoring already checked stones IN THE CURRENT FOUND GROUP.
 	 * @param index current stone
 	 * @return true if surrounded by own stones, false if not
 	 */
 	public boolean surroundedOwnRecursive(int index) { // all are outside or own
+		if (printDebug) System.out.println("Checking liberties..");
+		if (printDebug) System.out.println("above: " + board.above(index));
+		if (printDebug) System.out.println("right: " + board.right(index));
+		if (printDebug) System.out.println("below: " + board.below(index));
+		if (printDebug) System.out.println("left: " + board.left(index));
+		
 		if ((board.above(index) == -1 
-				|| checkedIndices.contains(board.above(index)) 
+				|| recursiveFound.contains(board.above(index)) 
 				||  board.getField(board.above(index)) == ownStone)
+				
 				&& (board.right(index) == -1 
-				|| checkedIndices.contains(board.right(index)) 
+				|| recursiveFound.contains(board.right(index)) 
 				|| board.getField(board.right(index)) == ownStone)
+				
 				&& (board.below(index) == -1 
-				|| checkedIndices.contains(board.below(index)) 
-				|| board.getField(board.below(index)) == ownStone) 
+				|| recursiveFound.contains(board.below(index)) 
+				|| board.getField(board.below(index)) == ownStone)
+				
 				&& (board.left(index) == -1 
-				|| checkedIndices.contains(board.left(index)) 
+				|| recursiveFound.contains(board.left(index)) 
 				|| board.getField(board.left(index)) == ownStone)) {
 			return true;
 		}
